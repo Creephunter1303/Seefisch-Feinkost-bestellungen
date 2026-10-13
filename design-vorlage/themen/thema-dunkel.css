@@ -1,0 +1,44 @@
+/* THEMA 4 · „Nachtschicht“ – Dark Mode auf Basis von F6.
+   Nach vorlage.css einbinden. Layout und Schriften bleiben gleich, nur Farben. */
+:root {
+  --hintergrund: #0E141B;
+  --flaeche: #1A2430;               /* offene Zettel */
+  --kopf: #151D27;
+  --kopf-linie: #243140;
+
+  --text: #E8EDF3;
+  --text-2: #C9D3DE;
+  --text-3: #93A1B0;
+  --icon: #C9D3DE;
+
+  --blau: #2E78C7;                  /* Primärbutton */
+  --blau-rahmen: #5B9BD5;
+  --blau-feld: #1F3550;
+  --blau-feld-text: #EEF5FF;
+  --blau-aktiv: #1F3550;
+  --blau-aktiv-rand: #5B9BD5;
+  --blau-auswahl: #22344A;
+  --blau-auswahl-rand: #4A6F96;
+  --tag-normal: #1C2632;
+  --tag-normal-text: #C9D3DE;
+  --strich: #2C3A4A;
+
+  --sekundaer: #243140;
+  --sekundaer-text: #D3DCE6;
+
+  --gruen-flaeche: #13261C; --gruen-rand: #2F6B45; --gruen-linie: #24452F; --gruen-punkt: #3A9E61; --gruen-text: #8FD9AA; --gruen-ware: #CFEBD9; --gruen-kunde: #A9C9B5;
+  --rot-flaeche: #2A1719;   --rot-rand: #7A3036;   --rot-linie: #4A2428;   --rot-punkt: #C9474F; --rot-text: #F0A3A9;   --rot-ware: #E6C4C7;
+
+  --online: #4CC37A;
+}
+
+body { background: var(--hintergrund); }
+.kopf { background: var(--kopf); box-shadow: 0 1px 0 var(--kopf-linie); }
+.fahrzeug { color: #EEF5FF; }
+.tag.aktiv { color: #EEF5FF; }
+.tag.aktiv .wt, .tag.aktiv .anz { color: #BFD6EE; }
+.markt-name { color: var(--blau-rahmen); }
+
+.zettel.offen { box-shadow: 0 8px 22px rgba(0,0,0,.45), 0 0 0 1px rgba(91,155,213,.15); }
+.primaer { box-shadow: 0 8px 22px rgba(46,120,199,.35); }
+.knopf-abgeholt { box-shadow: inset 0 0 0 1px #33445A; }

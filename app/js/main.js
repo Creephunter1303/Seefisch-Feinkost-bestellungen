@@ -118,6 +118,8 @@ app.aktualisieren = async function () {
     zustand.stand = new Date().toISOString();
     zustand.fehler = null;
     standSichern();
+    // Server erreichbar → hängende Änderungen sofort senden, nicht erst nach der Wartezeit.
+    if (app.warteschlange.hatFehler()) app.warteschlange.wiederholen();
   } catch (e) {
     zustand.fehler = e.message || 'Unbekannter Fehler';
   } finally {

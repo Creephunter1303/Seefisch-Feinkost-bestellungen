@@ -9,7 +9,9 @@ import { lesen, schreiben } from './speicher.js';
 import { Verbindungsfehler, mitZeitlimit } from './daten/fehler.js';
 
 const SCHLUESSEL = 'warteschlange';
-const WARTEZEITEN_MS = [5000, 15000, 30000, 60000, 120000];
+// Wartezeit nach Fehlversuchen. Bewusst kurz: Kommt das Netz zurück, soll nichts lange hängen.
+// (Zusätzlich sendet die App sofort neu, sobald eine Aktualisierung wieder klappt.)
+const WARTEZEITEN_MS = [3000, 10000, 20000, 30000];
 const ZEITLIMIT_MS = 25000;
 
 export class Warteschlange {
@@ -59,6 +61,13 @@ export class Warteschlange {
   anzahl() { return this.eintraege.length; }
 
   hatFehler() { return this.eintraege.some((e) => e.versuche > 0); }
+
+  /** Für die Einstellungen: letzte Fehlermeldung und wann der nächste Versuch kommt. */
+  diagnose() {
+    const e = this.eintraege.find((x) => x.versuche > 0);
+    if (!e) return null;
+    return { fehler: e.letzterFehler || '', versuche: e.versuche, inSekunden: Math.max(0, Math.round((e.faelligAb - Date.now()) / 1000)) };
+  }
 
   /** Letzter wartender Eintrag je Bestellung (z. B. für „Rückgängig"). */
   ueberlagerung() {

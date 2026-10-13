@@ -22,6 +22,14 @@ function schalter(titel, erklaerung, an, beiWechsel) {
     }, an ? '✓ An' : 'Aus'));
 }
 
+function diagnoseZeile(app) {
+  const d = app.warteschlange.diagnose();
+  if (!d) return null;
+  return h('p', { class: 'hinweis-text' },
+    'Letzter Sendeversuch fehlgeschlagen (' + d.versuche + '×): ' + (d.fehler || 'unbekannt') +
+    ' – nächster Versuch ' + (d.inSekunden ? 'in ' + d.inSekunden + ' s' : 'jetzt') + '. „Jetzt aktualisieren" sendet sofort, sobald das Netz da ist.');
+}
+
 export function einstellungenZeichnen(app) {
   const z = app.zustand;
   const n = app.warteschlange.anzahl();
@@ -33,6 +41,7 @@ export function einstellungenZeichnen(app) {
         h('p', null, z.fehler ? '⚠ Letzte Aktualisierung fehlgeschlagen: ' + z.fehler : 'Verbindung in Ordnung.'),
         z.stand && h('p', null, 'Stand der Daten: ' + zeitpunktText(z.stand)),
         h('p', null, n ? '⏳ ' + n + (n === 1 ? ' Änderung wartet' : ' Änderungen warten') + ' auf das Senden.' : 'Alle Änderungen sind gesendet.'),
+        diagnoseZeile(app),
         h('p', { class: 'hinweis-text' }, 'Die Übersicht aktualisiert sich alle 3 Minuten von selbst.'),
         h('button', { type: 'button', class: 'knopf breit', onclick: () => app.aktualisieren() }, icon('zurueckDrehen', { groesse: 22 }), 'Jetzt aktualisieren')),
 
