@@ -8,7 +8,6 @@ import { mitZeitlimit, Verbindungsfehler } from './daten/fehler.js';
 import { Warteschlange } from './warteschlange.js';
 import { ansichtGleich, ansichtName } from './logik.js';
 import { toast, vibrieren } from './ui.js';
-import { abholenKnopfInhalt } from './komponenten.js';
 import { listeZeichnen } from './ansichten/liste.js';
 import { formularZeichnen, formularNeuStarten } from './ansichten/formular.js';
 import { detailZeichnen } from './ansichten/detail.js';
@@ -18,8 +17,7 @@ import { einrichtungZeichnen } from './ansichten/einrichtung.js';
 import { overlayZeichnen } from './ansichten/overlays.js';
 
 const AKTUALISIEREN_MS = 3 * 60 * 1000; // Daten automatisch alle 3 Minuten holen
-const RUECKGAENGIG_MS = 6000;           // so lange gibt es „Rückgängig" nach „Abgeholt"
-const SCHARF_MS = 4000;                 // so lange wartet „Nochmal tippen = abgeholt"
+const RUECKGAENGIG_MS = 6000;           // so lange gibt es die „Rückgängig"-Einblendung
 const ZEITLIMIT_MS = 25000;             // danach gilt eine Anfrage als gescheitert
 
 const dq = datenquelleErstellen();
@@ -47,7 +45,6 @@ const zustand = {
   overlay: null,
   listenScroll: 0,
   nachOben: false,
-  scharf: null,
   einrichtungHinweis: null,
   bereit: false,     // erst zeichnen, wenn Konfiguration und Ansicht feststehen
 };
@@ -57,7 +54,7 @@ const app = { zustand, istDemo: !!dq.istDemo };
 app.warteschlange = new Warteschlange(dq, {
   beiErfolg: (b) => { if (b) einpflegen(b); },
   beiAblehnung: (eintrag, fehler) => {
-    toast('⚠ Nicht übernommen: ' + fehler.message, { art: 'fehler', dauer: 8000 });
+    toast('⚠ Nicht übernommen: ' + fehler.message, { dauer: 8000 });
     app.aktualisieren();
   },
   beiAenderung: () => app.statusZeichnen(),
@@ -85,7 +82,8 @@ app.bestellungen = function () {
     .filter((b) => b.datum >= heute)
     .map((b) => {
       const e = ueber.get(b.id);
-      if (!e || b.status === 'storniert') return b;
+      // Stornierte lassen sich nur wieder öffnen (Storno aufheben), nicht abholen.
+      if (!e || (b.status === 'storniert' && e.status !== 'offen')) return b;
       return { ...b, status: e.status, abgeholtAm: e.status === 'abgeholt' ? e.zeit : '', wartet: true };
     });
 };
@@ -125,20 +123,19 @@ function anzeigeAktualisieren() {
 function statusInfo() {
   const n = app.warteschlange.anzahl();
   const stand = zustand.stand ? uhrzeit(zustand.stand) : '';
-  if (zustand.laedt) return { klasse: 'laedt', text: '⟳ Aktualisiere …' };
+  if (zustand.laedt) return { klasse: 'laedt', text: 'Aktualisiere …' };
   if (zustand.fehler || app.warteschlange.hatFehler()) {
-    return { klasse: 'fehler', text: '⚠ Keine Verbindung' + (n ? ' · ' + n + ' wartet' : '') };
+    return { klasse: 'fehler', text: 'Keine Verbindung' + (n ? ' · ' + n + ' wartet' : '') };
   }
-  if (n) return { klasse: 'wartet', text: '⏳ Wird gesendet …' };
-  return { klasse: 'ok', text: stand ? '● Aktuell · ' + stand : '● Verbunden' };
+  if (n) return { klasse: 'wartet', text: 'Wird gesendet …' };
+  return { klasse: 'ok', text: stand ? 'Aktuell · ' + stand : 'Verbunden' };
 }
 
 app.statusZeichnen = function () {
   const s = statusInfo();
-  document.querySelectorAll('.status-pill').forEach((el) => {
-    el.className = 'status-pill ' + s.klasse;
+  document.querySelectorAll('.sync').forEach((el) => {
+    el.className = 'sync ' + s.klasse;
     el.textContent = s.text;
-    el.title = 'Tippen zum Aktualisieren';
   });
 };
 
@@ -175,7 +172,7 @@ app.einrichtungAbschliessen = function (a) {
   zustand.bildschirm = 'liste';
   history.replaceState({ b: 'liste' }, '');
   render();
-  toast('Eingerichtet: Dieses Tablet zeigt ' + ansichtName(a) + '.', { art: 'erfolg' });
+  toast('Eingerichtet: Dieses Tablet zeigt ' + ansichtName(a) + '.');
 };
 
 // ---------- Zeitraum ----------
@@ -227,54 +224,37 @@ app.sucheSchliessen = function () {
   render();
 };
 
-// ---------- Abholen (zwei Tipps + Rückgängig) ----------
+// ---------- Abholen (ein Tipp) und Rückgängig ----------
+// Die Änderung erscheint sofort und geht nach RUECKGAENGIG_MS über die Warteschlange raus.
 
-let scharfTimer = null;
-
-app.istScharf = (id) => !!zustand.scharf && zustand.scharf.id === id && zustand.scharf.bis > Date.now();
-
-function abholKnoepfeAktualisieren() {
-  document.querySelectorAll('.abholen-knopf').forEach((k) => abholenKnopfInhalt(k, app.istScharf(k.dataset.id)));
-}
-
-app.scharfSchalten = function (id) {
-  zustand.scharf = { id, bis: Date.now() + SCHARF_MS };
-  vibrieren(25);
-  abholKnoepfeAktualisieren();
-  clearTimeout(scharfTimer);
-  scharfTimer = setTimeout(() => { zustand.scharf = null; abholKnoepfeAktualisieren(); }, SCHARF_MS);
-};
-
-function statusAendern(id, status, meldung, gegenteil) {
-  const b = app.bestellungFinden(id);
-  if (!b) return;
-  zustand.scharf = null;
-  const zusatz = { tablet: app.tabletName(), geraet: geraeteId() };
-  const nr = app.warteschlange.hinzufuegen(id, status, RUECKGAENGIG_MS, zusatz);
-  render();
-  toast(meldung + b.kunde, {
-    dauer: RUECKGAENGIG_MS,
-    art: status === 'abgeholt' ? 'erfolg' : '',
-    aktion: {
-      text: 'Rückgängig',
-      fn: () => {
-        // Noch nicht gesendet → einfach zurücknehmen, sonst Gegen-Änderung schicken.
-        if (!app.warteschlange.zuruecknehmen(nr)) app.warteschlange.hinzufuegen(id, gegenteil, 0, zusatz);
-        render();
-        toast('Rückgängig gemacht – ' + b.kunde + ' ist wieder „' + (gegenteil === 'offen' ? 'Offen' : 'Abgeholt') + '".');
-      },
-    },
-  });
-}
+const zusatzDaten = () => ({ tablet: app.tabletName(), geraet: geraeteId() });
 
 app.abholen = function (id) {
-  clearTimeout(scharfTimer);
+  const b = app.bestellungFinden(id);
+  if (!b || b.status !== 'offen') return;
   vibrieren([30, 50, 30]);
-  statusAendern(id, 'abgeholt', '✓ Abgeholt: ', 'offen');
+  app.warteschlange.hinzufuegen(id, 'abgeholt', RUECKGAENGIG_MS, zusatzDaten());
+  render();
+  toast('✓ Abgeholt: ' + b.kunde, {
+    dauer: RUECKGAENGIG_MS,
+    art: 'erfolg',
+    aktion: { text: 'Rückgängig', fn: () => app.rueckgaengig(id) },
+  });
 };
 
-app.wiederOffen = function (id) {
-  statusAendern(id, 'offen', 'Wieder offen: ', 'abgeholt');
+/** Abgeholt oder Storniert zurücknehmen → wieder „offen". */
+app.rueckgaengig = function (id) {
+  const b = app.bestellungFinden(id);
+  if (!b || b.status === 'offen') return;
+  const war = b.status;
+  // Noch nicht gesendet → einfach zurücknehmen, sonst Gegen-Änderung schicken.
+  const e = app.warteschlange.ueberlagerung().get(id);
+  if (!(e && e.status === war && app.warteschlange.zuruecknehmen(e.nr))) {
+    app.warteschlange.hinzufuegen(id, 'offen', 0, zusatzDaten());
+  }
+  vibrieren(25);
+  render();
+  toast((war === 'storniert' ? 'Storno aufgehoben – ' : 'Rückgängig – ') + b.kunde + ' ist wieder offen.');
 };
 
 // ---------- Speichern (wartet auf den Server – mit klarer Meldung bei Fehlern) ----------

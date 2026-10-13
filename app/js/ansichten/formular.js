@@ -86,7 +86,7 @@ export function formularZeichnen(app) {
   const neu = fo.modus === 'neu';
   const wurzel = h('div', { class: 'bs bs-formular' },
     app.istDemo && demoStreifen(),
-    unterKopf(app, neu ? 'Neue Bestellung' : 'Bestellung bearbeiten', { zurueckText: '‹ Abbrechen' }),
+    unterKopf(app, neu ? 'Neue Bestellung' : 'Bestellung bearbeiten', { zurueckText: 'Abbrechen' }),
     h('div', { class: 'inhalt schmal formular' },
       fo.wiederhergestellt && h('div', { class: 'meldung info', id: 'entwurf-hinweis' },
         h('span', null, 'Entwurf von ' + uhrzeit(fo.wiederhergestellt) + ' Uhr wiederhergestellt.'),
@@ -96,12 +96,12 @@ export function formularZeichnen(app) {
       abschnittMarkt(app),
       abschnittDatum(app),
       textFeld(app, 'kunde', 'Kunde', { pflicht: true, platzhalter: 'Name des Kunden', gross: 'words' }),
-      textFeld(app, 'bestellung', 'Bestellung', { pflicht: true, mehrzeilig: true, platzhalter: 'z. B. 2 kg Lachsfilet, 1 kg Garnelen' }),
+      textFeld(app, 'bestellung', 'Bestellung', { pflicht: true, mehrzeilig: true, hinweis: 'eine Zeile pro Artikel', platzhalter: 'z. B.\n1 Räucheraal, ca. 500 g\n2 Makrelen geräuchert' }),
       textFeld(app, 'kontakt', 'Kontakt', { hinweis: 'optional · ab 50 € empfohlen', platzhalter: 'Telefon oder E-Mail' }),
       textFeld(app, 'kommentar', 'Kommentar', { hinweis: 'optional', mehrzeilig: true, platzhalter: 'Besonderheiten, Abholzeit …' }),
       abschnittMitarbeiter(app),
       h('div', { id: 'formular-meldung' }, meldungElement(fo)),
-      h('button', { type: 'button', class: 'knopf primaer breit speichern-knopf', id: 'speichern-knopf', onclick: () => speichern(app) },
+      h('button', { type: 'button', class: 'knopf betont breit speichern-knopf', id: 'speichern-knopf', onclick: () => speichern(app) },
         speichernInhalt(fo)),
       h('button', { type: 'button', class: 'knopf breit', onclick: () => app.zurueck() }, 'Abbrechen')));
   // Fehler-/OK-Markierungen nach dem Einhängen setzen.
@@ -284,7 +284,7 @@ function meldungElement(fo) {
 
 function meldungAktualisieren(app) {
   const fo = app.zustand.formular;
-  // Hinweis „rot markierte Felder" verschwindet, sobald alles stimmt.
+  // Hinweis „markierte Angaben ergänzen" verschwindet, sobald alles stimmt.
   if (fo.meldung && fo.meldung.pruefung && !Object.keys(pruefen(app)).length) fo.meldung = null;
   const ziel = document.getElementById('formular-meldung');
   if (ziel) ziel.replaceChildren(...[meldungElement(fo)].filter(Boolean));
@@ -325,7 +325,7 @@ async function speichern(app) {
   const fehler = pruefen(app);
   if (Object.keys(fehler).length) {
     fo.versucht = true;
-    fo.meldung = { art: 'fehler', text: 'Bitte die rot markierten Angaben ergänzen.', pruefung: true };
+    fo.meldung = { art: 'fehler', text: '⚠ Bitte die markierten Angaben ergänzen.', pruefung: true };
     PFLICHTFELDER.concat(['kontakt', 'kommentar']).forEach((n) => feldStatus(app, n));
     meldungAktualisieren(app);
     vibrieren([60, 40, 60]);
@@ -351,7 +351,7 @@ async function speichern(app) {
       loeschen(ENTWURF);
       z.formular = null;
       app.zurueck();
-      toast('✓ Änderungen gespeichert.', { art: 'erfolg' });
+      toast('✓ Änderungen gespeichert.');
     }
   } catch (e) {
     fo.sendet = false;
@@ -359,8 +359,8 @@ async function speichern(app) {
     fo.meldung = {
       art: 'fehler',
       text: e instanceof Verbindungsfehler
-        ? '❌ Nicht gespeichert – ' + e.message + ' Deine Eingaben sind noch da. Bitte Verbindung prüfen und „Erneut senden" tippen.'
-        : '❌ Nicht gespeichert: ' + e.message,
+        ? '⚠ Nicht gespeichert – ' + e.message + ' Deine Eingaben sind noch da. Bitte Verbindung prüfen und „Erneut senden" tippen.'
+        : '⚠ Nicht gespeichert: ' + e.message,
     };
     speichernKnopfAktualisieren(fo);
     meldungAktualisieren(app);

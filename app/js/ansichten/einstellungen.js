@@ -1,6 +1,7 @@
 // Einstellungen: Verbindung, Standard-Ansicht des Tablets (Admin-PIN), Prototyp-Schalter.
 
 import { h, toast } from '../ui.js';
+import { icon } from '../icons.js';
 import { demoStreifen, unterKopf } from '../komponenten.js';
 import { geraeteId, allesLoeschen } from '../speicher.js';
 import { echtHeuteIso, plusTage, datumKurz, heuteIso, istSimuliert, zeitpunktText } from '../datum.js';
@@ -9,7 +10,7 @@ import { demoEinstellungen, demoEinstellungenSpeichern, demoDatenZuruecksetzen }
 import { APP_VERSION } from '../version.js';
 
 function abschnitt(titel, ...inhalt) {
-  return h('section', { class: 'einst-abschnitt' }, h('h2', null, titel), inhalt);
+  return h('section', { class: 'karte' }, h('h2', null, titel), inhalt);
 }
 
 function schalter(titel, erklaerung, an, beiWechsel) {
@@ -29,16 +30,16 @@ export function einstellungenZeichnen(app) {
     unterKopf(app, 'Einstellungen'),
     h('div', { class: 'inhalt schmal' },
       abschnitt('Verbindung',
-        h('p', null, z.fehler ? '⚠ Letzte Aktualisierung fehlgeschlagen: ' + z.fehler : '● Verbindung in Ordnung.'),
+        h('p', null, z.fehler ? '⚠ Letzte Aktualisierung fehlgeschlagen: ' + z.fehler : 'Verbindung in Ordnung.'),
         z.stand && h('p', null, 'Stand der Daten: ' + zeitpunktText(z.stand)),
         h('p', null, n ? '⏳ ' + n + (n === 1 ? ' Änderung wartet' : ' Änderungen warten') + ' auf das Senden.' : 'Alle Änderungen sind gesendet.'),
         h('p', { class: 'hinweis-text' }, 'Die Übersicht aktualisiert sich alle 3 Minuten von selbst.'),
-        h('button', { type: 'button', class: 'knopf breit', onclick: () => app.aktualisieren() }, '⟳ Jetzt aktualisieren')),
+        h('button', { type: 'button', class: 'knopf breit', onclick: () => app.aktualisieren() }, icon('zurueckDrehen', { groesse: 22 }), 'Jetzt aktualisieren')),
 
       abschnitt('Dieses Tablet',
         h('p', null, 'Standard-Ansicht beim Öffnen: ', h('strong', null, ansichtName(z.standard))),
         h('p', { class: 'hinweis-text' }, 'Vorübergehend umschalten geht jederzeit oben links. Am nächsten Tag zeigt das Tablet automatisch wieder seine Standard-Ansicht.'),
-        h('button', { type: 'button', class: 'knopf breit', onclick: () => app.overlayOeffnen('pin') }, '🔒 Standard ändern (Admin-PIN)')),
+        h('button', { type: 'button', class: 'knopf breit', onclick: () => app.overlayOeffnen('pin') }, icon('schloss', { groesse: 22 }), 'Standard ändern (Admin-PIN)')),
 
       app.istDemo && demoAbschnitt(app),
 

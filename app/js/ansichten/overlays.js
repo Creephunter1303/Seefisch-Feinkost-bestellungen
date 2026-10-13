@@ -1,6 +1,7 @@
 // Einblendungen von unten: Ansicht wählen, Tag wählen, Admin-PIN, Standard-Ansicht.
 
 import { h, vibrieren, toast } from '../ui.js';
+import { icon } from '../icons.js';
 import { auswahlKnopf } from '../komponenten.js';
 import { heuteIso, plusTage, wochenstart, kalenderwoche, VORLAUF_TAGE, monatKurz, ausIso, TAGE_KURZ } from '../datum.js';
 import { ansichtGleich, ansichtName, maerkteAmTag, fuerAnsicht, istErledigt, tageText, mitSonntag, maerkteNachFahrzeug } from '../logik.js';
@@ -17,7 +18,7 @@ export function overlayZeichnen(app) {
 function blattKopf(app, titel) {
   return h('div', { class: 'blatt-kopf' },
     h('h2', null, titel),
-    h('button', { type: 'button', class: 'knopf', onclick: () => app.overlaySchliessen() }, '✕ Schließen'));
+    h('button', { type: 'button', class: 'knopf', onclick: () => app.overlaySchliessen() }, icon('kreuz', { groesse: 20, strich: 2.5 }), 'Schließen'));
 }
 
 // ---------- Ansicht wählen ----------
@@ -36,15 +37,15 @@ function ansichtBlatt(app) {
   return [
     blattKopf(app, 'Welche Bestellungen anzeigen?'),
     app.istVoruebergehend() && h('button', {
-      type: 'button', class: 'knopf primaer breit blatt-abstand', onclick: () => waehlen(z.standard),
+      type: 'button', class: 'knopf betont breit blatt-abstand', onclick: () => waehlen(z.standard),
     }, '↩ Zurück zur Standard-Ansicht: ' + ansichtName(z.standard)),
     h('h3', { class: 'blatt-titel' }, 'Fahrzeug'),
     h('div', { class: 'auswahl-gitter gross' },
       k.fahrzeuge.map((f) => {
         const a = { typ: 'fahrzeug', wert: f };
-        return auswahlKnopf('🚚 ' + f, heuteText(f) + standardMarke(a), ansichtGleich(a, z.ansicht), () => waehlen(a));
+        return auswahlKnopf(f, heuteText(f) + standardMarke(a), ansichtGleich(a, z.ansicht), () => waehlen(a), 'lkw');
       }),
-      auswahlKnopf('🗺️ Alle Märkte', 'alle Fahrzeuge' + standardMarke({ typ: 'alle' }), z.ansicht.typ === 'alle', () => waehlen({ typ: 'alle' }))),
+      auswahlKnopf('Alle Märkte', 'alle Fahrzeuge' + standardMarke({ typ: 'alle' }), z.ansicht.typ === 'alle', () => waehlen({ typ: 'alle' }), 'karte')),
     // Einzelne Märkte braucht man selten – bewusst kleiner und zurückhaltender.
     h('h3', { class: 'blatt-titel dezent' }, 'Oder einen einzelnen Markt'),
     maerkteNachFahrzeug(k).map(([fahrzeug, maerkte]) => [
@@ -165,7 +166,7 @@ function standardBlatt(app) {
   const waehlen = (a) => {
     app.standardSetzen(a);
     app.overlaySchliessen();
-    toast('Standard-Ansicht dieses Tablets: ' + ansichtName(a), { art: 'erfolg' });
+    toast('Standard-Ansicht dieses Tablets: ' + ansichtName(a));
   };
   return [
     blattKopf(app, 'Standard-Ansicht festlegen'),
@@ -173,8 +174,8 @@ function standardBlatt(app) {
     h('div', { class: 'auswahl-gitter gross' },
       z.konfig.fahrzeuge.map((f) => {
         const a = { typ: 'fahrzeug', wert: f };
-        return auswahlKnopf('🚚 ' + f, null, ansichtGleich(a, z.standard), () => waehlen(a));
+        return auswahlKnopf(f, null, ansichtGleich(a, z.standard), () => waehlen(a), 'lkw');
       }),
-      auswahlKnopf('🏢 Firma', 'alle Märkte', z.standard && z.standard.typ === 'alle', () => waehlen({ typ: 'alle' }))),
+      auswahlKnopf('Firma', 'alle Märkte', z.standard && z.standard.typ === 'alle', () => waehlen({ typ: 'alle' }), 'firma')),
   ];
 }

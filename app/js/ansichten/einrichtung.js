@@ -12,12 +12,12 @@ export function einrichtungZeichnen(app) {
   return h('div', { class: 'bs' },
     app.istDemo && demoStreifen(),
     h('div', { class: 'inhalt schmal einrichtung' },
-      h('h1', null, '🐟 Willkommen!'),
+      h('h1', null, 'Willkommen!'),
       h('p', { class: 'einrichtung-frage' }, 'Zu welchem Fahrzeug gehört dieses Tablet?'),
       z.einrichtungHinweis && h('div', { class: 'meldung fehler' }, z.einrichtungHinweis),
       h('div', { class: 'auswahl-gitter gross' },
-        k.fahrzeuge.map((f) => auswahlKnopf('🚚 ' + f, anzahl(f) + ' Märkte', false, () => waehlen({ typ: 'fahrzeug', wert: f }))),
-        auswahlKnopf('🏢 Firma', 'alle Märkte', false, () => waehlen({ typ: 'alle' }))),
+        k.fahrzeuge.map((f) => auswahlKnopf(f, anzahl(f) + ' Märkte', false, () => waehlen({ typ: 'fahrzeug', wert: f }), 'lkw')),
+        auswahlKnopf('Firma', 'alle Märkte', false, () => waehlen({ typ: 'alle' }), 'firma')),
       h('p', { class: 'hinweis-text' },
         'Das Tablet zeigt beim Öffnen immer die Bestellungen dieser Auswahl („' + ansichtName({ typ: 'alle' }) +
         '" für die Firma). Andere Fahrzeuge oder Märkte kann jeder vorübergehend mit einem Tipp anzeigen. ' +

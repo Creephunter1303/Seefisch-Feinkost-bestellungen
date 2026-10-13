@@ -14,7 +14,8 @@ ORDNER = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "app")
 
 class OhneCache(http.server.SimpleHTTPRequestHandler):
     extensions_map = {**http.server.SimpleHTTPRequestHandler.extensions_map,
-                      ".js": "text/javascript", ".webmanifest": "application/manifest+json"}
+                      ".js": "text/javascript", ".webmanifest": "application/manifest+json",
+                      ".woff2": "font/woff2"}
 
     def end_headers(self):
         self.send_header("Cache-Control", "no-store")

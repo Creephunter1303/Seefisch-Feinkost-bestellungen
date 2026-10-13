@@ -4,7 +4,7 @@
 // Bei jeder Änderung an der App VERSION erhöhen (und APP_VERSION in js/version.js),
 // sonst bekommen die Tablets die neue Version nicht.
 
-const VERSION = '0.1.2';
+const VERSION = '0.2.0';
 const CACHE = 'seefisch-app-' + VERSION;
 
 const DATEIEN = [
@@ -15,6 +15,11 @@ const DATEIEN = [
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/icon-maskable-512.png',
+  './schriften/barlow-latin-400-normal.woff2',
+  './schriften/barlow-latin-500-normal.woff2',
+  './schriften/barlow-latin-600-normal.woff2',
+  './schriften/barlow-condensed-latin-600-normal.woff2',
+  './schriften/barlow-condensed-latin-700-normal.woff2',
   './js/main.js',
   './js/version.js',
   './js/speicher.js',
@@ -22,6 +27,7 @@ const DATEIEN = [
   './js/logik.js',
   './js/pruefung.js',
   './js/ui.js',
+  './js/icons.js',
   './js/komponenten.js',
   './js/warteschlange.js',
   './js/daten/index.js',

@@ -9,7 +9,7 @@ import { heuteIso } from '../datum.js';
 import { bestellungPruefen } from '../pruefung.js';
 
 const DATEN = 'demo_daten';
-const DATEN_VERSION = 2; // erhöhen, wenn sich Märkte/Fahrzeuge der Beispieldaten ändern
+const DATEN_VERSION = 3; // erhöhen, wenn sich Märkte/Fahrzeuge der Beispieldaten ändern
 const EINSTELLUNGEN = 'demo_einstellungen';
 const DEMO_PIN = '1234';
 
@@ -134,7 +134,10 @@ export class DemoDaten {
     if (status !== 'abgeholt' && status !== 'offen') throw new Serverfehler('Unbekannter Status: ' + status);
     const d = this._daten();
     const b = this._finden(d, id);
-    if (b.status === 'storniert') throw new Serverfehler('Die Bestellung von ' + b.kunde + ' wurde inzwischen storniert.');
+    if (b.status === 'storniert' && status === 'abgeholt') {
+      throw new Serverfehler('Die Bestellung von ' + b.kunde + ' wurde inzwischen storniert.');
+    }
+    if (b.status === 'storniert') { b.storniertVon = ''; b.storniertAm = ''; } // Storno aufheben
     b.status = status;
     b.abgeholtAm = status === 'abgeholt' ? (zeit || new Date().toISOString()) : '';
     schreiben(DATEN, d);

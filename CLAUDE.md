@@ -15,10 +15,16 @@ Tablet-App (PWA) für Kundenbestellungen der Verkaufswagen. Löst v3 ab
 
 ## Feste Entscheidungen
 - UI/Doku Deutsch, Begriffe wie am Wagen (Abholung, Kunde, Markt). UX-Regeln „Ein Blick, ein Tipp":
-  Tippflächen ≥ 64 px, Kontrast ≥ 7:1, Status immer Wort + Zeichen + Farbe;
-  Orange = offen, Grün = abgeholt, Grau = storniert, Rot nur für Fehler/Stornieren.
-- Status: offen → abgeholt, dazu storniert. „Abgeholt" = 2 Tipps (scharf, bestätigen) + 6 s Rückgängig,
-  ohne Mitarbeiter (Protokoll: Tablet). Neu/Bearbeiten/Stornieren: Mitarbeiter-Auswahl Pflicht.
+  Tippflächen ≥ 56 px, Kontraste nach UX-Regeln, Status immer Wort + Zeichen + Farbe.
+- Design: **Designvorlage F6** (`design-vorlage/`) ist verbindlich; Variablen aus `vorlage.css` 1:1 in
+  `app/app.css`, Schriften Barlow / Barlow Condensed (selbst gehostet, `app/schriften/`).
+  Farbregel: Dunkelblau gefüllt NUR „Neue Bestellung". Blau = offen / aktive Auswahl,
+  Grün = abgeholt, Rot = storniert – nie für etwas anderes. Fehler neutral: dunkel + ⚠.
+- Zettel-Typen: offen (weiß, blauer Rahmen), abgeholt (grün), storniert (rot, durchgestrichen,
+  bleibt sichtbar). Reihenfolge: offen, abgeholt, storniert. Bestellung ist Freitext (Zeilenumbrüche bleiben).
+- Status: offen → abgeholt, dazu storniert. „Abgeholt" = **ein Tipp**, danach „Rückgängig" auf dem
+  Zettel (plus 6 s Einblendung), ohne Mitarbeiter (Protokoll: Tablet). „Rückgängig" auf einem
+  stornierten Zettel hebt das Storno auf. Neu/Bearbeiten/Stornieren: Mitarbeiter-Auswahl Pflicht.
 - Tablet zeigt nur heute + Zukunft (62 Tage). Nicht Abgeholtes bleibt „offen" in der Tabelle.
 - Alle Tablets haben dieselbe App. Standard-Ansicht beim ersten Start, Ändern nur mit Admin-PIN;
   vorübergehende Ansicht springt am nächsten Tag zurück.

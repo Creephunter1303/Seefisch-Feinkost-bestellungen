@@ -1,26 +1,52 @@
-// Bausteine, die auf mehreren Bildschirmen gleich aussehen (Konsistenz-Regel).
+// Bausteine, die auf mehreren Bildschirmen gleich aussehen (Designvorlage F6).
 
 import { h } from './ui.js';
+import { icon } from './icons.js';
 import { uhrzeit, iso, echtHeuteIso, tagMonat } from './datum.js';
+import { marktFinden } from './logik.js';
 
 export function demoStreifen() {
   return h('div', { class: 'demo-streifen' }, 'PROTOTYP · Beispieldaten, nur auf diesem Tablet');
 }
 
-/** Kopfzeile der Unterseiten: Zurück links, Titel, Verbindungsstatus rechts. */
-export function unterKopf(app, titel, { zurueckText = '‹ Zurück' } = {}) {
-  return h('header', { class: 'kopf' },
-    h('button', { type: 'button', class: 'kopf-zurueck', onclick: () => app.zurueck() }, zurueckText),
-    h('h1', { class: 'kopf-titel' }, titel),
-    h('div', { class: 'kopf-rechts' },
-      h('button', { type: 'button', class: 'status-pill', onclick: () => app.aktualisieren() })));
+/** Sync-Status als reiner Text; Tippen aktualisiert. Inhalt setzt app.statusZeichnen(). */
+export function syncAnzeige(app) {
+  return h('button', { type: 'button', class: 'sync', title: 'Tippen zum Aktualisieren', onclick: () => app.aktualisieren() });
 }
 
-/** Gut sichtbares Markt-Etikett, bei fremden Märkten mit Fahrzeug. */
-export function marktEtikett(markt, fahrzeug) {
-  return h('span', { class: 'markt-etikett' },
-    h('span', { class: 'markt-name' }, markt),
-    fahrzeug && h('span', { class: 'markt-fz' }, fahrzeug));
+/** Kopfleiste der Unterseiten: Zurück links, Titel, Sync-Status rechts. */
+export function unterKopf(app, titel, { zurueckText = 'Zurück' } = {}) {
+  return h('header', { class: 'kopf unter' },
+    h('button', { type: 'button', class: 'kopf-zurueck', onclick: () => app.zurueck() },
+      icon('pfeilLinks', { groesse: 22, strich: 2.5 }), zurueckText),
+    h('h1', { class: 'kopf-titel' }, titel),
+    syncAnzeige(app));
+}
+
+/** Fahrzeug eines Markts – nur wenn es nicht das eigene des Tablets ist (Firmen-Tablet: immer). */
+export function fremdesFahrzeug(app, marktName) {
+  const z = app.zustand;
+  const m = marktFinden(z.konfig, marktName);
+  if (!m) return null;
+  const eigenes = z.standard && z.standard.typ === 'fahrzeug' ? z.standard.wert : null;
+  return m.fahrzeug !== eigenes ? m.fahrzeug : null;
+}
+
+/** Markt-Überschrift: Ort-Symbol, Name in Großbuchstaben, rechts der Zähler. */
+export function marktKopf(app, name, liste, { klein = false, zaehler = true } = {}) {
+  const offen = liste.filter((b) => b.status === 'offen').length;
+  const abgeholt = liste.filter((b) => b.status === 'abgeholt').length;
+  const storniert = liste.filter((b) => b.status === 'storniert').length;
+  const fz = fremdesFahrzeug(app, name);
+  return h('div', { class: 'markt' + (klein ? ' klein' : '') },
+    h('div', { class: 'markt-name' },
+      icon('ort', { groesse: klein ? 20 : 22, strich: 2.2 }),
+      h('h2', null, name),
+      fz && h('span', { class: 'markt-fz' }, fz)),
+    zaehler && h('span', { class: 'zaehler' },
+      h('b', null, offen ? offen + ' zurücklegen' : 'nichts zurückzulegen'),
+      abgeholt ? ' · ' + abgeholt + ' abgeholt' : '',
+      storniert ? ' · ' + storniert + ' storniert' : ''));
 }
 
 function zeitKurz(isoZeit) {
@@ -29,42 +55,66 @@ function zeitKurz(isoZeit) {
   return (iso(d) === echtHeuteIso() ? '' : tagMonat(iso(d)) + ', ') + uhrzeit(d) + ' Uhr';
 }
 
-/** Status immer als Wort + Zeichen + Farbe (nie Farbe allein). */
-export function statusAnzeige(b) {
+function datumKurzAus(isoZeit) {
+  const d = new Date(isoZeit);
+  return isNaN(d) ? '' : tagMonat(iso(d));
+}
+
+/** „Abgeholt · 10:12 Uhr" bzw. „Storniert · Ben, 12.10." */
+export function statusText(b) {
   if (b.status === 'abgeholt') {
-    return h('div', { class: 'status abgeholt' },
-      h('span', { class: 'status-wort' }, '✓ Abgeholt'),
-      b.abgeholtAm && h('span', { class: 'status-zeit' }, zeitKurz(b.abgeholtAm)),
-      b.wartet && h('span', { class: 'status-zeit' }, '⏳ wird gesendet'));
+    return 'Abgeholt' + (b.abgeholtAm ? ' · ' + zeitKurz(b.abgeholtAm) : '') + (b.wartet ? ' · wird gesendet' : '');
   }
   if (b.status === 'storniert') {
-    return h('div', { class: 'status storniert' }, h('span', { class: 'status-wort' }, '✕ Storniert'));
+    const wer = [b.storniertVon, b.storniertAm && datumKurzAus(b.storniertAm)].filter(Boolean).join(', ');
+    return 'Storniert' + (wer ? ' · ' + wer : '') + (b.wartet ? ' · wird gesendet' : '');
   }
-  return h('div', { class: 'status offen' },
-    h('span', { class: 'status-wort' }, '○ Offen'),
-    b.wartet && h('span', { class: 'status-zeit' }, '⏳ wird gesendet'));
+  return 'Offen';
 }
 
-/**
- * „Abgeholt" in zwei Tipps: Der erste Tipp macht den Knopf scharf (4 Sekunden),
- * erst der zweite setzt den Status. Danach gibt es noch „Rückgängig".
- */
-export function abholenKnopf(app, b, { breit = false } = {}) {
-  const k = h('button', { type: 'button', class: 'abholen-knopf' + (breit ? ' breit' : ''), 'data-id': b.id });
-  abholenKnopfInhalt(k, app.istScharf(b.id));
-  k.addEventListener('click', (e) => {
-    e.stopPropagation();
-    if (k.classList.contains('scharf')) app.abholen(b.id);
-    else app.scharfSchalten(b.id);
-  });
-  return k;
+/** Statuszeile der erledigten Zettel, mit „Rückgängig". */
+export function statusZeile(app, b) {
+  const abgeholt = b.status === 'abgeholt';
+  return h('div', { class: 'status-zeile' },
+    h('span', { class: 'status-punkt' },
+      abgeholt ? icon('haken', { groesse: 17, strich: 3.2 }) : icon('kreuz', { groesse: 15, strich: 3.4 })),
+    h('span', { class: 'status-text' }, statusText(b)),
+    h('button', { type: 'button', class: 'rueckgaengig', onclick: () => app.rueckgaengig(b.id) }, 'Rückgängig'));
 }
 
-export function abholenKnopfInhalt(k, scharf) {
-  k.classList.toggle('scharf', scharf);
-  k.replaceChildren(...(scharf
-    ? [h('span', { class: 'abholen-gross' }, 'Nochmal tippen'), h('span', { class: 'abholen-klein' }, '= abgeholt')]
-    : [h('span', { class: 'abholen-gross' }, '✓ Abgeholt')]));
+/** „Als abgeholt markieren" – ein Tipp, danach Rückgängig auf dem Zettel. */
+export function abgeholtKnopf(app, b, { breit = false } = {}) {
+  return h('button', {
+    type: 'button',
+    class: 'knopf-abgeholt' + (breit ? ' breit' : ''),
+    onclick: (e) => { e.stopPropagation(); app.abholen(b.id); },
+  }, icon('kreisHaken', { groesse: 24, strich: 2.2 }), 'Als abgeholt markieren');
+}
+
+/** Zettel einer Bestellung – drei Typen: offen (weiß, blau), abgeholt (grün), storniert (rot). */
+export function zettel(app, b, { mitAktion = true, antippbar = true } = {}) {
+  const oben = (klasse, ...kinder) => (antippbar
+    ? h('button', {
+      type: 'button',
+      class: 'zettel-oben ' + klasse,
+      'aria-label': 'Bestellung von ' + b.kunde + ' öffnen',
+      onclick: () => app.navigieren('detail', { detailId: b.id, detailStorno: null }),
+    }, ...kinder)
+    : h('div', { class: 'zettel-oben ' + klasse }, ...kinder));
+
+  if (b.status === 'offen') {
+    const infos = [b.kontakt && 'Tel. ' + b.kontakt, b.kommentar && '„' + b.kommentar + '“'].filter(Boolean);
+    return h('article', { class: 'zettel offen' },
+      oben('', h('span', { class: 'ware' }, b.bestellung), h('span', { class: 'kunde' }, b.kunde)),
+      mitAktion && h('div', { class: 'fuss' },
+        h('div', { class: 'infos' },
+          infos.length ? infos.map((t) => h('span', null, t)) : h('span', null, 'Keine weiteren Angaben'),
+          b.wartet && h('span', null, '⏳ wird gesendet')),
+        abgeholtKnopf(app, b)));
+  }
+  return h('article', { class: 'zettel ' + b.status },
+    oben('kopfteil', h('span', { class: 'ware' }, b.bestellung), h('span', { class: 'kunde' }, b.kunde)),
+    statusZeile(app, b));
 }
 
 /** Große Namens-Knöpfe für die Mitarbeiter-Auswahl. */
@@ -79,11 +129,13 @@ export function namensGitter(namen, gewaehlt, beiWahl) {
 }
 
 /** Auswahl-Knopf mit Titel und kleiner Zusatzzeile. */
-export function auswahlKnopf(titel, zusatz, gewaehlt, beiWahl) {
+export function auswahlKnopf(titel, zusatz, gewaehlt, beiWahl, symbol = null) {
   return h('button', {
     type: 'button',
     class: 'auswahl' + (gewaehlt ? ' gewaehlt' : ''),
     'aria-pressed': gewaehlt ? 'true' : 'false',
     onclick: beiWahl,
-  }, h('span', { class: 'auswahl-titel' }, gewaehlt ? '✓ ' + titel : titel), zusatz && h('small', null, zusatz));
+  },
+    h('span', { class: 'auswahl-titel' }, symbol && icon(symbol, { groesse: 24 }), (gewaehlt ? '✓ ' : '') + titel),
+    zusatz && h('small', null, zusatz));
 }

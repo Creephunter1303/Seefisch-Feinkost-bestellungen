@@ -48,8 +48,8 @@ Maßstab ist die am wenigsten technikerfahrene Person.
 
 | # | Aufgabe | Worauf achten |
 |---|---|---|
-| 1 | „Markier die Bestellung von **Frau Müller** als abgeholt." (steht immer beim ersten Markt des Tages; ggf. oben auf „Alle Märkte" stellen) | Wird verstanden, dass man ein zweites Mal tippen muss? |
-| 2 | „Oh, das war die falsche – mach das rückgängig." | Wird „Rückgängig" unten gesehen? |
+| 1 | „Markier die Bestellung von **Frau Müller** als abgeholt." (steht immer beim ersten Markt des Tages; ggf. oben auf „Alle Märkte" stellen) | Wird „Als abgeholt markieren" gefunden, obwohl der Knopf bewusst dezent ist? |
+| 2 | „Oh, das war die falsche – mach das rückgängig." | Wird „Rückgängig" auf dem grünen Zettel gefunden? |
 | 3 | „Ein Kunde möchte für nächsten Samstag 2 kg Lachs. Nimm die Bestellung auf." | Markt/Abholtag/Name ohne Hilfe? |
 | 4 | „Zeig mal, was Borco Alt heute hat. Und dann wieder deinen Wagen." | Wird die Ansicht oben links gefunden? Der Rückweg? |
 | 5 | „Welche Bestellungen hast du diese Woche noch?" | Wird „Woche" gefunden? |

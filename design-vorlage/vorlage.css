@@ -1,0 +1,162 @@
+/* =========================================================================
+   Designvorlage Bestellübersicht – Seefisch-Feinkost (Variante F6)
+   Verbindliche Referenz für Farben, Schriften, Abstände und Komponenten.
+   Alle Werte als Variablen – in der App 1:1 übernehmen.
+   ========================================================================= */
+
+/* ---------- Schriften (selbst gehostet, funktionieren offline) ---------- */
+@font-face { font-family: "Barlow"; font-weight: 400; src: url("schriften/barlow-latin-400-normal.woff2") format("woff2"); font-display: swap; }
+@font-face { font-family: "Barlow"; font-weight: 500; src: url("schriften/barlow-latin-500-normal.woff2") format("woff2"); font-display: swap; }
+@font-face { font-family: "Barlow"; font-weight: 600; src: url("schriften/barlow-latin-600-normal.woff2") format("woff2"); font-display: swap; }
+@font-face { font-family: "Barlow Condensed"; font-weight: 600; src: url("schriften/barlow-condensed-latin-600-normal.woff2") format("woff2"); font-display: swap; }
+@font-face { font-family: "Barlow Condensed"; font-weight: 700; src: url("schriften/barlow-condensed-latin-700-normal.woff2") format("woff2"); font-display: swap; }
+
+:root {
+  /* Flächen */
+  --hintergrund: #E8ECF0;        /* App-Hintergrund hinter den Zetteln */
+  --flaeche: #FFFFFF;            /* Kopfleiste, offene Zettel */
+  --kopf-linie: #D5DCE3;
+
+  /* Text */
+  --text: #111827;
+  --text-2: #1F2937;             /* Kundenname */
+  --text-3: #4A5361;             /* Telefon, Kommentar, Zähler, Status-Text */
+  --icon: #3D4652;
+
+  /* Hauptfarbe Blau – NUR für Primäraktion, aktive Auswahl, offene Bestellung */
+  --blau: #0B3D66;               /* Primärbutton „Neue Bestellung“, Marktname */
+  --blau-rahmen: #4F79A3;        /* Rahmen offene Bestellung (3 px) */
+  --blau-feld: #E3ECF5;          /* Bestellfeld im offenen Zettel */
+  --blau-feld-text: #0B2A47;
+  --blau-aktiv: #DCE7F2;         /* aktiver Tag */
+  --blau-aktiv-rand: #5B84AB;
+  --blau-auswahl: #D3E2F0;       /* Fahrzeug-Auswahl */
+  --blau-auswahl-rand: #9FBBD6;
+  --tag-normal: #F5F7F9;
+  --tag-normal-text: #2B3440;
+  --strich: #C3D3E3;             /* gestrichelte Trennlinie im offenen Zettel */
+
+  /* Sekundärbutton „Als abgeholt markieren“ – bewusst dezent */
+  --sekundaer: #F0F3F6;
+  --sekundaer-text: #3A4D61;
+
+  /* Status Abgeholt (Grün) */
+  --gruen-flaeche: #E2F3E7;
+  --gruen-rand: #8CCB9F;
+  --gruen-linie: #A9D8B7;
+  --gruen-punkt: #1E7A3C;
+  --gruen-text: #14532D;
+  --gruen-ware: #163A23;
+  --gruen-kunde: #1F3A2A;
+
+  /* Status Storniert (Rot) */
+  --rot-flaeche: #FBEAEA;
+  --rot-rand: #E3A0A0;
+  --rot-linie: #EBBDBD;
+  --rot-punkt: #B42323;
+  --rot-text: #8F1D1D;
+  --rot-ware: #4C1A1A;
+
+  /* Online-Punkt */
+  --online: #1E7A3C;
+
+  /* Schrift */
+  --schrift: "Barlow", system-ui, sans-serif;
+  --schrift-schmal: "Barlow Condensed", "Barlow", sans-serif;
+
+  /* Maße */
+  --radius-zettel: 6px;
+  --radius-feld: 5px;
+  --radius-button: 10px;
+  --radius-primaer: 12px;
+  --tipp-min: 56px;              /* kleinste Tippfläche */
+  --abstand-rand: 20px;          /* Seitenrand Hochformat (Querformat 24px) */
+  --abstand-zettel: 12px;        /* Abstand zwischen Zetteln */
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { background: var(--hintergrund); font-family: var(--schrift); color: var(--text); }
+button { font-family: inherit; cursor: pointer; border: 0; }
+svg { display: block; }
+
+.app { display: flex; flex-direction: column; overflow: hidden; background: var(--hintergrund); }
+
+/* ---------- Kopfleiste ---------- */
+.kopf { background: var(--flaeche); box-shadow: 0 1px 0 var(--kopf-linie); padding: 14px var(--abstand-rand) 0; display: flex; flex-direction: column; gap: 14px; }
+.kopf-zeile { display: flex; align-items: center; gap: 12px; }
+.fahrzeug { height: 56px; padding: 0 16px; border-radius: 12px; background: var(--blau-auswahl); color: var(--blau); box-shadow: inset 0 0 0 1.5px var(--blau-auswahl-rand); display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: 600; }
+.platzhalter { flex: 1; }
+.sync { font-size: 16px; color: var(--text-3); display: flex; align-items: center; gap: 8px; }
+.sync::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--online); }
+.icon-knopf { width: var(--tipp-min); height: var(--tipp-min); background: transparent; color: var(--icon); display: flex; align-items: center; justify-content: center; }
+
+/* ---------- Tagesleiste ---------- */
+.tage { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; padding-bottom: 14px; }
+.tag { height: 92px; border-radius: var(--radius-button); background: var(--tag-normal); color: var(--tag-normal-text); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+.tag .wt, .tag .anz { font-size: 15px; font-weight: 500; letter-spacing: .04em; color: var(--text-3); }
+.tag .anz { font-size: 14px; letter-spacing: 0; }
+.tag .nr { font-family: var(--schrift-schmal); font-size: 30px; font-weight: 700; line-height: 1; }
+.tag.aktiv { background: var(--blau-aktiv); color: var(--blau); box-shadow: inset 0 0 0 2px var(--blau-aktiv-rand); }
+.tag.aktiv .wt, .tag.aktiv .anz { color: var(--blau); font-weight: 600; }
+
+/* ---------- Liste ---------- */
+.liste { flex: 1; overflow: hidden; padding: 18px var(--abstand-rand) 14px; display: flex; flex-direction: column; gap: var(--abstand-zettel); }
+.markt { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.markt-name { display: flex; align-items: center; gap: 8px; color: var(--blau); }
+.markt-name h2 { margin: 0; font-family: var(--schrift-schmal); font-size: 26px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--text); }
+.zaehler { font-size: 17px; color: var(--text-3); }
+.zaehler b { color: var(--text); font-weight: 600; }
+
+/* ---------- Zettel: gemeinsam ---------- */
+.zettel { border-radius: var(--radius-zettel); display: flex; flex-direction: column; }
+.ware { font-family: var(--schrift-schmal); font-weight: 600; white-space: pre-line; }
+
+/* Offen: weiß, kräftiger blauer Rahmen, Bestellung im blauen Feld */
+.zettel.offen { background: var(--flaeche); border: 3px solid var(--blau-rahmen); box-shadow: 0 6px 16px rgba(11,61,102,.12); }
+.zettel.offen .ware { margin: 10px 10px 0; padding: 14px 16px; border-radius: var(--radius-feld); background: var(--blau-feld); color: var(--blau-feld-text); font-size: 30px; line-height: 1.15; }
+.zettel.offen .kunde { padding: 10px 20px 12px; font-size: 20px; color: var(--text-2); }
+.zettel.offen .fuss { border-top: 2px dashed var(--strich); padding: 10px 14px 12px 20px; display: flex; align-items: center; gap: 12px; }
+.zettel.offen .infos { flex: 1; font-size: 16px; color: var(--text-3); display: flex; flex-direction: column; gap: 2px; }
+.knopf-abgeholt { height: 58px; padding: 0 18px; border-radius: var(--radius-button); background: var(--sekundaer); color: var(--sekundaer-text); display: flex; align-items: center; gap: 9px; font-size: 18px; font-weight: 500; flex-shrink: 0; }
+
+/* Erledigt: kompakter, farbig hinterlegt */
+.zettel.abgeholt, .zettel.storniert { border-width: 2px; border-style: solid; }
+.zettel.abgeholt { background: var(--gruen-flaeche); border-color: var(--gruen-rand); }
+.zettel.storniert { background: var(--rot-flaeche); border-color: var(--rot-rand); }
+.zettel.abgeholt .kopfteil, .zettel.storniert .kopfteil { padding: 12px 18px 10px; display: flex; flex-direction: column; gap: 2px; }
+.zettel.abgeholt .ware, .zettel.storniert .ware { font-size: 26px; line-height: 1.1; }
+.zettel.abgeholt .ware { color: var(--gruen-ware); }
+.zettel.storniert .ware { color: var(--rot-ware); text-decoration: line-through; }
+.zettel.abgeholt .kunde { font-size: 18px; color: var(--gruen-kunde); }
+.zettel.storniert .kunde { font-size: 18px; color: var(--rot-ware); }
+.status-zeile { padding: 4px 8px 4px 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid; }
+.zettel.abgeholt .status-zeile { border-color: var(--gruen-linie); color: var(--gruen-text); }
+.zettel.storniert .status-zeile { border-color: var(--rot-linie); color: var(--rot-text); }
+.status-punkt { width: 28px; height: 28px; border-radius: 50%; color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.zettel.abgeholt .status-punkt { background: var(--gruen-punkt); }
+.zettel.storniert .status-punkt { background: var(--rot-punkt); }
+.status-text { flex: 1; font-size: 18px; font-weight: 600; }
+.rueckgaengig { height: var(--tipp-min); padding: 0 14px; background: transparent; color: inherit; font-size: 17px; font-weight: 500; }
+
+/* ---------- Primäraktion ---------- */
+.fuss-leiste { padding: 0 var(--abstand-rand) 20px; }
+.primaer { width: 100%; height: 72px; border-radius: var(--radius-primaer); background: var(--blau); color: #fff; display: flex; align-items: center; justify-content: center; gap: 12px; font-size: 23px; font-weight: 600; box-shadow: 0 6px 16px rgba(11,61,102,.3); }
+
+/* ---------- Querformat ---------- */
+.app.quer { --abstand-rand: 24px; }
+.app.quer .kopf { padding-top: 10px; gap: 10px; }
+.app.quer .tage { padding-bottom: 12px; }
+.app.quer .tag { height: 60px; flex-direction: row; gap: 10px; }
+.app.quer .tag .text { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.15; }
+.app.quer .liste { padding-top: 14px; padding-bottom: 0; }
+.app.quer .raster { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--abstand-zettel); align-items: start; }
+.app.quer .zettel.offen .ware { font-size: 27px; line-height: 1.12; padding: 12px 14px; }
+.app.quer .zettel.offen .kunde { padding: 8px 18px 10px; font-size: 19px; }
+.app.quer .zettel.offen .fuss { padding: 8px 12px 10px 18px; }
+.app.quer .knopf-abgeholt { height: 56px; font-size: 17px; padding: 0 14px; }
+.app.quer .zettel.abgeholt .ware, .app.quer .zettel.storniert .ware { font-size: 24px; }
+.app.quer { position: relative; }
+.app.quer .liste { padding-bottom: 96px; }   /* Platz, damit der schwebende Button nichts dauerhaft verdeckt */
+.app.quer .fuss-leiste { position: absolute; right: 0; bottom: 0; padding: 0 24px 18px; }
+.app.quer .primaer { width: 420px; height: 64px; font-size: 22px; }

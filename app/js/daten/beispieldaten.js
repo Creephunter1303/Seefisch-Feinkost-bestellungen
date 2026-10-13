@@ -38,6 +38,16 @@ const WAREN = [
   'Räucherlachs 400 g, geschnitten', '1 Karpfen, ca. 2 kg, küchenfertig',
   'Fischplatte für 6 Personen', '2 Makrelen, geräuchert', '500 g Krabbensalat',
   '1 kg Seelachsfilet', '600 g Rotbarschfilet', '1 kg Lachsfilet mit Haut, 2 Stücke',
+  '2 Forellen geräuchert\n250 g Nordseekrabben', '4 Bismarckheringe\n1 Glas Sahnehering\n2 Brötchen-Fischplatten',
+  'Räucherlachs 300 g\nMeerrettich-Sahne',
+];
+
+// Die vier Bestellungen aus der Designvorlage (heute, erster Markt). „Frau Müller" für den Aufgabentest.
+const VORLAGE = [
+  { kunde: 'Frau Fuchs', bestellung: '1 Räucheraal, ca. 500 g\n2 Makrelen geräuchert\n200 g Krabbensalat', kontakt: '05141 12345', kommentar: 'bitte vorher anrufen' },
+  { kunde: 'Frau Müller', bestellung: 'Lachsfilet ohne Haut, ca. 2 kg', kontakt: '', kommentar: '' },
+  { kunde: 'Herr Krüger', bestellung: '6 Matjesfilets', status: 'abgeholt' },
+  { kunde: 'Herr Wolf', bestellung: 'Heilbutt in Scheiben, 800 g', status: 'storniert' },
 ];
 
 const KONTAKTE = [
@@ -84,21 +94,24 @@ export function beispielBestellungen(konfig, heute, weihnachten) {
     const tag = plusTage(heute, i);
     const maerkte = konfig.maerkte.filter((m) => m.tage.includes(wochentag(tag)));
     maerkte.forEach((m, mi) => {
+      // Erster Markt heute: wie die Designvorlage – 2 offen, 1 abgeholt, 1 storniert.
+      const vorlage = i === 0 && mi === 0 && !weihnachten;
       let n;
-      if (weihnachten) n = 3 + Math.floor(rnd() * 5);
+      if (vorlage) n = 4;
+      else if (weihnachten) n = 3 + Math.floor(rnd() * 5);
       else if (i === 0) n = 2 + Math.floor(rnd() * 2);
       else {
         const r = rnd();
         n = r < 0.35 ? 0 : r < 0.8 ? 1 : 2;
       }
       for (let k = 0; k < n; k++) {
-        const erste = i === 0 && mi === 0 && k === 0; // „Frau Müller" für den Aufgabentest
-        liste.push({
+        const fest = vorlage ? VORLAGE[k] : (i === 0 && mi === 0 && k === 0 ? VORLAGE[1] : {});
+        const b = {
           id: id(),
           datum: tag,
           markt: m.name,
-          kunde: erste ? 'Frau Müller' : nimm(KUNDEN),
-          bestellung: erste ? '2 kg Lachsfilet ohne Haut' : nimm(WAREN),
+          kunde: nimm(KUNDEN),
+          bestellung: nimm(WAREN),
           kontakt: rnd() < 0.45 ? nimm(KONTAKTE) : '',
           kommentar: rnd() < 0.35 ? nimm(KOMMENTARE) : '',
           status: 'offen',
@@ -108,18 +121,16 @@ export function beispielBestellungen(konfig, heute, weihnachten) {
           geaendertVon: '', geaendertAm: '',
           abgeholtAm: '',
           storniertVon: '', storniertAm: '',
-        });
+          ...fest,
+        };
+        if (b.status === 'abgeholt') b.abgeholtAm = zeitVor(0, 10);
+        if (b.status === 'storniert') { b.storniertVon = 'Ben'; b.storniertAm = zeitVor(1, 15); }
+        liste.push(b);
       }
     });
   }
 
-  // Damit „Erledigt" und „Storniert" im Prototyp zu sehen sind:
-  const heutige = liste.filter((b) => b.datum === heute);
-  if (heutige.length >= 2) {
-    const b = heutige[heutige.length - 1];
-    b.status = 'abgeholt';
-    b.abgeholtAm = zeitVor(0, 8);
-  }
+  // Damit „Storniert" auch an späteren Tagen vorkommt:
   const spaetere = liste.filter((b) => b.datum > heute);
   if (spaetere.length >= 3) {
     const b = spaetere[2];
