@@ -142,9 +142,16 @@ function tagBauen(app, liste) {
   const erledigt = amTag.filter(istErledigt);
   const maerkte = maerkteAmTag(z.konfig, z.ansicht, tag);
 
+  // Nur ein Markt an diesem Tag? Dann steht er einmal groß oben statt auf jeder Kachel.
+  const marktNamen = new Set([...maerkte.map((m) => m.name), ...amTag.map((b) => b.markt)]);
+  const einzigerMarkt = marktNamen.size === 1 ? [...marktNamen][0] : null;
+  const kachelOpt = { ohneMarkt: !!einzigerMarkt };
+
   const teile = [titelZeile(app, rel ? rel + ' · ' + datumLang(tag) : datumLang(tag), zahlenText(offen.length, erledigt.length))];
-  if (maerkte.length && z.ansicht.typ !== 'markt') {
-    teile.push(h('div', { class: 'tag-maerkte' }, (maerkte.length > 1 ? 'Märkte: ' : 'Markt: ') + maerkte.map((m) => m.name).join(' · ')));
+  if (einzigerMarkt) {
+    teile.push(marktBanner(app, einzigerMarkt));
+  } else if (maerkte.length) {
+    teile.push(h('div', { class: 'tag-maerkte' }, 'Märkte: ' + maerkte.map((m) => m.name).join(' · ')));
   }
   if (!amTag.length) {
     teile.push(leerTag(app, liste, tag, maerkte));
@@ -153,15 +160,33 @@ function tagBauen(app, liste) {
   if (!offen.length) {
     teile.push(h('div', { class: 'alles-erledigt' }, '✓ Alle Bestellungen ' + (rel === 'Heute' ? 'für heute' : 'für diesen Tag') + ' sind erledigt.'));
   } else {
-    teile.push(...nachMarktGruppiert(app, offen));
+    teile.push(...nachMarktGruppiert(app, offen, kachelOpt));
   }
-  if (erledigt.length) teile.push(erledigtBereich(app, erledigt));
+  if (erledigt.length) teile.push(erledigtBereich(app, erledigt, kachelOpt));
   return teile;
 }
 
-function nachMarktGruppiert(app, offen) {
+/** Großes Markt-Etikett oben – gleiche Gestalt wie auf den Kacheln, nur groß. */
+function marktBanner(app, name) {
+  const fz = fremdesFahrzeug(app, name);
+  return h('div', { class: 'markt-banner' },
+    h('span', { class: 'markt-banner-symbol', 'aria-hidden': 'true' }, '📍'),
+    h('span', { class: 'markt-banner-name' }, name),
+    fz && h('span', { class: 'markt-fz' }, fz));
+}
+
+/** Fahrzeug eines Markts – nur wenn es nicht das eigene des Tablets ist (Firmen-Tablet: immer). */
+function fremdesFahrzeug(app, marktName) {
+  const z = app.zustand;
+  const m = marktFinden(z.konfig, marktName);
+  if (!m) return null;
+  const eigenes = z.standard && z.standard.typ === 'fahrzeug' ? z.standard.wert : null;
+  return m.fahrzeug !== eigenes ? m.fahrzeug : null;
+}
+
+function nachMarktGruppiert(app, offen, kachelOpt) {
   const maerkte = [...new Set(offen.map((b) => b.markt))];
-  if (maerkte.length < 2) return [kachelGitter(app, offen)];
+  if (maerkte.length < 2) return [kachelGitter(app, offen, kachelOpt)];
   return maerkte.flatMap((m) => {
     const vomMarkt = offen.filter((b) => b.markt === m);
     return [h('h3', { class: 'markt-kopf' }, m + ' · ' + vomMarkt.length + ' offen'), kachelGitter(app, vomMarkt)];
@@ -198,7 +223,7 @@ function leerTag(app, liste, tag, maerkte) {
   return h('div', { class: 'leer' }, h('div', { class: 'leer-titel' }, titel), weiter);
 }
 
-function erledigtBereich(app, erledigt) {
+function erledigtBereich(app, erledigt, kachelOpt = {}) {
   const z = app.zustand;
   const abgeholt = erledigt.filter((b) => b.status === 'abgeholt').length;
   const storniert = erledigt.length - abgeholt;
@@ -212,7 +237,7 @@ function erledigtBereich(app, erledigt) {
       'aria-expanded': z.erledigtZeigen ? 'true' : 'false',
       onclick: () => { z.erledigtZeigen = !z.erledigtZeigen; listenInhaltErneuern(app); },
     }, z.erledigtZeigen ? '▴ Erledigte ausblenden' : '▾ Erledigt: ' + teile.join(' · ') + ' – anzeigen'),
-    z.erledigtZeigen && kachelGitter(app, erledigt));
+    z.erledigtZeigen && kachelGitter(app, erledigt, kachelOpt));
 }
 
 function wocheBauen(app, liste) {
@@ -306,22 +331,18 @@ function suchErgebnisse(app, alle, inAnsicht) {
 
 // ---------- Kachel ----------
 
-function kachelGitter(app, liste) {
-  return h('div', { class: 'kacheln' }, liste.map((b) => kachel(app, b)));
+function kachelGitter(app, liste, kachelOpt = {}) {
+  return h('div', { class: 'kacheln' }, liste.map((b) => kachel(app, b, kachelOpt)));
 }
 
-function kachel(app, b) {
-  const z = app.zustand;
-  const m = marktFinden(z.konfig, b.markt);
-  // Fahrzeug nur zeigen, wenn es nicht das eigene ist (oder das Firmen-Tablet alles sieht).
-  const fremd = m && (!z.standard || z.standard.typ !== 'fahrzeug' || m.fahrzeug !== z.standard.wert);
+function kachel(app, b, { ohneMarkt = false } = {}) {
   return h('article', { class: 'kachel ' + b.status },
     h('button', {
       type: 'button',
       class: 'kachel-inhalt',
       onclick: () => app.navigieren('detail', { detailId: b.id, detailStorno: null }),
     },
-      h('span', { class: 'kachel-markt' }, marktEtikett(b.markt, fremd ? m.fahrzeug : null)),
+      !ohneMarkt && h('span', { class: 'kachel-markt' }, marktEtikett(b.markt, fremdesFahrzeug(app, b.markt))),
       h('span', { class: 'kachel-ware' }, b.bestellung),
       h('span', { class: 'kachel-kunde' }, b.kunde),
       (b.kontakt || b.kommentar) && h('span', { class: 'kachel-details' },

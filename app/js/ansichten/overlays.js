@@ -39,19 +39,20 @@ function ansichtBlatt(app) {
       type: 'button', class: 'knopf primaer breit blatt-abstand', onclick: () => waehlen(z.standard),
     }, '↩ Zurück zur Standard-Ansicht: ' + ansichtName(z.standard)),
     h('h3', { class: 'blatt-titel' }, 'Fahrzeug'),
-    h('div', { class: 'auswahl-gitter' },
+    h('div', { class: 'auswahl-gitter gross' },
       k.fahrzeuge.map((f) => {
         const a = { typ: 'fahrzeug', wert: f };
         return auswahlKnopf('🚚 ' + f, heuteText(f) + standardMarke(a), ansichtGleich(a, z.ansicht), () => waehlen(a));
       }),
       auswahlKnopf('🗺️ Alle Märkte', 'alle Fahrzeuge' + standardMarke({ typ: 'alle' }), z.ansicht.typ === 'alle', () => waehlen({ typ: 'alle' }))),
-    h('h3', { class: 'blatt-titel' }, 'Einzelner Markt'),
+    // Einzelne Märkte braucht man selten – bewusst kleiner und zurückhaltender.
+    h('h3', { class: 'blatt-titel dezent' }, 'Oder einen einzelnen Markt'),
     maerkteNachFahrzeug(k).map(([fahrzeug, maerkte]) => [
-      h('div', { class: 'gruppe-titel' }, fahrzeug),
-      h('div', { class: 'auswahl-gitter' },
+      h('div', { class: 'gruppe-titel klein' }, fahrzeug),
+      h('div', { class: 'auswahl-gitter dezent' },
         maerkte.map((m) => {
           const a = { typ: 'markt', wert: m.name };
-          return auswahlKnopf('📍 ' + m.name, tageText(m), ansichtGleich(a, z.ansicht), () => waehlen(a));
+          return auswahlKnopf(m.name, tageText(m), ansichtGleich(a, z.ansicht), () => waehlen(a));
         })),
     ]),
   ];
