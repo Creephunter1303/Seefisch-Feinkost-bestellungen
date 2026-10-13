@@ -1,0 +1,69 @@
+/* THEMA 2 · „Marktstand“ – Kreidetafel-Kopf, Packpapier-Hintergrund, Zettel wie Bons,
+   Bestellung mit Textmarker-Gelb. Nach vorlage.css einbinden. Layout bleibt gleich. */
+@font-face { font-family: "Bebas Neue"; font-weight: 400; src: url("../schriften/bebas-neue-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Work Sans"; font-weight: 400; src: url("../schriften/work-sans-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Work Sans"; font-weight: 500; src: url("../schriften/work-sans-latin-500-normal.woff2") format("woff2"); }
+@font-face { font-family: "Work Sans"; font-weight: 600; src: url("../schriften/work-sans-latin-600-normal.woff2") format("woff2"); }
+
+:root {
+  --hintergrund: #D9C9A8;            /* Packpapier */
+  --text: #1E211F;
+  --text-2: #2B2F2C;
+  --text-3: #575B55;
+  --tafel: #263230;                  /* Kreidetafel */
+  --gruen-haupt: #1E5B47;            /* Primärfarbe Tannengrün */
+  --blau: #1E5B47;
+  --blau-rahmen: #263230;
+  --blau-feld: #FFEFA3;              /* Textmarker */
+  --blau-feld-text: #1E211F;
+  --strich: #CFC6B4;
+  --sekundaer: #F1ECE2;
+  --sekundaer-text: #3A3E39;
+  --gruen-flaeche: #E3EBDD; --gruen-rand: #9DB591; --gruen-linie: #BCCDB2; --gruen-punkt: #3C6B35; --gruen-text: #2F5529; --gruen-ware: #253821; --gruen-kunde: #33452F;
+  --rot-flaeche: #F2E1DA; --rot-rand: #CF9C8C; --rot-linie: #E2BFB3; --rot-punkt: #9C3B26; --rot-text: #7E2F1F; --rot-ware: #4A2219;
+  --schrift: "Work Sans", system-ui, sans-serif;
+  --schrift-schmal: "Bebas Neue", "Barlow Condensed", sans-serif;
+  --radius-zettel: 2px;
+}
+
+body, button { font-family: var(--schrift); }
+/* Packpapier-Faser */
+.app {
+  background-color: var(--hintergrund);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .45  0 0 0 0 .36  0 0 0 0 .22  0 0 0 .18 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Kopf als Kreidetafel */
+.kopf {
+  background-color: var(--tafel);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.7' numOctaves='3'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+  box-shadow: inset 0 -6px 0 #8B6B43;   /* Holzrahmen */
+  padding-bottom: 6px;
+}
+.fahrzeug { background: transparent; color: #F4F1E8; box-shadow: inset 0 0 0 2px rgba(244,241,232,.55); font-family: var(--schrift); }
+.sync { color: #CFCBBF; }
+.sync::before { background: #9BD08A; }
+.icon-knopf { color: #F4F1E8; }
+.tag { background: transparent; color: #F4F1E8; box-shadow: inset 0 0 0 1.5px rgba(244,241,232,.22); }
+.tag .wt, .tag .anz { color: #CFCBBF; font-family: var(--schrift); }
+.tag .nr { font-family: var(--schrift-schmal); font-weight: 400; font-size: 36px; }
+.tag.aktiv { background: #F4F1E8; color: var(--tafel); box-shadow: none; }
+.tag.aktiv .wt, .tag.aktiv .anz { color: var(--tafel); }
+
+.markt-name { color: var(--gruen-haupt); }
+.markt-name h2 { font-family: var(--schrift-schmal); font-weight: 400; font-size: 34px; letter-spacing: .04em; color: var(--text); }
+
+/* Zettel wie Kassenbon mit Zackenkante oben */
+.zettel { font-family: var(--schrift); }
+.zettel .ware { font-family: var(--schrift); font-weight: 600; letter-spacing: -.01em; }
+.zettel.offen { border: 3px solid var(--tafel); box-shadow: 0 8px 14px rgba(60,45,20,.22); position: relative; margin-top: 6px; }
+.zettel.offen::before {
+  content: ""; position: absolute; left: -3px; right: -3px; top: -11px; height: 10px;
+  background: linear-gradient(-45deg, var(--tafel) 5px, transparent 0) 0 5px, linear-gradient(45deg, var(--tafel) 5px, transparent 0) 0 5px;
+  background-size: 10px 10px; background-repeat: repeat-x;
+}
+.zettel.offen .ware { background: var(--blau-feld); font-size: 27px; line-height: 1.25; border-radius: 2px; }
+.zettel.abgeholt .ware, .zettel.storniert .ware { font-size: 22px; font-weight: 500; }
+
+.primaer { background: var(--gruen-haupt); border-radius: 4px; letter-spacing: .02em; box-shadow: 0 6px 0 #133D30; }
+.knopf-abgeholt { border-radius: 4px; }

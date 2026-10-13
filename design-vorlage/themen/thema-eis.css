@@ -1,0 +1,64 @@
+/* THEMA 3 · „Frisch auf Eis“ – klar und modern: Eisblau, kräftiges Petrol, weiche Rundungen,
+   feines Eis-Raster. Nach vorlage.css einbinden. Layout bleibt gleich. */
+@font-face { font-family: "Space Grotesk"; font-weight: 500; src: url("../schriften/space-grotesk-latin-500-normal.woff2") format("woff2"); }
+@font-face { font-family: "Space Grotesk"; font-weight: 600; src: url("../schriften/space-grotesk-latin-600-normal.woff2") format("woff2"); }
+@font-face { font-family: "Space Grotesk"; font-weight: 700; src: url("../schriften/space-grotesk-latin-700-normal.woff2") format("woff2"); }
+@font-face { font-family: "Manrope"; font-weight: 400; src: url("../schriften/manrope-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Manrope"; font-weight: 500; src: url("../schriften/manrope-latin-500-normal.woff2") format("woff2"); }
+@font-face { font-family: "Manrope"; font-weight: 600; src: url("../schriften/manrope-latin-600-normal.woff2") format("woff2"); }
+@font-face { font-family: "Manrope"; font-weight: 700; src: url("../schriften/manrope-latin-700-normal.woff2") format("woff2"); }
+
+:root {
+  --hintergrund: #E6F1F4;            /* Eisblau */
+  --text: #0C2228;
+  --text-2: #183239;
+  --text-3: #4D646B;
+  --blau: #00606B;                   /* Petrol */
+  --blau-rahmen: #00808C;
+  --blau-feld: #D7F0F2;
+  --blau-feld-text: #04373E;
+  --blau-aktiv: #00606B;
+  --strich: #BCDCE0;
+  --sekundaer: #EEF5F6;
+  --sekundaer-text: #2E4C53;
+  --gruen-flaeche: #E5F2EA; --gruen-rand: #9FCDB0; --gruen-linie: #BCDDC7; --gruen-punkt: #24804C; --gruen-text: #1C5E39; --gruen-ware: #173D27; --gruen-kunde: #23412F;
+  --rot-flaeche: #F8E8EA; --rot-rand: #E2A9B1; --rot-linie: #EDC6CB; --rot-punkt: #B83548; --rot-text: #932B3A; --rot-ware: #4F1E26;
+  --schrift: "Manrope", system-ui, sans-serif;
+  --schrift-schmal: "Space Grotesk", "Manrope", sans-serif;
+  --radius-zettel: 18px;
+  --radius-feld: 12px;
+  --radius-button: 14px;
+  --radius-primaer: 999px;
+}
+
+body, button { font-family: var(--schrift); }
+/* Feines Eis-Raster */
+.app {
+  background-color: var(--hintergrund);
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(0,96,107,.10) 1px, transparent 0);
+  background-size: 18px 18px;
+}
+
+.kopf { background: rgba(255,255,255,.85); box-shadow: 0 1px 0 #CFE3E7; }
+.fahrzeug { background: var(--blau); color: #fff; box-shadow: none; border-radius: 999px; padding: 0 20px; }
+.sync { color: var(--text-3); }
+.sync::before { background: #24804C; box-shadow: 0 0 0 4px rgba(36,128,76,.15); }
+.tag { background: #F1F8F9; border-radius: 16px; }
+.tag .nr { font-family: var(--schrift-schmal); font-weight: 700; letter-spacing: -.02em; }
+.tag.aktiv { background: var(--blau-aktiv); color: #fff; box-shadow: 0 6px 14px rgba(0,96,107,.25); }
+.tag.aktiv .wt, .tag.aktiv .anz { color: #D5EEF0; }
+
+.markt-name { color: var(--blau-rahmen); }
+.markt-name h2 { font-family: var(--schrift-schmal); font-weight: 700; letter-spacing: -.01em; text-transform: none; font-size: 28px; }
+.zaehler b { color: var(--blau); }
+
+.zettel { font-family: var(--schrift); }
+.zettel .ware { font-family: var(--schrift-schmal); font-weight: 600; letter-spacing: -.015em; }
+.zettel.offen { border: 3px solid var(--blau-rahmen); box-shadow: 0 10px 24px rgba(0,96,107,.14); }
+.zettel.offen .ware { margin: 12px 12px 0; font-size: 27px; line-height: 1.22; background: linear-gradient(135deg, #DDF3F5, #CCEBEE); }
+.zettel.abgeholt .ware, .zettel.storniert .ware { font-size: 22px; font-weight: 500; }
+.status-punkt { border-radius: 10px; }
+
+.primaer { background: linear-gradient(135deg, #00727E, #004E58); box-shadow: 0 10px 22px rgba(0,78,88,.35); font-weight: 700; }
+.knopf-abgeholt { border-radius: 999px; }

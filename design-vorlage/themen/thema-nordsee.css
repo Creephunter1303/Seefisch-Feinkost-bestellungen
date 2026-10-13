@@ -1,0 +1,52 @@
+/* THEMA 1 · „Nordsee-Kutter“ – maritim: dunkles Marineblau, Sand, Signalorange wie Rettungsring.
+   Nach vorlage.css einbinden. Layout bleibt gleich. */
+@font-face { font-family: "Zilla Slab"; font-weight: 500; src: url("../schriften/zilla-slab-latin-500-normal.woff2") format("woff2"); }
+@font-face { font-family: "Zilla Slab"; font-weight: 600; src: url("../schriften/zilla-slab-latin-600-normal.woff2") format("woff2"); }
+@font-face { font-family: "Zilla Slab"; font-weight: 700; src: url("../schriften/zilla-slab-latin-700-normal.woff2") format("woff2"); }
+
+:root {
+  --hintergrund: #EFE8DA;            /* Sand */
+  --text: #13213A;
+  --text-2: #22324D;
+  --text-3: #55607A;
+  --blau: #13294B;                   /* Marine */
+  --blau-rahmen: #1F3E6B;
+  --blau-feld: #E4EBF3;
+  --blau-feld-text: #0F2140;
+  --strich: #C7D0DC;
+  --orange: #D9531E;                 /* Signalorange */
+  --sekundaer: #F3EEE4;
+  --sekundaer-text: #3B4660;
+  --gruen-flaeche: #E6EFE3; --gruen-rand: #9CC0A0; --gruen-linie: #B9D3BB; --gruen-punkt: #2E6B45; --gruen-text: #24563A; --gruen-ware: #1E3B2A; --gruen-kunde: #2C4535;
+  --rot-flaeche: #F6E6E1; --rot-rand: #DDA898; --rot-linie: #E8C4B8; --rot-punkt: #A8351E; --rot-text: #87301E; --rot-ware: #4E2117;
+  --schrift-schmal: "Zilla Slab", Georgia, serif;
+}
+
+/* Sand mit feinem Wellenmuster */
+.app {
+  background-color: var(--hintergrund);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='24'%3E%3Cpath d='M0 12 Q10 4 20 12 T40 12 T60 12 T80 12' fill='none' stroke='%23D9CFBB' stroke-width='1.2'/%3E%3C/svg%3E");
+}
+
+/* Kopf: dunkle Marine-Leiste mit Orange-Linie */
+.kopf { background: var(--blau); box-shadow: inset 0 -4px 0 var(--orange); padding-bottom: 4px; }
+.fahrzeug { background: rgba(255,255,255,.12); color: #fff; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.35); }
+.sync { color: #C9D3E3; }
+.sync::before { background: #6FD08C; }
+.icon-knopf { color: #E7ECF4; }
+.tag { background: rgba(255,255,255,.08); color: #E7ECF4; }
+.tag .wt, .tag .anz { color: #AEBBD0; }
+.tag.aktiv { background: #FFFFFF; color: var(--blau); box-shadow: inset 0 -5px 0 var(--orange); }
+.tag.aktiv .wt, .tag.aktiv .anz { color: var(--blau); }
+.tag .nr { font-family: var(--schrift-schmal); font-weight: 700; }
+
+.markt-name { color: var(--orange); }
+.markt-name h2 { font-weight: 700; letter-spacing: .02em; text-transform: none; font-size: 28px; color: var(--blau); }
+
+/* Offener Zettel wie ein Lieferschein mit Kopfband */
+.zettel.offen { border: 3px solid var(--blau-rahmen); border-top-width: 10px; box-shadow: 0 8px 18px rgba(19,41,75,.16); }
+.zettel.offen .ware { font-family: var(--schrift-schmal); font-weight: 600; background: var(--blau-feld); }
+.zettel .ware { font-family: var(--schrift-schmal); }
+
+/* Primär: Signalorange */
+.primaer { background: var(--orange); box-shadow: 0 6px 16px rgba(217,83,30,.35); font-weight: 600; }

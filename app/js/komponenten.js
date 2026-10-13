@@ -102,10 +102,13 @@ export function abgeholtKnopf(app, b, { breit = false } = {}) {
 }
 
 export function abgeholtKnopfInhalt(k, scharf) {
+  // Breite festhalten, damit der Knopf beim Scharfschalten nicht wächst.
+  if (scharf && !k.style.width && k.offsetWidth) k.style.width = k.offsetWidth + 'px';
+  if (!scharf) k.style.width = '';
   k.classList.toggle('scharf', scharf);
   k.replaceChildren(
     icon(scharf ? 'haken' : 'kreisHaken', { groesse: 24, strich: scharf ? 3 : 2.2 }),
-    scharf ? 'Nochmal tippen = abgeholt' : 'Als abgeholt markieren');
+    scharf ? 'Nochmal tippen' : 'Als abgeholt markieren');
 }
 
 /** „Tel. 0171 …" bzw. „E-Mail …" – das Kontaktfeld ist Freitext. */
