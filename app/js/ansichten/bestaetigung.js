@@ -1,9 +1,9 @@
 // Bestätigung nach dem Speichern einer neuen Bestellung – zum Nachlesen.
-// Blau, weil die neue Bestellung „offen" ist (Grün bleibt „abgeholt" vorbehalten).
+// Grüner Kopf = „gespeichert"; der Zettel darunter ist blau, weil die Bestellung „offen" ist.
 
 import { h, toast } from '../ui.js';
 import { icon } from '../icons.js';
-import { demoStreifen, marktKopf, zettel } from '../komponenten.js';
+import { demoStreifen, marktKopf, zettel, kontaktText } from '../komponenten.js';
 import { datumVoll, datumKurz } from '../datum.js';
 import { formularNeuStarten } from './formular.js';
 
@@ -15,12 +15,14 @@ export function bestaetigungZeichnen(app) {
   return h('div', { class: 'bs' },
     app.istDemo && demoStreifen(),
     h('div', { class: 'inhalt schmal' },
-      h('div', { class: 'erfolg-kopf', role: 'status' }, icon('kreisHaken', { groesse: 34, strich: 2.2 }), 'Bestellung gespeichert'),
+      h('div', { class: 'erfolg-kopf', role: 'status' },
+        h('span', { class: 'erfolg-punkt' }, icon('haken', { groesse: 24, strich: 3.2 })),
+        'Bestellung gespeichert'),
       h('div', { class: 'detail-markt' }, marktKopf(app, b.markt, [], { zaehler: false })),
       z,
       h('div', { class: 'karte detail-info' },
         zeile('Abholung', datumVoll(b.datum)),
-        zeile('Kontakt', b.kontakt && 'Tel. ' + b.kontakt),
+        zeile('Kontakt', b.kontakt && kontaktText(b.kontakt)),
         zeile('Kommentar', b.kommentar),
         zeile('Aufgenommen', b.erfasstVon)),
       h('div', { class: 'knopf-spalte' },

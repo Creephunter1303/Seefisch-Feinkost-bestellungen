@@ -23,11 +23,15 @@ export function unterKopf(app, titel, { zurueckText = 'Zurück' } = {}) {
     syncAnzeige(app));
 }
 
-/** Fahrzeug eines Markts – nur wenn es nicht das eigene des Tablets ist (Firmen-Tablet: immer). */
+/**
+ * Fahrzeug zu einem Markt anzeigen? In „Alle Märkte" immer, sonst nur wenn es nicht das
+ * eigene Fahrzeug des Tablets ist (Firmen-Tablet: immer).
+ */
 export function fremdesFahrzeug(app, marktName) {
   const z = app.zustand;
   const m = marktFinden(z.konfig, marktName);
   if (!m) return null;
+  if (z.ansicht && z.ansicht.typ === 'alle') return m.fahrzeug;
   const eigenes = z.standard && z.standard.typ === 'fahrzeug' ? z.standard.wert : null;
   return m.fahrzeug !== eigenes ? m.fahrzeug : null;
 }
@@ -82,13 +86,31 @@ export function statusZeile(app, b) {
     h('button', { type: 'button', class: 'rueckgaengig', onclick: () => app.rueckgaengig(b.id) }, 'Rückgängig'));
 }
 
-/** „Als abgeholt markieren" – ein Tipp, danach Rückgängig auf dem Zettel. */
+/**
+ * „Als abgeholt markieren" in zwei Tipps: Der erste Tipp macht den Knopf scharf (4 Sekunden,
+ * grün), erst der zweite setzt den Status. Danach „Rückgängig" auf dem Zettel.
+ */
 export function abgeholtKnopf(app, b, { breit = false } = {}) {
-  return h('button', {
-    type: 'button',
-    class: 'knopf-abgeholt' + (breit ? ' breit' : ''),
-    onclick: (e) => { e.stopPropagation(); app.abholen(b.id); },
-  }, icon('kreisHaken', { groesse: 24, strich: 2.2 }), 'Als abgeholt markieren');
+  const k = h('button', { type: 'button', class: 'knopf-abgeholt' + (breit ? ' breit' : ''), 'data-id': b.id });
+  abgeholtKnopfInhalt(k, app.istScharf(b.id));
+  k.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (k.classList.contains('scharf')) app.abholen(b.id);
+    else app.scharfSchalten(b.id);
+  });
+  return k;
+}
+
+export function abgeholtKnopfInhalt(k, scharf) {
+  k.classList.toggle('scharf', scharf);
+  k.replaceChildren(
+    icon(scharf ? 'haken' : 'kreisHaken', { groesse: 24, strich: scharf ? 3 : 2.2 }),
+    scharf ? 'Nochmal tippen = abgeholt' : 'Als abgeholt markieren');
+}
+
+/** „Tel. 0171 …" bzw. „E-Mail …" – das Kontaktfeld ist Freitext. */
+export function kontaktText(kontakt) {
+  return (kontakt.includes('@') ? 'E-Mail ' : 'Tel. ') + kontakt;
 }
 
 /** Zettel einer Bestellung – drei Typen: offen (weiß, blau), abgeholt (grün), storniert (rot). */
@@ -103,7 +125,7 @@ export function zettel(app, b, { mitAktion = true, antippbar = true } = {}) {
     : h('div', { class: 'zettel-oben ' + klasse }, ...kinder));
 
   if (b.status === 'offen') {
-    const infos = [b.kontakt && 'Tel. ' + b.kontakt, b.kommentar && '„' + b.kommentar + '“'].filter(Boolean);
+    const infos = [b.kontakt && kontaktText(b.kontakt), b.kommentar && '„' + b.kommentar + '“'].filter(Boolean);
     return h('article', { class: 'zettel offen' },
       oben('', h('span', { class: 'ware' }, b.bestellung), h('span', { class: 'kunde' }, b.kunde)),
       mitAktion && h('div', { class: 'fuss' },

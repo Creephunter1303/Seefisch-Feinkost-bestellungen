@@ -8,6 +8,7 @@ import { mitZeitlimit, Verbindungsfehler } from './daten/fehler.js';
 import { Warteschlange } from './warteschlange.js';
 import { ansichtGleich, ansichtName } from './logik.js';
 import { toast, vibrieren } from './ui.js';
+import { abgeholtKnopfInhalt } from './komponenten.js';
 import { listeZeichnen } from './ansichten/liste.js';
 import { formularZeichnen, formularNeuStarten } from './ansichten/formular.js';
 import { detailZeichnen } from './ansichten/detail.js';
@@ -18,6 +19,7 @@ import { overlayZeichnen } from './ansichten/overlays.js';
 
 const AKTUALISIEREN_MS = 3 * 60 * 1000; // Daten automatisch alle 3 Minuten holen
 const RUECKGAENGIG_MS = 6000;           // so lange gibt es die „Rückgängig"-Einblendung
+const SCHARF_MS = 4000;                 // so lange wartet „Nochmal tippen = abgeholt"
 const ZEITLIMIT_MS = 25000;             // danach gilt eine Anfrage als gescheitert
 
 const dq = datenquelleErstellen();
@@ -224,13 +226,33 @@ app.sucheSchliessen = function () {
   render();
 };
 
-// ---------- Abholen (ein Tipp) und Rückgängig ----------
-// Die Änderung erscheint sofort und geht nach RUECKGAENGIG_MS über die Warteschlange raus.
+// ---------- Abholen (zwei Tipps) und Rückgängig ----------
+// Erster Tipp: Knopf wird scharf. Zweiter Tipp: Status ändert sich sofort und geht nach
+// RUECKGAENGIG_MS über die Warteschlange raus.
 
 const zusatzDaten = () => ({ tablet: app.tabletName(), geraet: geraeteId() });
 
+let scharf = null;      // { id, bis }
+let scharfTimer = null;
+
+app.istScharf = (id) => !!scharf && scharf.id === id && scharf.bis > Date.now();
+
+function abgeholtKnoepfeAktualisieren() {
+  document.querySelectorAll('.knopf-abgeholt').forEach((k) => abgeholtKnopfInhalt(k, app.istScharf(k.dataset.id)));
+}
+
+app.scharfSchalten = function (id) {
+  scharf = { id, bis: Date.now() + SCHARF_MS };
+  vibrieren(25);
+  abgeholtKnoepfeAktualisieren();
+  clearTimeout(scharfTimer);
+  scharfTimer = setTimeout(() => { scharf = null; abgeholtKnoepfeAktualisieren(); }, SCHARF_MS);
+};
+
 app.abholen = function (id) {
   const b = app.bestellungFinden(id);
+  scharf = null;
+  clearTimeout(scharfTimer);
   if (!b || b.status !== 'offen') return;
   vibrieren([30, 50, 30]);
   app.warteschlange.hinzufuegen(id, 'abgeholt', RUECKGAENGIG_MS, zusatzDaten());

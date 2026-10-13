@@ -3,7 +3,7 @@
 
 import { h, toast } from '../ui.js';
 import { icon } from '../icons.js';
-import { demoStreifen, unterKopf, marktKopf, zettel, abgeholtKnopf, namensGitter } from '../komponenten.js';
+import { demoStreifen, unterKopf, marktKopf, zettel, abgeholtKnopf, namensGitter, kontaktText } from '../komponenten.js';
 import { datumVoll, relativerTag, zeitpunktText } from '../datum.js';
 import { Verbindungsfehler } from '../daten/fehler.js';
 import { formularBearbeitenStarten } from './formular.js';
@@ -34,7 +34,7 @@ export function detailZeichnen(app) {
       zettelDetail(app, b),
       h('div', { class: 'karte detail-info' },
         zeile('Abholung', datumVoll(b.datum) + (rel ? ' · ' + rel : '')),
-        zeile('Kontakt', b.kontakt ? 'Tel. ' + b.kontakt : 'keine Angabe'),
+        zeile('Kontakt', b.kontakt ? kontaktText(b.kontakt) : 'keine Angabe'),
         zeile('Kommentar', b.kommentar || 'kein Kommentar'),
         zeile('Aufgenommen', b.erfasstVon && b.erfasstVon + (b.erfasstAm ? ', ' + zeitpunktText(b.erfasstAm) : ''), true),
         zeile('Geändert', b.geaendertVon && b.geaendertVon + (b.geaendertAm ? ', ' + zeitpunktText(b.geaendertAm) : ''), true),

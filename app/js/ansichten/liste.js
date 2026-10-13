@@ -115,6 +115,15 @@ function tagKachel(app, t, istHeute, anzahl) {
       h('span', { class: 'anz nur-quer' }, istHeute ? anzahl + ' offen' : anzahl ? anzahl + ' Best.' : 'keine')));
 }
 
+/** Welche Woche „Ganze KW" zeigt: am Samstag/Sonntag ist die laufende Woche praktisch vorbei → nächste Woche. */
+function wocheAb() {
+  const heute = heuteIso();
+  const wt = wochentag(heute);
+  if (wt === 6) return plusTage(heute, 2);
+  if (wt === 0) return plusTage(heute, 1);
+  return heute;
+}
+
 function wochenKachel(app) {
   const z = app.zustand;
   const aktiv = z.zeitraum === 'woche';
@@ -123,7 +132,7 @@ function wochenKachel(app) {
     class: 'tag' + (aktiv ? ' aktiv' : ''),
     'aria-pressed': aktiv ? 'true' : 'false',
     'aria-label': 'Ganze Kalenderwoche anzeigen',
-    onclick: () => { if (!aktiv) app.tagSetzen(heuteIso()); app.zeitraumSetzen('woche'); },
+    onclick: () => { if (!aktiv) app.tagSetzen(wocheAb()); app.zeitraumSetzen('woche'); },
   },
     h('span', { class: 'nr' }, 'KW'),
     h('span', { class: 'text' },

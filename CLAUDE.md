@@ -19,11 +19,13 @@ Tablet-App (PWA) für Kundenbestellungen der Verkaufswagen. Löst v3 ab
 - Design: **Designvorlage F6** (`design-vorlage/`) ist verbindlich; Variablen aus `vorlage.css` 1:1 in
   `app/app.css`, Schriften Barlow / Barlow Condensed (selbst gehostet, `app/schriften/`).
   Farbregel: Dunkelblau gefüllt NUR „Neue Bestellung". Blau = offen / aktive Auswahl,
-  Grün = abgeholt, Rot = storniert – nie für etwas anderes. Fehler neutral: dunkel + ⚠.
+  Grün = abgeholt (und der Kopf „Bestellung gespeichert"), Rot = storniert – sonst nie. Fehler neutral: dunkel + ⚠.
+- Fahrzeug am Markt-Kopf: in „Alle Märkte" immer, sonst nur bei fremdem Fahrzeug.
+  „Ganze KW" zeigt Sa/So schon die nächste Woche.
 - Zettel-Typen: offen (weiß, blauer Rahmen), abgeholt (grün), storniert (rot, durchgestrichen,
   bleibt sichtbar). Reihenfolge: offen, abgeholt, storniert. Bestellung ist Freitext (Zeilenumbrüche bleiben).
-- Status: offen → abgeholt, dazu storniert. „Abgeholt" = **ein Tipp**, danach „Rückgängig" auf dem
-  Zettel (plus 6 s Einblendung), ohne Mitarbeiter (Protokoll: Tablet). „Rückgängig" auf einem
+- Status: offen → abgeholt, dazu storniert. „Abgeholt" = **zwei Tipps** (1. Tipp macht den Knopf
+  4 s scharf/grün, 2. bestätigt), danach „Rückgängig" auf dem Zettel (plus 6 s Einblendung), ohne Mitarbeiter (Protokoll: Tablet). „Rückgängig" auf einem
   stornierten Zettel hebt das Storno auf. Neu/Bearbeiten/Stornieren: Mitarbeiter-Auswahl Pflicht.
 - Tablet zeigt nur heute + Zukunft (62 Tage). Nicht Abgeholtes bleibt „offen" in der Tabelle.
 - Alle Tablets haben dieselbe App. Standard-Ansicht beim ersten Start, Ändern nur mit Admin-PIN;
