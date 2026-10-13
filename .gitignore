@@ -1,0 +1,11 @@
+# Zugangsdaten und lokale Einstellungen – gehören NIE ins Repo
+.env
+.env.*
+.clasp.json
+.clasprc.json
+lokal/
+*.local.*
+
+# System
+.DS_Store
+__pycache__/

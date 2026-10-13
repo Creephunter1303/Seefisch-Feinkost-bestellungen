@@ -1,0 +1,132 @@
+// Beispieldaten für den Prototyp. Echte Märkte aus v3, Fahrzeug-Zuordnung und
+// Mitarbeiter sind nur Beispiele – die echten kommen später aus der Google-Tabelle.
+
+import { plusTage, wochentag } from '../datum.js';
+
+export const DEMO_KONFIG = {
+  fahrzeuge: ['Wagen 1', 'Wagen 2', 'Wagen 3'],
+  maerkte: [
+    { name: 'REWE Groß Ilsede', tage: [2], fahrzeug: 'Wagen 3' },
+    { name: 'Stadtmarkt Celle MI', tage: [3], fahrzeug: 'Wagen 1' },
+    { name: 'Stadtmarkt Wolfsburg MI', tage: [3], fahrzeug: 'Wagen 2' },
+    { name: 'Ölsburg E-Center', tage: [4], fahrzeug: 'Wagen 3' },
+    { name: 'Uetze', tage: [4], fahrzeug: 'Wagen 1' },
+    { name: 'Stederdorf', tage: [4], fahrzeug: 'Wagen 2' },
+    { name: 'Vorsfelde Wolfsburg', tage: [5], fahrzeug: 'Wagen 2' },
+    { name: 'Celle Weststadt', tage: [5], fahrzeug: 'Wagen 1' },
+    { name: 'Groß Schwülper', tage: [5], fahrzeug: 'Wagen 3' },
+    { name: 'Isenbüttel', tage: [5], fahrzeug: 'Wagen 2' },
+    { name: 'Stadtmarkt Celle SA', tage: [6], fahrzeug: 'Wagen 1' },
+    { name: 'Stadtmarkt Wolfsburg SA', tage: [6], fahrzeug: 'Wagen 2' },
+    { name: 'Hildesheim', tage: [6], fahrzeug: 'Wagen 3' },
+  ],
+  mitarbeiter: ['Anna', 'Ben', 'Clara', 'Dirk', 'Eva'],
+};
+
+const KUNDEN = [
+  'Herr Schmidt', 'Familie Becker', 'Herr Krüger', 'Frau Hoffmann', 'Restaurant Seeblick',
+  'Herr Wagner', 'Frau Schulz', 'Herr Koch', 'Frau Bauer', 'Herr Richter', 'Frau Klein',
+  'Herr Wolf', 'Frau Neumann', 'Herr Schwarz', 'Frau Zimmermann', 'Herr Braun',
+  'Frau Hartmann', 'Herr Lange', 'Frau Werner', 'Herr Krause', 'Frau Lehmann',
+  'Herr Peters', 'Frau Fuchs', 'Herr Vogel', 'Frau Keller',
+];
+
+const WAREN = [
+  '1 Räucheraal, ca. 500 g', '6 Matjesfilets', '1 ganzer Zander, ca. 1,5 kg, geschuppt',
+  '500 g Nordseekrabben', '1 kg Garnelen, roh, geschält', '4 Forellen, geräuchert',
+  '800 g Heilbutt in Scheiben', '1,2 kg Kabeljau-Rückenfilet', '3 Schillerlocken',
+  '4 Thunfischsteaks à 200 g', '1 kg Miesmuscheln', '2 Gläser Bismarckheringe',
+  'Räucherlachs 400 g, geschnitten', '1 Karpfen, ca. 2 kg, küchenfertig',
+  'Fischplatte für 6 Personen', '2 Makrelen, geräuchert', '500 g Krabbensalat',
+  '1 kg Seelachsfilet', '600 g Rotbarschfilet', '1 kg Lachsfilet mit Haut, 2 Stücke',
+];
+
+const KONTAKTE = [
+  '0171 2345678', '0152 3456789', '05141 12345', '0160 9876543', 'krueger@example.com',
+  '05361 23456', '0176 5551234', 'becker@example.com',
+];
+
+const KOMMENTARE = [
+  'kommt gegen 11 Uhr', 'bitte in Scheiben schneiden', 'ist schon bezahlt', 'Stammkunde',
+  'Tochter holt ab', 'bitte vorher anrufen', 'möglichst ohne Gräten', 'kommt erst kurz vor Marktende',
+];
+
+const ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+
+/** Zufallszahlen, die für denselben Tag immer gleich ausfallen (stabile Testdaten). */
+function zufallsgenerator(text) {
+  let s = 0;
+  for (let i = 0; i < text.length; i++) s = (Math.imul(s, 31) + text.charCodeAt(i)) | 0;
+  return function () {
+    s = (s + 0x6D2B79F5) | 0;
+    let t = Math.imul(s ^ (s >>> 15), 1 | s);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/**
+ * Erzeugt Bestellungen für die nächsten 14 Tage. Normal ca. 10 pro Woche (heute je Markt
+ * 2–3, damit es etwas zu sehen gibt), mit `weihnachten` ca. 60 pro Woche.
+ */
+export function beispielBestellungen(konfig, heute, weihnachten) {
+  const rnd = zufallsgenerator('seefisch|' + heute + '|' + (weihnachten ? 'w' : 'n'));
+  const nimm = (liste) => liste[Math.floor(rnd() * liste.length)];
+  const id = () => 'B-' + Array.from({ length: 8 }, () => ALPHABET[Math.floor(rnd() * ALPHABET.length)]).join('');
+  const zeitVor = (tageVorher, stunde) => {
+    const d = new Date();
+    d.setDate(d.getDate() - tageVorher);
+    d.setHours(stunde, Math.floor(rnd() * 60), 0, 0);
+    return d.toISOString();
+  };
+
+  const liste = [];
+  for (let i = 0; i < 14; i++) {
+    const tag = plusTage(heute, i);
+    const maerkte = konfig.maerkte.filter((m) => m.tage.includes(wochentag(tag)));
+    maerkte.forEach((m, mi) => {
+      let n;
+      if (weihnachten) n = 3 + Math.floor(rnd() * 5);
+      else if (i === 0) n = 2 + Math.floor(rnd() * 2);
+      else {
+        const r = rnd();
+        n = r < 0.35 ? 0 : r < 0.8 ? 1 : 2;
+      }
+      for (let k = 0; k < n; k++) {
+        const erste = i === 0 && mi === 0 && k === 0; // „Frau Müller" für den Aufgabentest
+        liste.push({
+          id: id(),
+          datum: tag,
+          markt: m.name,
+          kunde: erste ? 'Frau Müller' : nimm(KUNDEN),
+          bestellung: erste ? '2 kg Lachsfilet ohne Haut' : nimm(WAREN),
+          kontakt: rnd() < 0.45 ? nimm(KONTAKTE) : '',
+          kommentar: rnd() < 0.35 ? nimm(KOMMENTARE) : '',
+          status: 'offen',
+          erfasstVon: nimm(konfig.mitarbeiter),
+          erfasstAm: zeitVor(1 + Math.floor(rnd() * 9), 8 + Math.floor(rnd() * 6)),
+          erfasstUeber: m.fahrzeug,
+          geaendertVon: '', geaendertAm: '',
+          abgeholtAm: '',
+          storniertVon: '', storniertAm: '',
+        });
+      }
+    });
+  }
+
+  // Damit „Erledigt" und „Storniert" im Prototyp zu sehen sind:
+  const heutige = liste.filter((b) => b.datum === heute);
+  if (heutige.length >= 2) {
+    const b = heutige[heutige.length - 1];
+    b.status = 'abgeholt';
+    b.abgeholtAm = zeitVor(0, 8);
+  }
+  const spaetere = liste.filter((b) => b.datum > heute);
+  if (spaetere.length >= 3) {
+    const b = spaetere[2];
+    b.status = 'storniert';
+    b.storniertVon = nimm(konfig.mitarbeiter);
+    b.storniertAm = zeitVor(1, 15);
+  }
+  return liste;
+}

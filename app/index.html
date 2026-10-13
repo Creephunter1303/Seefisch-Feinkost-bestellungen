@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#0b4a7a">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Bestellungen · Seefisch</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="app.css">
+  <script type="module" src="js/main.js"></script>
+</head>
+<body>
+  <div id="app">
+    <div class="start-laden">
+      <div class="dreher" aria-hidden="true"></div>
+      <p>Bestellungen werden geladen …</p>
+    </div>
+  </div>
+  <div id="overlay" hidden></div>
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  <noscript><p class="start-laden">Bitte JavaScript aktivieren.</p></noscript>
+</body>
+</html>
