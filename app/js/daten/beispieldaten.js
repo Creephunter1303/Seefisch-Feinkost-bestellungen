@@ -1,26 +1,25 @@
-// Beispieldaten für den Prototyp. Echte Märkte aus v3, Fahrzeug-Zuordnung und
-// Mitarbeiter sind nur Beispiele – die echten kommen später aus der Google-Tabelle.
+// Beispieldaten für den Prototyp. Märkte, Markttage und Fahrzeuge wie im Blatt
+// „Konfiguration" (Stand 13.10.2026). Die Mitarbeiter sind bewusst erfunden – das Repo ist
+// öffentlich; die echten Namen kommen in Schritt 2 direkt aus der Tabelle.
 
 import { plusTage, wochentag } from '../datum.js';
 
 export const DEMO_KONFIG = {
-  fahrzeuge: ['Wagen 1', 'Wagen 2', 'Wagen 3'],
+  fahrzeuge: ['Seico', 'Borco Neu', 'Borco Alt'],
   maerkte: [
-    { name: 'REWE Groß Ilsede', tage: [2], fahrzeug: 'Wagen 3' },
-    { name: 'Stadtmarkt Celle MI', tage: [3], fahrzeug: 'Wagen 1' },
-    { name: 'Stadtmarkt Wolfsburg MI', tage: [3], fahrzeug: 'Wagen 2' },
-    { name: 'Ölsburg E-Center', tage: [4], fahrzeug: 'Wagen 3' },
-    { name: 'Uetze', tage: [4], fahrzeug: 'Wagen 1' },
-    { name: 'Stederdorf', tage: [4], fahrzeug: 'Wagen 2' },
-    { name: 'Vorsfelde Wolfsburg', tage: [5], fahrzeug: 'Wagen 2' },
-    { name: 'Celle Weststadt', tage: [5], fahrzeug: 'Wagen 1' },
-    { name: 'Groß Schwülper', tage: [5], fahrzeug: 'Wagen 3' },
-    { name: 'Isenbüttel', tage: [5], fahrzeug: 'Wagen 2' },
-    { name: 'Stadtmarkt Celle SA', tage: [6], fahrzeug: 'Wagen 1' },
-    { name: 'Stadtmarkt Wolfsburg SA', tage: [6], fahrzeug: 'Wagen 2' },
-    { name: 'Hildesheim', tage: [6], fahrzeug: 'Wagen 3' },
+    { name: 'REWE Groß Ilsede', tage: [2], fahrzeug: 'Seico' },
+    { name: 'Stadtmarkt Celle', tage: [3, 6], fahrzeug: 'Borco Neu' },
+    { name: 'Stadtmarkt Wolfsburg', tage: [3, 6], fahrzeug: 'Seico' },
+    { name: 'Ölsburg E-Center', tage: [4], fahrzeug: 'Borco Alt' },
+    { name: 'Uetze', tage: [4], fahrzeug: 'Seico' },
+    { name: 'Stederdorf', tage: [4], fahrzeug: 'Borco Neu' },
+    { name: 'Vorsfelde Wolfsburg', tage: [5], fahrzeug: 'Borco Alt' },
+    { name: 'Celle Weststadt', tage: [5], fahrzeug: 'Seico' },
+    { name: 'Groß Schwülper', tage: [5], fahrzeug: 'Borco Neu' },
+    { name: 'Isenbüttel', tage: [5], fahrzeug: 'Seico' },
+    { name: 'Hildesheim', tage: [6], fahrzeug: 'Borco Alt' },
   ],
-  mitarbeiter: ['Anna', 'Ben', 'Clara', 'Dirk', 'Eva'],
+  mitarbeiter: ['Anna', 'Ben', 'Clara', 'Dirk', 'Eva', 'Finn', 'Gabi'],
 };
 
 const KUNDEN = [

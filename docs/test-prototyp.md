@@ -6,11 +6,12 @@ Erkennbar am gelb gestreiften Balken „PROTOTYP" ganz oben.
 
 ## 1. Öffnen und einrichten
 
-1. Auf dem Tablet **Chrome** öffnen und die App-Adresse eingeben (siehe [Veröffentlichen](veroeffentlichen.md)).
-2. Optional, wie eine richtige App: Chrome-Menü **⋮** → **„Zum Startbildschirm hinzufügen"**
+1. Auf dem Tablet **Chrome** öffnen und diese Adresse eingeben:
+   **https://creephunter1303.github.io/Seefisch-Feinkost-bestellungen/**
+2. Wie eine richtige App: Chrome-Menü **⋮** → **„Zum Startbildschirm hinzufügen"**
    bzw. **„App installieren"**. Danach startet sie vom Startbildschirm ohne Browserleisten.
-3. Beim ersten Öffnen fragt die App: **„Zu welchem Fahrzeug gehört dieses Tablet?"** → Wagen antippen
-   (oder „Firma" für das Firmen-Tablet).
+3. Beim ersten Öffnen fragt die App: **„Zu welchem Fahrzeug gehört dieses Tablet?"** →
+   **Seico**, **Borco Neu** oder **Borco Alt** antippen (oder „Firma" für das Firmen-Tablet).
 
 ## 2. Die Prototyp-Schalter
 
@@ -25,7 +26,9 @@ Unter **⚙ Einstellungen → „Nur im Prototyp"**:
 | Beispieldaten neu erzeugen / Prototyp zurücksetzen | Neu anfangen |
 
 Die Beispieldaten passen sich jeden Tag an „heute" an. Selbst angelegte Bestellungen bleiben erhalten.
-Die Zuordnung der Märkte zu Wagen 1–3 und die Mitarbeiter (Anna, Ben, Clara, Dirk, Eva) sind Beispiele.
+Märkte, Markttage und Fahrzeuge entsprechen dem Blatt „Konfiguration" (Stand 13.10.).
+Die Mitarbeiter-Namen (Anna, Ben, Clara …) sind erfunden – das Repo ist öffentlich, echte Namen
+gehören dort nicht hinein. In Schritt 2 kommen die echten Namen direkt aus der Tabelle.
 
 ## 3. 5-Sekunden-Test
 
@@ -48,7 +51,7 @@ Maßstab ist die am wenigsten technikerfahrene Person.
 | 1 | „Markier die Bestellung von **Frau Müller** als abgeholt." (steht immer beim ersten Markt des Tages; ggf. oben auf „Alle Märkte" stellen) | Wird verstanden, dass man ein zweites Mal tippen muss? |
 | 2 | „Oh, das war die falsche – mach das rückgängig." | Wird „Rückgängig" unten gesehen? |
 | 3 | „Ein Kunde möchte für nächsten Samstag 2 kg Lachs. Nimm die Bestellung auf." | Markt/Abholtag/Name ohne Hilfe? |
-| 4 | „Zeig mal, was Wagen 2 heute hat. Und dann wieder deinen Wagen." | Wird die Ansicht oben links gefunden? Der Rückweg? |
+| 4 | „Zeig mal, was Borco Alt heute hat. Und dann wieder deinen Wagen." | Wird die Ansicht oben links gefunden? Der Rückweg? |
 | 5 | „Welche Bestellungen hast du diese Woche noch?" | Wird „Woche" gefunden? |
 | 6 | „Frau … ruft an: Sie holt lieber eine Woche später ab. Ändere das." | Antippen → Bearbeiten → Abholtag |
 | 7 | „Storniere diese Bestellung." | |

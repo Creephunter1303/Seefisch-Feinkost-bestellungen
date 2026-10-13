@@ -10,6 +10,8 @@ Tablet-App (PWA) für Kundenbestellungen der Verkaufswagen. Löst v3 ab
 - `backend/` – Google Apps Script als JSON-Schnittstelle (Schritt 2). Google-Tabelle
   „Fisch-Bestellungen" bleibt Quelle der Wahrheit.
 - `docs/` – Anleitungen für Max, Deutsch, Klick für Klick.
+- Veröffentlichung: GitHub Pages per Actions (`.github/workflows/pages.yml`, Ordner `app/`).
+  **Repo ist öffentlich** → keine echten Mitarbeiternamen, keine Tabellen-ID, keine Schlüssel ins Repo.
 
 ## Feste Entscheidungen
 - UI/Doku Deutsch, Begriffe wie am Wagen (Abholung, Kunde, Markt). UX-Regeln „Ein Blick, ein Tipp":

@@ -9,6 +9,7 @@ import { heuteIso } from '../datum.js';
 import { bestellungPruefen } from '../pruefung.js';
 
 const DATEN = 'demo_daten';
+const DATEN_VERSION = 2; // erhöhen, wenn sich Märkte/Fahrzeuge der Beispieldaten ändern
 const EINSTELLUNGEN = 'demo_einstellungen';
 const DEMO_PIN = '1234';
 
@@ -33,10 +34,10 @@ export class DemoDaten {
     const e = demoEinstellungen();
     const heute = heuteIso();
     let d = lesen(DATEN, null);
-    if (!d || d.version !== 1 || d.erzeugtFuer !== heute || d.weihnachten !== e.weihnachten) {
-      const eigene = d && d.version === 1 ? d.bestellungen.filter((b) => b.eigene && b.datum >= heute) : [];
+    if (!d || d.version !== DATEN_VERSION || d.erzeugtFuer !== heute || d.weihnachten !== e.weihnachten) {
+      const eigene = d && d.version === DATEN_VERSION ? d.bestellungen.filter((b) => b.eigene && b.datum >= heute) : [];
       d = {
-        version: 1,
+        version: DATEN_VERSION,
         erzeugtFuer: heute,
         weihnachten: e.weihnachten,
         bestellungen: beispielBestellungen(DEMO_KONFIG, heute, e.weihnachten).concat(eigene),

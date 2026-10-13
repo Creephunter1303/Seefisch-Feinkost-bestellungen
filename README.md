@@ -5,6 +5,8 @@ zurücklegen" – auf einen Blick, jede häufige Aktion mit einem Tipp.
 
 **Stand:** Schritt 1 – klickbarer Prototyp mit Beispieldaten (noch ohne Verbindung zur Google-Tabelle).
 
+**App:** https://creephunter1303.github.io/Seefisch-Feinkost-bestellungen/
+
 ## Ordner
 
 | Ordner | Inhalt |
