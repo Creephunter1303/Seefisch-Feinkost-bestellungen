@@ -26,7 +26,8 @@ Tablet-App (PWA) für Kundenbestellungen der Verkaufswagen. Löst v3 ab
 - Zettel-Typen: offen (weiß, blauer Rahmen), abgeholt (grün), storniert (rot, durchgestrichen,
   bleibt sichtbar). Reihenfolge: offen, abgeholt, storniert. Bestellung ist Freitext (Zeilenumbrüche bleiben).
 - Status: offen → abgeholt, dazu storniert. „Abgeholt" = **zwei Tipps** (1. Tipp: Knopf 4 s „Nochmal tippen",
-  gedämpftes Grün, gleiche Größe; 2. Tipp bestätigt), danach „Rückgängig" auf dem Zettel (plus 6 s Einblendung), ohne Mitarbeiter (Protokoll: Tablet). „Rückgängig" auf einem
+  gedämpftes Grün, gleiche Größe; 2. Tipp bestätigt), danach „Rückgängig" auf dem Zettel – ebenfalls
+  zwei Tipps – plus 6 s Einblendung (wegwischbar, Rückgängig dort mit einem Tipp), ohne Mitarbeiter (Protokoll: Tablet). „Rückgängig" auf einem
   stornierten Zettel hebt das Storno auf. Neu/Bearbeiten/Stornieren: Mitarbeiter-Auswahl Pflicht.
 - Tablet zeigt nur heute + Zukunft (62 Tage). Nicht Abgeholtes bleibt „offen" in der Tabelle.
 - Alle Tablets haben dieselbe App. Standard-Ansicht beim ersten Start, Ändern nur mit Admin-PIN;

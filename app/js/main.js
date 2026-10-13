@@ -8,7 +8,7 @@ import { mitZeitlimit, Verbindungsfehler } from './daten/fehler.js';
 import { Warteschlange } from './warteschlange.js';
 import { ansichtGleich, ansichtName } from './logik.js';
 import { toast, vibrieren } from './ui.js';
-import { abgeholtKnopfInhalt } from './komponenten.js';
+import { scharfInhalt } from './komponenten.js';
 import { listeZeichnen } from './ansichten/liste.js';
 import { formularZeichnen, formularNeuStarten } from './ansichten/formular.js';
 import { detailZeichnen } from './ansichten/detail.js';
@@ -78,15 +78,30 @@ function standSichern() {
 
 /** Bestellungen, wie sie angezeigt werden: Server-Stand + noch nicht gesendete Änderungen. */
 app.bestellungen = function () {
-  const ueber = app.warteschlange.ueberlagerung();
+  const wartend = app.warteschlange.eintraegeJeBestellung();
   const heute = heuteIso();
   return zustand.bestellungen
     .filter((b) => b.datum >= heute)
     .map((b) => {
-      const e = ueber.get(b.id);
-      // Stornierte lassen sich nur wieder öffnen (Storno aufheben), nicht abholen.
-      if (!e || (b.status === 'storniert' && e.status !== 'offen')) return b;
-      return { ...b, status: e.status, abgeholtAm: e.status === 'abgeholt' ? e.zeit : '', wartet: true };
+      const liste = wartend.get(b.id);
+      if (!liste) return b;
+      // Wartende Änderungen der Reihe nach auf den Server-Stand anwenden – so stimmt auch
+      // „Storno aufheben → Abgeholt", wenn das Aufheben noch nicht beim Server ist.
+      let status = b.status;
+      let zeit = b.abgeholtAm;
+      for (const e of liste) {
+        if (status === 'storniert' && e.status === 'abgeholt') continue; // Storniertes nicht abholen
+        status = e.status;
+        zeit = e.zeit;
+      }
+      return {
+        ...b,
+        status,
+        abgeholtAm: status === 'abgeholt' ? zeit : '',
+        storniertVon: status === 'storniert' ? b.storniertVon : '',
+        storniertAm: status === 'storniert' ? b.storniertAm : '',
+        wartet: true,
+      };
     });
 };
 
@@ -232,27 +247,33 @@ app.sucheSchliessen = function () {
 
 const zusatzDaten = () => ({ tablet: app.tabletName(), geraet: geraeteId() });
 
-let scharf = null;      // { id, bis }
+// Zwei-Tipp-Knöpfe („Als abgeholt markieren", „Rückgängig" auf dem Zettel) tragen einen
+// Schlüssel wie 'abholen:B-…' bzw. 'zurueck:B-…' in data-scharf.
+let scharf = null;      // { schluessel, bis }
 let scharfTimer = null;
 
-app.istScharf = (id) => !!scharf && scharf.id === id && scharf.bis > Date.now();
+app.istScharf = (schluessel) => !!scharf && scharf.schluessel === schluessel && scharf.bis > Date.now();
 
-function abgeholtKnoepfeAktualisieren() {
-  document.querySelectorAll('.knopf-abgeholt').forEach((k) => abgeholtKnopfInhalt(k, app.istScharf(k.dataset.id)));
+function scharfeKnoepfeAktualisieren() {
+  document.querySelectorAll('[data-scharf]').forEach((k) => scharfInhalt(k, app.istScharf(k.dataset.scharf)));
 }
 
-app.scharfSchalten = function (id) {
-  scharf = { id, bis: Date.now() + SCHARF_MS };
+app.scharfSchalten = function (schluessel) {
+  scharf = { schluessel, bis: Date.now() + SCHARF_MS };
   vibrieren(25);
-  abgeholtKnoepfeAktualisieren();
+  scharfeKnoepfeAktualisieren();
   clearTimeout(scharfTimer);
-  scharfTimer = setTimeout(() => { scharf = null; abgeholtKnoepfeAktualisieren(); }, SCHARF_MS);
+  scharfTimer = setTimeout(() => { scharf = null; scharfeKnoepfeAktualisieren(); }, SCHARF_MS);
 };
+
+function scharfLoesen() {
+  scharf = null;
+  clearTimeout(scharfTimer);
+}
 
 app.abholen = function (id) {
   const b = app.bestellungFinden(id);
-  scharf = null;
-  clearTimeout(scharfTimer);
+  scharfLoesen();
   if (!b || b.status !== 'offen') return;
   vibrieren([30, 50, 30]);
   app.warteschlange.hinzufuegen(id, 'abgeholt', RUECKGAENGIG_MS, zusatzDaten());
@@ -267,6 +288,7 @@ app.abholen = function (id) {
 /** Abgeholt oder Storniert zurücknehmen → wieder „offen". */
 app.rueckgaengig = function (id) {
   const b = app.bestellungFinden(id);
+  scharfLoesen();
   if (!b || b.status === 'offen') return;
   const war = b.status;
   // Noch nicht gesendet → einfach zurücknehmen, sonst Gegen-Änderung schicken.

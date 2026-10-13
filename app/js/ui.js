@@ -50,6 +50,9 @@ export function toast(text, { aktion = null, dauer = 4000, art = '' } = {}) {
       onclick: () => { toastAusblenden(); aktion.fn(); },
     }, aktion.text));
   }
+  wischenEinrichten(el);
+  el.style.translate = '';
+  el.style.opacity = '';
   el.hidden = false;
   toastTimer = setTimeout(toastAusblenden, dauer);
 }
@@ -58,4 +61,36 @@ export function toastAusblenden() {
   const el = document.getElementById('toast');
   clearTimeout(toastTimer);
   if (el) el.hidden = true;
+}
+
+// Steht die Einblendung im Weg: nach unten wischen (oder kurz antippen) blendet sie aus.
+// Der „Rückgängig"-Knopf darin funktioniert normal.
+let wischStart = null;
+
+function wischenEinrichten(el) {
+  if (el.dataset.wischen) return;
+  el.dataset.wischen = '1';
+  el.addEventListener('pointerdown', (e) => {
+    if (e.target.closest('.toast-knopf')) return;
+    wischStart = { y: e.clientY, id: e.pointerId };
+    el.setPointerCapture(e.pointerId);
+    el.style.transition = 'none';
+  });
+  el.addEventListener('pointermove', (e) => {
+    if (!wischStart || e.pointerId !== wischStart.id) return;
+    const dy = Math.max(0, e.clientY - wischStart.y);
+    el.style.translate = '0 ' + dy + 'px';
+    el.style.opacity = String(Math.max(0.2, 1 - dy / 160));
+  });
+  const ende = (e) => {
+    if (!wischStart || e.pointerId !== wischStart.id) return;
+    const dy = e.clientY - wischStart.y;
+    wischStart = null;
+    el.style.transition = 'translate .15s, opacity .15s';
+    if (dy > 40 || Math.abs(dy) < 8) toastAusblenden(); // weggewischt oder angetippt
+    el.style.translate = '';
+    el.style.opacity = '';
+  };
+  el.addEventListener('pointerup', ende);
+  el.addEventListener('pointercancel', (e) => { wischStart = null; el.style.translate = ''; el.style.opacity = ''; });
 }

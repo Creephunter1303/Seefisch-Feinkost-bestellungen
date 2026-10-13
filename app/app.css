@@ -403,6 +403,25 @@ h1, h2, h3, p { margin: 0; }
 .status-text { flex: 1; font-size: 18px; font-weight: 600; }
 .rueckgaengig { height: var(--tipp-min); padding: 0 14px; background: transparent; color: inherit; font-size: 17px; font-weight: 500; border-radius: var(--radius-button); }
 .rueckgaengig:active { box-shadow: inset 0 0 0 2px currentColor; }
+/* Zwei Tipps auch für „Rückgängig": breit genug für „Nochmal tippen", damit nichts springt */
+.rueckgaengig { min-width: 148px; white-space: nowrap; flex-shrink: 0; }
+.rueckgaengig.scharf {
+  position: relative;
+  overflow: hidden;
+  font-weight: 600;
+  background: rgba(255, 255, 255, .75);
+  box-shadow: inset 0 0 0 2px currentColor;
+}
+.rueckgaengig.scharf::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 4px;
+  width: 100%;
+  background: currentColor;
+  animation: ablauf 4s linear forwards;
+}
 
 /* ---------- Primäraktion „Neue Bestellung" ---------- */
 
@@ -663,6 +682,7 @@ textarea.eingabe { min-height: 120px; resize: vertical; line-height: 1.3; }
   box-shadow: 0 6px 20px rgba(0, 0, 0, .3);
 }
 .toast-erfolg { background: var(--gruen-punkt); }   /* nur „Abgeholt" */
+.toast { touch-action: none; cursor: grab; user-select: none; }   /* nach unten wegwischbar */
 .toast-text { flex: 1; padding: 8px 0; }
 .toast-knopf { flex: none; min-height: var(--tipp-min); padding: 0 18px; border-radius: var(--radius-button); background: #fff; color: var(--text); font-size: 18px; font-weight: 600; }
 

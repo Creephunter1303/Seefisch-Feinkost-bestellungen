@@ -76,36 +76,46 @@ export function statusText(b) {
   return 'Offen';
 }
 
-/** Statuszeile der erledigten Zettel, mit „Rückgängig". */
+/** Statuszeile der erledigten Zettel, mit „Rückgängig" (zwei Tipps). */
 export function statusZeile(app, b) {
   const abgeholt = b.status === 'abgeholt';
   return h('div', { class: 'status-zeile' },
     h('span', { class: 'status-punkt' },
       abgeholt ? icon('haken', { groesse: 17, strich: 3.2 }) : icon('kreuz', { groesse: 15, strich: 3.4 })),
     h('span', { class: 'status-text' }, statusText(b)),
-    h('button', { type: 'button', class: 'rueckgaengig', onclick: () => app.rueckgaengig(b.id) }, 'Rückgängig'));
+    zweiTippKnopf(app, 'zurueck:' + b.id, 'rueckgaengig', () => app.rueckgaengig(b.id)));
 }
 
 /**
- * „Als abgeholt markieren" in zwei Tipps: Der erste Tipp macht den Knopf scharf (4 Sekunden,
- * grün), erst der zweite setzt den Status. Danach „Rückgängig" auf dem Zettel.
+ * „Als abgeholt markieren" in zwei Tipps: Der erste Tipp macht den Knopf scharf (4 Sekunden),
+ * erst der zweite setzt den Status. Danach „Rückgängig" auf dem Zettel.
  */
 export function abgeholtKnopf(app, b, { breit = false } = {}) {
-  const k = h('button', { type: 'button', class: 'knopf-abgeholt' + (breit ? ' breit' : ''), 'data-id': b.id });
-  abgeholtKnopfInhalt(k, app.istScharf(b.id));
+  return zweiTippKnopf(app, 'abholen:' + b.id, 'knopf-abgeholt' + (breit ? ' breit' : ''), () => app.abholen(b.id));
+}
+
+/** Knopf, der erst beim zweiten Tipp innerhalb von 4 Sekunden auslöst – gegen Versehen. */
+function zweiTippKnopf(app, schluessel, klasse, ausloesen) {
+  const k = h('button', { type: 'button', class: klasse, 'data-scharf': schluessel });
+  scharfInhalt(k, app.istScharf(schluessel));
   k.addEventListener('click', (e) => {
     e.stopPropagation();
-    if (k.classList.contains('scharf')) app.abholen(b.id);
-    else app.scharfSchalten(b.id);
+    if (k.classList.contains('scharf')) ausloesen();
+    else app.scharfSchalten(schluessel);
   });
   return k;
 }
 
-export function abgeholtKnopfInhalt(k, scharf) {
-  // Breite festhalten, damit der Knopf beim Scharfschalten nicht wächst.
+/** Beschriftung je Zustand; die Breite bleibt beim Scharfschalten gleich. */
+export function scharfInhalt(k, scharf) {
+  k.classList.toggle('scharf', scharf);
+  if (k.classList.contains('rueckgaengig')) {
+    // Feste Mindestbreite in der CSS – passt für beide Texte.
+    k.replaceChildren(scharf ? 'Nochmal tippen' : 'Rückgängig');
+    return;
+  }
   if (scharf && !k.style.width && k.offsetWidth) k.style.width = k.offsetWidth + 'px';
   if (!scharf) k.style.width = '';
-  k.classList.toggle('scharf', scharf);
   k.replaceChildren(
     icon(scharf ? 'haken' : 'kreisHaken', { groesse: 24, strich: scharf ? 3 : 2.2 }),
     scharf ? 'Nochmal tippen' : 'Als abgeholt markieren');

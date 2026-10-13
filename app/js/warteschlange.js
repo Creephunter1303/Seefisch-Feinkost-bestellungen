@@ -60,10 +60,20 @@ export class Warteschlange {
 
   hatFehler() { return this.eintraege.some((e) => e.versuche > 0); }
 
-  /** Letzter wartender Eintrag je Bestellung – den zeigt die Oberfläche statt des Server-Stands. */
+  /** Letzter wartender Eintrag je Bestellung (z. B. für „Rückgängig"). */
   ueberlagerung() {
     const m = new Map();
     for (const e of this.eintraege) m.set(e.bestellId, e);
+    return m;
+  }
+
+  /** Alle wartenden Einträge je Bestellung, in Sende-Reihenfolge. */
+  eintraegeJeBestellung() {
+    const m = new Map();
+    for (const e of this.eintraege) {
+      if (!m.has(e.bestellId)) m.set(e.bestellId, []);
+      m.get(e.bestellId).push(e);
+    }
     return m;
   }
 
