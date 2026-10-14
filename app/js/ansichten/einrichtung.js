@@ -3,6 +3,7 @@
 import { h } from '../ui.js';
 import { demoStreifen, auswahlKnopf } from '../komponenten.js';
 import { ansichtName } from '../logik.js';
+import { linkEinfuegen } from './link-einfuegen.js';
 
 export function einrichtungZeichnen(app) {
   const z = app.zustand;
@@ -25,5 +26,8 @@ export function einrichtungZeichnen(app) {
       h('p', { class: 'hinweis-text' },
         'Das Tablet zeigt beim Öffnen immer die Bestellungen dieser Auswahl („' + ansichtName({ typ: 'alle' }) +
         '" für die Firma). Andere Fahrzeuge oder Märkte kann jeder vorübergehend mit einem Tipp anzeigen. ' +
-        'Diese Grundeinstellung lässt sich später nur mit der Admin-PIN ändern.')));
+        'Diese Grundeinstellung lässt sich später nur mit der Admin-PIN ändern.'),
+      app.istDemo && h('section', { class: 'karte einrichtung-link' },
+        h('h2', null, 'Mit der Google-Tabelle verbinden'),
+        linkEinfuegen({ titel: false }))));
 }

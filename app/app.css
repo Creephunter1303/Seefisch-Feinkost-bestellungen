@@ -660,6 +660,13 @@ textarea.eingabe { min-height: 120px; resize: vertical; line-height: 1.3; }
 .einrichtung h1 { font-family: var(--schrift-schmal); font-size: 36px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; margin-bottom: 8px; }
 .einrichtung-frage { font-size: 22px; font-weight: 600; margin: 0 0 18px; }
 .einrichtung .hinweis-text { margin-top: 22px; }
+.einrichtung-link { margin-top: 28px; }
+
+/* Einrichtungs-Link einfügen (Prototyp-Modus) */
+.link-einfuegen { margin-top: 14px; }
+.link-einfuegen .hinweis-text { margin: 0 0 10px; }
+textarea.eingabe.link-feld { min-height: 96px; font-size: 16px; word-break: break-all; }
+.link-einfuegen .meldung { margin: 12px 0 0; }
 
 /* ---------- Einblendung unten (Toast) ---------- */
 

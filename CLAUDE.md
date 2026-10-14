@@ -12,7 +12,9 @@ Tablet-App (PWA) für Kundenbestellungen der Verkaufswagen. Löst v3 ab
   (vom Skript erzeugt, Spalte „Aktiv" sperrt); Einstellungen (Kalender „Bestellungen", Admin-PIN,
   Web-App-Adresse) im Blatt „Einstellungen". Anleitung: `docs/backend-einrichten.md`.
 - Einrichtungs-Link `…/#api=<…/exec>&k=<Schlüssel>` → App speichert ihn (`sf_verbindung`) und
-  nutzt `daten/appsscript.js`; ohne Einrichtung läuft der Prototyp (`daten/demo.js`).
+  nutzt `daten/appsscript.js`; ohne Einrichtung läuft der Prototyp (`daten/demo.js`). Im Prototyp-Modus
+  lässt sich der Link auch einfügen (Willkommen + Einstellungen, `ansichten/link-einfuegen.js`) –
+  nötig für die iPhone-Home-Bildschirm-App (eigener Speicher).
 - Test ohne Google: `python3 werkzeuge/test_backend.py` (bildet die Schnittstelle nach, Port 8766).
 - `docs/` – Anleitungen für Max, Deutsch, Klick für Klick.
 - Veröffentlichung: GitHub Pages per Actions (`.github/workflows/pages.yml`, Ordner `app/`).

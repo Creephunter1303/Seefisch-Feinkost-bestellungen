@@ -60,6 +60,10 @@ Alles mit **dem Google-Konto** machen, dem die Tabelle und der Kalender „Beste
 3. Die App meldet „Verbunden mit der Google-Tabelle" → Fahrzeug antippen.
    Der gelbe Prototyp-Streifen ist weg – ab jetzt sind es echte Daten.
 4. War die App schon auf dem Startbildschirm installiert: danach einfach wieder von dort öffnen.
+5. **iPhone/iPad mit App auf dem Home-Bildschirm:** Die Home-Bildschirm-App hat einen eigenen
+   Speicher und übernimmt die Verbindung aus Safari **nicht**. Dann: Link kopieren → App vom
+   Home-Bildschirm öffnen → Zahnrad (Einstellungen) → **Einrichtungs-Link einfügen** →
+   „Aus Zwischenablage einfügen" → **Verbinden**. (Geht auch direkt auf dem Willkommen-Bildschirm.)
 
 ## Tablets verwalten
 

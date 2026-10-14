@@ -2,7 +2,7 @@
 
 import { lesen, schreiben, loeschen, dauerhaftAnfordern, geraeteId } from './speicher.js';
 import { heuteIso, heuteSimulieren, uhrzeit } from './datum.js';
-import { datenquelleErstellen, einrichtungAusLink } from './daten/index.js';
+import { datenquelleErstellen, einrichtungAusLink, neuVerbunden } from './daten/index.js';
 import { demoEinstellungen } from './daten/demo.js';
 import { mitZeitlimit, Verbindungsfehler, Zugangsfehler } from './daten/fehler.js';
 import { Warteschlange } from './warteschlange.js';
@@ -23,7 +23,8 @@ const SCHARF_MS = 4000;                 // so lange wartet „Nochmal tippen = a
 const ZEITLIMIT_MS = 25000;             // danach gilt eine Anfrage als gescheitert
 
 // Einrichtungs-Link (…/#api=…&k=…) zuerst auswerten – er legt fest, ob echte Daten oder Prototyp.
-const neuEingerichtet = einrichtungAusLink();
+einrichtungAusLink();
+const neuEingerichtet = neuVerbunden();   // auch nach eingefügtem Link (Seite wurde neu geladen)
 const dq = datenquelleErstellen();
 if (dq.istDemo) heuteSimulieren(demoEinstellungen().tag);
 
@@ -138,8 +139,8 @@ app.aktualisieren = async function () {
 /** Nach neuen Daten: Liste/Detail neu zeichnen, Formulare nie (Tastatur und Eingaben bleiben). */
 function anzeigeAktualisieren() {
   if (zustand.konfig && ['liste', 'detail', 'einstellungen'].includes(zustand.bildschirm)) {
-    const sucheAktiv = document.activeElement && document.activeElement.id === 'suchfeld';
-    if (!sucheAktiv) render();
+    const tippt = document.activeElement && ['suchfeld', 'linkfeld'].includes(document.activeElement.id);
+    if (!tippt) render();
   }
   app.statusZeichnen();
 }

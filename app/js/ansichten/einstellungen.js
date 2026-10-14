@@ -9,6 +9,7 @@ import { ansichtName } from '../logik.js';
 import { demoEinstellungen, demoEinstellungenSpeichern, demoDatenZuruecksetzen } from '../daten/demo.js';
 import { verbindungTrennen } from '../daten/index.js';
 import { APP_VERSION } from '../version.js';
+import { linkEinfuegen } from './link-einfuegen.js';
 
 function abschnitt(titel, ...inhalt) {
   return h('section', { class: 'karte' }, h('h2', null, titel), inhalt);
@@ -66,7 +67,8 @@ export function einstellungenZeichnen(app) {
 
       abschnitt('Dieses Tablet',
         app.istDemo
-          ? h('p', null, 'Modus: ', h('strong', null, 'Prototyp mit Beispieldaten'), ' – zum echten Betrieb den Einrichtungs-Link aus der Tabelle (Blatt „Tablets") öffnen.')
+          ? [h('p', null, 'Modus: ', h('strong', null, 'Prototyp mit Beispieldaten'), ' – zum echten Betrieb den Einrichtungs-Link aus der Tabelle (Blatt „Tablets") öffnen oder hier einfügen.'),
+            linkEinfuegen()]
           : h('p', null, 'Verbunden mit der Google-Tabelle als Tablet ', h('strong', null, '„' + app.tabletName() + '"'), '.'),
         h('p', null, 'Standard-Ansicht beim Öffnen: ', h('strong', null, ansichtName(z.standard))),
         h('p', { class: 'hinweis-text' }, 'Vorübergehend umschalten geht jederzeit oben links. Am nächsten Tag zeigt das Tablet automatisch wieder seine Standard-Ansicht.'),
