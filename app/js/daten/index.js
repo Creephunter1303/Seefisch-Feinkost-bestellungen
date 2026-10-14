@@ -43,7 +43,11 @@ export function einrichtungAusLink() {
   const lokal = ['localhost', '127.0.0.1'].includes(location.hostname) && /^http:\/\/127\.0\.0\.1:\d+\/$/.test(api);
   if (!(google || lokal) || schluessel.length < 16) return false;
   // Neues Tablet bzw. neuer Schlüssel: Daten aus dem Prototyp oder vom alten Stand verwerfen.
-  ['letzter_stand', 'warteschlange', 'entwurf', 'ansicht_temp', 'demo_daten'].forEach(loeschen);
+  // Gleicher Schlüssel, nur neue Web-App-Adresse (neue Bereitstellung): Wartendes behalten.
+  const bisher = lesen(VERBINDUNG);
+  if (!bisher || bisher.schluessel !== schluessel) {
+    ['letzter_stand', 'warteschlange', 'entwurf', 'ansicht_temp', 'demo_daten'].forEach(loeschen);
+  }
   schreiben(VERBINDUNG, { api, schluessel, seit: new Date().toISOString() });
   return true;
 }
