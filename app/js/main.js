@@ -2,9 +2,9 @@
 
 import { lesen, schreiben, loeschen, dauerhaftAnfordern, geraeteId } from './speicher.js';
 import { heuteIso, heuteSimulieren, uhrzeit } from './datum.js';
-import { datenquelleErstellen } from './daten/index.js';
+import { datenquelleErstellen, einrichtungAusLink } from './daten/index.js';
 import { demoEinstellungen } from './daten/demo.js';
-import { mitZeitlimit, Verbindungsfehler } from './daten/fehler.js';
+import { mitZeitlimit, Verbindungsfehler, Zugangsfehler } from './daten/fehler.js';
 import { Warteschlange } from './warteschlange.js';
 import { ansichtGleich, ansichtName } from './logik.js';
 import { toast, vibrieren } from './ui.js';
@@ -22,6 +22,8 @@ const RUECKGAENGIG_MS = 6000;           // so lange gibt es die „Rückgängig"
 const SCHARF_MS = 4000;                 // so lange wartet „Nochmal tippen = abgeholt"
 const ZEITLIMIT_MS = 25000;             // danach gilt eine Anfrage als gescheitert
 
+// Einrichtungs-Link (…/#api=…&k=…) zuerst auswerten – er legt fest, ob echte Daten oder Prototyp.
+const neuEingerichtet = einrichtungAusLink();
 const dq = datenquelleErstellen();
 if (dq.istDemo) heuteSimulieren(demoEinstellungen().tag);
 
@@ -49,6 +51,8 @@ const zustand = {
   nachOben: false,
   einrichtungHinweis: null,
   bereit: false,     // erst zeichnen, wenn Konfiguration und Ansicht feststehen
+  tablet: null,      // { name } – vom Server, nur im echten Betrieb
+  gesperrt: false,   // Schlüssel ungültig / Tablet in der Tabelle gesperrt
 };
 
 const app = { zustand, istDemo: !!dq.istDemo };
@@ -117,11 +121,14 @@ app.aktualisieren = async function () {
     zustand.bestellungen = r.bestellungen;
     zustand.stand = new Date().toISOString();
     zustand.fehler = null;
+    zustand.gesperrt = false;
+    if (r.tablet) zustand.tablet = r.tablet;
     standSichern();
     // Server erreichbar → hängende Änderungen sofort senden, nicht erst nach der Wartezeit.
     if (app.warteschlange.hatFehler()) app.warteschlange.wiederholen();
   } catch (e) {
     zustand.fehler = e.message || 'Unbekannter Fehler';
+    zustand.gesperrt = e instanceof Zugangsfehler;
   } finally {
     zustand.laedt = false;
   }
@@ -143,6 +150,7 @@ function statusInfo() {
   const n = app.warteschlange.anzahl();
   const stand = zustand.stand ? uhrzeit(zustand.stand) : '';
   if (zustand.laedt) return { klasse: 'laedt', text: 'Aktualisiere …' };
+  if (zustand.gesperrt) return { klasse: 'fehler', text: 'Tablet gesperrt' };
   if (zustand.fehler || app.warteschlange.hatFehler()) {
     return { klasse: 'fehler', text: 'Keine Verbindung' + (n ? ' · ' + n + ' wartet' : '') };
   }
@@ -183,7 +191,8 @@ app.standardSetzen = function (a) {
   app.ansichtSetzen(a);
 };
 
-app.tabletName = () => (!zustand.standard ? '' : zustand.standard.typ === 'alle' ? 'Firma' : zustand.standard.wert);
+app.tabletName = () => (zustand.tablet ? zustand.tablet.name
+  : !zustand.standard ? '' : zustand.standard.typ === 'alle' ? 'Firma' : zustand.standard.wert);
 
 app.einrichtungAbschliessen = function (a) {
   app.standardSetzen(a);
@@ -306,13 +315,22 @@ app.rueckgaengig = function (id) {
 // ---------- Speichern (wartet auf den Server – mit klarer Meldung bei Fehlern) ----------
 
 /** Anfrage mit Zeitlimit; Verbindungsprobleme zeigt auch die Statusanzeige oben an. */
+/** Hinweis vom Server, z. B. wenn nur der Kalendertermin nicht angepasst werden konnte. */
+function warnungZeigen(r) {
+  if (r && r.warnung) toast('⚠ ' + r.warnung, { dauer: 9000 });
+}
+
 async function senden(versprechen) {
   try {
     const r = await mitZeitlimit(versprechen, ZEITLIMIT_MS);
     if (zustand.fehler) { zustand.fehler = null; app.statusZeichnen(); }
     return r;
   } catch (e) {
-    if (e instanceof Verbindungsfehler) { zustand.fehler = e.message; app.statusZeichnen(); }
+    if (e instanceof Verbindungsfehler) {
+      zustand.fehler = e.message;
+      zustand.gesperrt = e instanceof Zugangsfehler;
+      app.statusZeichnen();
+    }
     throw e;
   }
 }
@@ -320,18 +338,21 @@ async function senden(versprechen) {
 app.speichernNeu = async function (daten) {
   const r = await senden(dq.neu(daten));
   einpflegen(r.bestellung);
+  warnungZeigen(r);
   return r.bestellung;
 };
 
 app.speichernAenderung = async function (daten) {
   const r = await senden(dq.aendern(daten));
   einpflegen(r.bestellung);
+  warnungZeigen(r);
   return r.bestellung;
 };
 
 app.stornieren = async function (id, mitarbeiter) {
   const r = await senden(dq.stornieren({ id, mitarbeiter, tablet: app.tabletName(), geraet: geraeteId() }));
   einpflegen(r.bestellung);
+  warnungZeigen(r);
   return r.bestellung;
 };
 
@@ -458,6 +479,9 @@ async function start() {
   }
   await app.aktualisieren();
   if (!zustand.konfig) { startFehlerZeigen(); return; }
+  if (neuEingerichtet) {
+    toast('✓ Verbunden mit der Google-Tabelle' + (zustand.tablet ? ' · Tablet „' + zustand.tablet.name + '"' : '') + '.', { dauer: 7000 });
+  }
   if (!letzter || !letzter.konfig) { bildschirmBeimStart(); render(); }
 
   app.warteschlange.planen();

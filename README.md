@@ -3,7 +3,7 @@
 Übersicht der Kundenbestellungen für die Verkaufswagen: „Diese Bestellungen muss ich heute
 zurücklegen" – auf einen Blick, jede häufige Aktion mit einem Tipp.
 
-**Stand:** Schritt 1 – klickbarer Prototyp mit Beispieldaten (noch ohne Verbindung zur Google-Tabelle).
+**Stand:** Schritt 2 – Anbindung an die Google-Tabelle ist gebaut; Bereitstellung siehe [Backend einrichten](docs/backend-einrichten.md). Ohne Einrichtungs-Link läuft die App als Prototyp mit Beispieldaten.
 
 **App:** https://creephunter1303.github.io/Seefisch-Feinkost-bestellungen/
 
@@ -14,7 +14,7 @@ zurücklegen" – auf einen Blick, jede häufige Aktion mit einem Tipp.
 | `app/` | Die App selbst (wird veröffentlicht) |
 | `docs/` | Anleitungen: [Prototyp testen](docs/test-prototyp.md), [Veröffentlichen](docs/veroeffentlichen.md) |
 | `werkzeuge/` | Hilfsprogramme: lokaler Test-Server, App-Symbole erzeugen |
-| `backend/` | Google Apps Script (folgt in Schritt 2) |
+| `backend/` | Google Apps Script für die Tabelle ([Anleitung](docs/backend-einrichten.md)) |
 
 ## Lokal ausprobieren (am Mac)
 

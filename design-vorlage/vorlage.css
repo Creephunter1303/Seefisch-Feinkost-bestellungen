@@ -20,14 +20,14 @@
   /* Text */
   --text: #111827;
   --text-2: #1F2937;             /* Kundenname */
-  --text-3: #4A5361;             /* Telefon, Kommentar, Zähler, Status-Text */
+  --text-3: #3F4856;             /* Telefon, Zähler, Status-Text (v2: dunkler, ≥ 7:1 auch auf Grau) */
   --icon: #3D4652;
 
   /* Hauptfarbe Blau – NUR für Primäraktion, aktive Auswahl, offene Bestellung */
   --blau: #0B3D66;               /* Primärbutton „Neue Bestellung“, Marktname */
   --blau-rahmen: #4F79A3;        /* Rahmen offene Bestellung (3 px) */
   --blau-feld: #E3ECF5;          /* Bestellfeld im offenen Zettel */
-  --blau-feld-text: #0B2A47;
+  --blau-feld-text: #111111;     /* Bestelltext schwarz */
   --blau-aktiv: #DCE7F2;         /* aktiver Tag */
   --blau-aktiv-rand: #5B84AB;
   --blau-auswahl: #D3E2F0;       /* Fahrzeug-Auswahl */
@@ -117,7 +117,11 @@ svg { display: block; }
 .zettel.offen .ware { margin: 10px 10px 0; padding: 14px 16px; border-radius: var(--radius-feld); background: var(--blau-feld); color: var(--blau-feld-text); font-size: 30px; line-height: 1.15; }
 .zettel.offen .kunde { padding: 10px 20px 12px; font-size: 20px; color: var(--text-2); }
 .zettel.offen .fuss { border-top: 2px dashed var(--strich); padding: 10px 14px 12px 20px; display: flex; align-items: center; gap: 12px; }
-.zettel.offen .infos { flex: 1; font-size: 16px; color: var(--text-3); display: flex; flex-direction: column; gap: 2px; }
+.zettel.offen .infos { flex: 1; font-size: 17px; color: var(--text-3); display: flex; flex-direction: column; gap: 4px; }
+.infos .zeile { display: flex; align-items: center; gap: 8px; }
+.infos .hinweis { color: var(--text); font-weight: 600; }          /* Kommentar = wichtig */
+.infos .hinweis svg { color: #B45309; }
+.zettel.offen .fuss.nur-knopf { justify-content: flex-end; }       /* keine Infos → nur der Button */
 .knopf-abgeholt { height: 58px; padding: 0 18px; border-radius: var(--radius-button); background: var(--sekundaer); color: var(--sekundaer-text); display: flex; align-items: center; gap: 9px; font-size: 18px; font-weight: 500; flex-shrink: 0; }
 
 /* Erledigt: kompakter, farbig hinterlegt */
@@ -160,3 +164,46 @@ svg { display: block; }
 .app.quer .liste { padding-bottom: 96px; }   /* Platz, damit der schwebende Button nichts dauerhaft verdeckt */
 .app.quer .fuss-leiste { position: absolute; right: 0; bottom: 0; padding: 0 24px 18px; }
 .app.quer .primaer { width: 420px; height: 64px; font-size: 22px; }
+
+/* =========================================================================
+   v2 – Ergänzungen aus der Optimierung (14.10.)
+   ========================================================================= */
+:root {
+  --hinweis-flaeche: #FFF1CC;     /* Bernstein: nur für Hinweise (fremde Ansicht, offline) */
+  --hinweis-rand: #E8C46A;
+  --hinweis-text: #4D3800;
+  --offline: #D97706;
+}
+
+/* Tagesleiste: Wochentag auch bei „Heute“ */
+.tag .wt b { font-weight: 700; }
+
+/* Hinweisband: fremde Ansicht / offline – direkt unter der Kopfleiste */
+.hinweisband { display: flex; align-items: center; gap: 12px; padding: 0 12px 0 var(--abstand-rand); min-height: 60px; background: var(--hinweis-flaeche); border-bottom: 2px solid var(--hinweis-rand); color: var(--hinweis-text); font-size: 18px; }
+.hinweisband b { font-weight: 600; }
+.hinweisband .platzhalter { flex: 1; }
+.hinweisband button { height: 48px; padding: 0 16px; border-radius: var(--radius-button); background: #fff; color: var(--hinweis-text); font-size: 17px; font-weight: 600; box-shadow: inset 0 0 0 1.5px var(--hinweis-rand); }
+
+/* Sync-Status offline */
+.sync.offline { color: #8A4B05; font-weight: 600; }
+.sync.offline::before { background: var(--offline); }
+
+/* Mehrere Märkte: Abstand zwischen Marktgruppen */
+.markt.weiterer { margin-top: 14px; }
+
+/* Erledigtes eingeklappt (ab 3 erledigten Zetteln) */
+.eingeklappt { height: 60px; border-radius: var(--radius-zettel); background: rgba(255,255,255,.55); box-shadow: inset 0 0 0 1.5px #C5CED8; display: flex; align-items: center; gap: 14px; padding: 0 18px; font-size: 18px; color: var(--text-2); width: 100%; }
+.eingeklappt .punkt { width: 12px; height: 12px; border-radius: 50%; }
+.eingeklappt .gruen { background: var(--gruen-punkt); }
+.eingeklappt .rot { background: var(--rot-punkt); }
+.eingeklappt .platzhalter { flex: 1; }
+.eingeklappt .mehr { font-weight: 600; color: var(--blau); }
+
+/* Leerer Markt */
+.leer { padding: 18px 20px; border-radius: var(--radius-zettel); background: rgba(255,255,255,.55); color: var(--text-3); font-size: 18px; box-shadow: inset 0 0 0 1.5px #D3DAE2; }
+
+/* Zettel ohne Telefon/Kommentar: Button in die Kundenzeile, keine leere Fußzeile */
+.zettel.offen .kunde-zeile { display: flex; align-items: center; gap: 12px; padding: 6px 12px 12px 0; }
+.zettel.offen .kunde-zeile .kunde { flex: 1; padding: 0 0 0 20px; }
+.app.quer .zettel.offen .kunde-zeile { padding: 4px 12px 10px 0; }
+.app.quer .zettel.offen .kunde-zeile .kunde { padding-left: 18px; }

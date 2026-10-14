@@ -5,6 +5,14 @@ Beispieldaten. Kalendertermine werden wie in v3 gespiegelt (abschaltbar).
 
 Legende: **[Max]** = machst du (mit Klick-Anleitung von mir) · **[Claude]** = mache ich
 
+## Stand (14.10.2026)
+
+- ✅ A entschieden: Schlüssel **pro Tablet** (Blatt „Tablets"), direkt in der echten Tabelle,
+  Code kopieren, Termine in den Kalender **„Bestellungen"** (nicht mehr Hauptkalender).
+- ✅ C Tabelle vorbereitet (Spalten, Blätter „Einstellungen" und „Tablets", Sprache Deutsch).
+- ✅ D Backend (`backend/Code.gs`) und ✅ E App-Anbindung gebaut, gegen einen Test-Server getestet.
+- ⏳ B und F: deine Schritte – Anleitung: [backend-einrichten.md](backend-einrichten.md).
+
 ## A. Entscheidungen vorab
 
 | # | Frage | Vorschlag |

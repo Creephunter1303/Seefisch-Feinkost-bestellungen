@@ -6,6 +6,17 @@ export class Verbindungsfehler extends Error {
   }
 }
 
+/**
+ * Schlüssel des Tablets ungültig oder gesperrt (Blatt „Tablets"). Gilt als Verbindungsproblem:
+ * Wartende Änderungen bleiben erhalten und gehen raus, sobald das Tablet neu eingerichtet ist.
+ */
+export class Zugangsfehler extends Verbindungsfehler {
+  constructor(text) {
+    super(text || 'Dieses Tablet ist nicht (mehr) freigeschaltet.');
+    this.name = 'Zugangsfehler';
+  }
+}
+
 /** Der Server hat geantwortet, aber abgelehnt (z. B. Bestellung inzwischen storniert). */
 export class Serverfehler extends Error {
   constructor(text) {

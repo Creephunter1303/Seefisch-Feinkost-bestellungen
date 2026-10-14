@@ -1,0 +1,29 @@
+/* F6 MINIMAL – Testvariante „nur das Nötigste“. Nach ../vorlage.css einbinden.
+   Weg: Tagesleiste, Sync-Text, Zähler, Telefon (→ Detailansicht), erledigte Zettel (→ eingeklappt). */
+
+/* Kopf: eine Zeile */
+.kopf-min { background: var(--flaeche); box-shadow: 0 1px 0 var(--kopf-linie); padding: 14px var(--abstand-rand); display: flex; align-items: center; gap: 12px; }
+.tag-titel { display: flex; flex-direction: column; line-height: 1.05; }
+.tag-titel .gross { font-family: var(--schrift-schmal); font-size: 34px; font-weight: 700; }
+.tag-titel .klein { font-size: 16px; color: var(--text-3); margin-top: 2px; }
+.knopf-tage { height: 56px; padding: 0 16px; border-radius: 12px; background: var(--tag-normal); color: var(--text-2); display: flex; align-items: center; gap: 8px; font-size: 18px; font-weight: 500; }
+.online-punkt { width: 12px; height: 12px; border-radius: 50%; background: var(--online); flex-shrink: 0; }
+
+/* Markt: schlicht, ohne Zähler */
+.markt-min { display: flex; align-items: center; gap: 8px; color: var(--blau); padding: 2px 2px 0; }
+.markt-min h2 { margin: 0; font-family: var(--schrift-schmal); font-size: 24px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--text); }
+
+/* Zettel kompakt: Bestellfeld + eine Zeile darunter */
+.zettel-min { background: var(--flaeche); border: 3px solid var(--blau-rahmen); border-radius: var(--radius-zettel); box-shadow: 0 6px 16px rgba(11,61,102,.12); }
+.zettel-min .ware { margin: 10px 10px 0; padding: 14px 16px; border-radius: var(--radius-feld); background: var(--blau-feld); color: var(--blau-feld-text); font-family: var(--schrift-schmal); font-weight: 600; font-size: 30px; line-height: 1.15; white-space: pre-line; }
+.zettel-min .unten { display: flex; align-items: center; gap: 12px; padding: 8px 10px 10px 20px; }
+.zettel-min .wer { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.zettel-min .kunde { font-size: 20px; color: var(--text-2); }
+.zettel-min .hinweis { display: flex; align-items: center; gap: 6px; font-size: 17px; font-weight: 600; color: var(--text); }
+.zettel-min .hinweis svg { color: #B45309; flex-shrink: 0; }
+
+/* Abgehakt-Knopf: runder Kreis mit Wort darunter */
+.haken { width: 84px; height: 72px; border-radius: 14px; background: var(--sekundaer); color: var(--sekundaer-text); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 14px; font-weight: 600; flex-shrink: 0; }
+
+.app.quer .zettel-min .ware { font-size: 27px; padding: 12px 14px; }
+.app.quer .tag-titel .gross { font-size: 30px; }

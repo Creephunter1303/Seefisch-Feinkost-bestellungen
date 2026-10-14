@@ -7,8 +7,13 @@ Tablet-App (PWA) für Kundenbestellungen der Verkaufswagen. Löst v3 ab
   Lokal starten: `python3 werkzeuge/server.py` → http://localhost:8765 (ohne Zwischenspeicher).
 - `app/js/daten/` – austauschbare Datenanbindung (Interface in `index.js`). Schritt 1: `demo.js`
   (Beispieldaten im Browser). Schritt 2: Apps Script.
-- `backend/` – Google Apps Script als JSON-Schnittstelle (Schritt 2). Google-Tabelle
-  „Fisch-Bestellungen" bleibt Quelle der Wahrheit.
+- `backend/` – Google Apps Script (an die Tabelle gebunden) als JSON-Schnittstelle. Google-Tabelle
+  „Fisch-Bestellungen" bleibt Quelle der Wahrheit. Ein Schlüssel **pro Tablet** im Blatt „Tablets"
+  (vom Skript erzeugt, Spalte „Aktiv" sperrt); Einstellungen (Kalender „Bestellungen", Admin-PIN,
+  Web-App-Adresse) im Blatt „Einstellungen". Anleitung: `docs/backend-einrichten.md`.
+- Einrichtungs-Link `…/#api=<…/exec>&k=<Schlüssel>` → App speichert ihn (`sf_verbindung`) und
+  nutzt `daten/appsscript.js`; ohne Einrichtung läuft der Prototyp (`daten/demo.js`).
+- Test ohne Google: `python3 werkzeuge/test_backend.py` (bildet die Schnittstelle nach, Port 8766).
 - `docs/` – Anleitungen für Max, Deutsch, Klick für Klick.
 - Veröffentlichung: GitHub Pages per Actions (`.github/workflows/pages.yml`, Ordner `app/`).
   **Repo ist öffentlich** → keine echten Mitarbeiternamen, keine Tabellen-ID, keine Schlüssel ins Repo.

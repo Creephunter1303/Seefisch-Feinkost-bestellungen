@@ -7,6 +7,7 @@ import { geraeteId, allesLoeschen } from '../speicher.js';
 import { echtHeuteIso, plusTage, datumKurz, heuteIso, istSimuliert, zeitpunktText } from '../datum.js';
 import { ansichtName } from '../logik.js';
 import { demoEinstellungen, demoEinstellungenSpeichern, demoDatenZuruecksetzen } from '../daten/demo.js';
+import { verbindungTrennen } from '../daten/index.js';
 import { APP_VERSION } from '../version.js';
 
 function abschnitt(titel, ...inhalt) {
@@ -20,6 +21,24 @@ function schalter(titel, erklaerung, an, beiWechsel) {
       type: 'button', class: 'knopf schalter' + (an ? ' an' : ''), 'aria-pressed': an ? 'true' : 'false',
       onclick: beiWechsel,
     }, an ? '✓ An' : 'Aus'));
+}
+
+/** Verbindung zur Tabelle lösen (zwei Tipps). Danach läuft die App wieder als Prototyp. */
+function abmeldenKnopf() {
+  let scharf = false;
+  let timer = null;
+  const k = h('button', { type: 'button', class: 'knopf breit' }, 'Tablet abmelden');
+  k.addEventListener('click', () => {
+    if (scharf) {
+      verbindungTrennen();
+      location.reload();
+      return;
+    }
+    scharf = true;
+    k.textContent = 'Wirklich abmelden? Nochmal tippen';
+    timer = setTimeout(() => { scharf = false; k.textContent = 'Tablet abmelden'; }, 4000);
+  });
+  return k;
 }
 
 function diagnoseZeile(app) {
@@ -46,9 +65,13 @@ export function einstellungenZeichnen(app) {
         h('button', { type: 'button', class: 'knopf breit', onclick: () => app.aktualisieren() }, icon('zurueckDrehen', { groesse: 22 }), 'Jetzt aktualisieren')),
 
       abschnitt('Dieses Tablet',
+        app.istDemo
+          ? h('p', null, 'Modus: ', h('strong', null, 'Prototyp mit Beispieldaten'), ' – zum echten Betrieb den Einrichtungs-Link aus der Tabelle (Blatt „Tablets") öffnen.')
+          : h('p', null, 'Verbunden mit der Google-Tabelle als Tablet ', h('strong', null, '„' + app.tabletName() + '"'), '.'),
         h('p', null, 'Standard-Ansicht beim Öffnen: ', h('strong', null, ansichtName(z.standard))),
         h('p', { class: 'hinweis-text' }, 'Vorübergehend umschalten geht jederzeit oben links. Am nächsten Tag zeigt das Tablet automatisch wieder seine Standard-Ansicht.'),
-        h('button', { type: 'button', class: 'knopf breit', onclick: () => app.overlayOeffnen('pin') }, icon('schloss', { groesse: 22 }), 'Standard ändern (Admin-PIN)')),
+        h('button', { type: 'button', class: 'knopf breit', onclick: () => app.overlayOeffnen('pin') }, icon('schloss', { groesse: 22 }), 'Standard ändern (Admin-PIN)'),
+        !app.istDemo && abmeldenKnopf()),
 
       app.istDemo && demoAbschnitt(app),
 
