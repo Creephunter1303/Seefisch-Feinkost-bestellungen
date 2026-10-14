@@ -16,6 +16,7 @@ import { bestaetigungZeichnen } from './ansichten/bestaetigung.js';
 import { einstellungenZeichnen } from './ansichten/einstellungen.js';
 import { einrichtungZeichnen } from './ansichten/einrichtung.js';
 import { overlayZeichnen } from './ansichten/overlays.js';
+import { linkEinfuegen } from './ansichten/link-einfuegen.js';
 
 const AKTUALISIEREN_MS = 3 * 60 * 1000; // Daten automatisch alle 3 Minuten holen
 const RUECKGAENGIG_MS = 6000;           // so lange gibt es die „Rückgängig"-Einblendung
@@ -447,20 +448,23 @@ function overlayZeichnen_() {
 
 function startFehlerZeigen() {
   const wurzel = document.getElementById('app');
-  const knopf = document.createElement('button');
-  knopf.className = 'knopf primaer';
-  knopf.textContent = '↻ Erneut versuchen';
-  knopf.addEventListener('click', () => location.reload());
-  const box = document.createElement('div');
-  box.className = 'leer start-fehler';
-  const titel = document.createElement('div');
-  titel.className = 'leer-titel';
-  titel.textContent = '⚠ Bestellungen konnten nicht geladen werden';
-  const text = document.createElement('p');
-  text.className = 'leer-text';
-  text.textContent = (zustand.fehler || 'Keine Verbindung.') + ' Bitte Internet prüfen und erneut versuchen.';
-  box.append(titel, text, knopf);
-  wurzel.replaceChildren(box);
+  const erneut = h('button', { type: 'button', class: 'knopf primaer', onclick: () => location.reload() }, '↻ Erneut versuchen');
+  // Gesperrt (oder neuer Schlüssel in der Tabelle): Hier muss ein neuer Link hinein können –
+  // sonst säße z. B. die iPhone-Home-Bildschirm-App fest.
+  if (zustand.gesperrt) {
+    wurzel.replaceChildren(h('div', { class: 'leer start-fehler' },
+      h('div', { class: 'leer-titel' }, '⚠ Dieses Tablet ist gesperrt'),
+      h('p', { class: 'leer-text' },
+        'In der Tabelle (Blatt „Tablets") ist es gesperrt oder hat einen neuen Schlüssel bekommen. ' +
+        'Bitte den aktuellen Einrichtungs-Link öffnen oder hier einfügen.'),
+      linkEinfuegen(),
+      erneut));
+    return;
+  }
+  wurzel.replaceChildren(h('div', { class: 'leer start-fehler' },
+    h('div', { class: 'leer-titel' }, '⚠ Bestellungen konnten nicht geladen werden'),
+    h('p', { class: 'leer-text' }, (zustand.fehler || 'Keine Verbindung.') + ' Bitte Internet prüfen und erneut versuchen.'),
+    erneut));
 }
 
 // ---------- Start ----------

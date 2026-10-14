@@ -37,6 +37,8 @@ Tablet-App (PWA) für Kundenbestellungen der Verkaufswagen. Löst v3 ab
   zwei Tipps – plus 6 s Einblendung (wegwischbar, Rückgängig dort mit einem Tipp), ohne Mitarbeiter (Protokoll: Tablet). „Rückgängig" auf einem
   stornierten Zettel hebt das Storno auf. Neu/Bearbeiten/Stornieren: Mitarbeiter-Auswahl Pflicht.
 - Tablet zeigt nur heute + Zukunft (62 Tage). Nicht Abgeholtes bleibt „offen" in der Tabelle.
+- „Tablet abmelden" nur mit Admin-PIN (Ausnahme: Tablet gesperrt → zwei Tipps, PIN nicht prüfbar).
+  Gesperrt: Start-Fehlerseite und Einstellungen bieten das Feld „Einrichtungs-Link einfügen".
 - Alle Tablets haben dieselbe App. Standard-Ansicht beim ersten Start, Ändern nur mit Admin-PIN;
   vorübergehende Ansicht springt am nächsten Tag zurück.
 - Kalender-Spiegelung bleibt, per Schalter in der Tabelle abschaltbar.

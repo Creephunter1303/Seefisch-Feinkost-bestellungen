@@ -24,10 +24,17 @@ function schalter(titel, erklaerung, an, beiWechsel) {
     }, an ? '✓ An' : 'Aus'));
 }
 
-/** Verbindung zur Tabelle lösen (zwei Tipps). Danach läuft die App wieder als Prototyp. */
-function abmeldenKnopf() {
+/**
+ * Verbindung zur Tabelle lösen – nur mit Admin-PIN, damit niemand am Markt versehentlich abmeldet.
+ * Ausnahme: Ist das Tablet gesperrt (Schlüssel ungültig), kann der Server die PIN nicht prüfen –
+ * dann genügen zwei Tipps (es geht ohnehin nichts mehr).
+ */
+function abmeldenKnopf(app) {
+  if (!app.zustand.gesperrt) {
+    return h('button', { type: 'button', class: 'knopf breit', onclick: () => app.overlayOeffnen('pin', { ziel: 'abmelden' }) },
+      icon('schloss', { groesse: 22 }), 'Tablet abmelden (Admin-PIN)');
+  }
   let scharf = false;
-  let timer = null;
   const k = h('button', { type: 'button', class: 'knopf breit' }, 'Tablet abmelden');
   k.addEventListener('click', () => {
     if (scharf) {
@@ -37,7 +44,7 @@ function abmeldenKnopf() {
     }
     scharf = true;
     k.textContent = 'Wirklich abmelden? Nochmal tippen';
-    timer = setTimeout(() => { scharf = false; k.textContent = 'Tablet abmelden'; }, 4000);
+    setTimeout(() => { scharf = false; k.textContent = 'Tablet abmelden'; }, 4000);
   });
   return k;
 }
@@ -73,7 +80,8 @@ export function einstellungenZeichnen(app) {
         h('p', null, 'Standard-Ansicht beim Öffnen: ', h('strong', null, ansichtName(z.standard))),
         h('p', { class: 'hinweis-text' }, 'Vorübergehend umschalten geht jederzeit oben links. Am nächsten Tag zeigt das Tablet automatisch wieder seine Standard-Ansicht.'),
         h('button', { type: 'button', class: 'knopf breit', onclick: () => app.overlayOeffnen('pin') }, icon('schloss', { groesse: 22 }), 'Standard ändern (Admin-PIN)'),
-        !app.istDemo && abmeldenKnopf()),
+        !app.istDemo && z.gesperrt && linkEinfuegen(),   // neuer Schlüssel → neuen Link einfügen
+        !app.istDemo && abmeldenKnopf(app)),
 
       app.istDemo && demoAbschnitt(app),
 

@@ -5,6 +5,7 @@ import { icon } from '../icons.js';
 import { auswahlKnopf } from '../komponenten.js';
 import { heuteIso, plusTage, wochenstart, kalenderwoche, VORLAUF_TAGE, monatKurz, ausIso, TAGE_KURZ } from '../datum.js';
 import { ansichtGleich, ansichtName, maerkteAmTag, fuerAnsicht, istErledigt, tageText, mitSonntag, maerkteNachFahrzeug } from '../logik.js';
+import { verbindungTrennen } from '../daten/index.js';
 
 export function overlayZeichnen(app) {
   const o = app.zustand.overlay;
@@ -113,9 +114,11 @@ function tagBlatt(app) {
 }
 
 // ---------- Admin-PIN ----------
+// o.ziel: 'standard' (Standard-Ansicht ändern, Vorgabe) oder 'abmelden' (Tablet von der Tabelle trennen)
 
 function pinBlatt(app) {
   const o = app.zustand.overlay;
+  const abmelden = o.ziel === 'abmelden';
   if (o.pin === undefined) o.pin = '';
   const neu = () => app.overlayNeuZeichnen();
   const tippen = (ziffer) => {
@@ -128,6 +131,7 @@ function pinBlatt(app) {
       app.pinPruefen(o.pin)
         .then((ok) => {
           o.prueft = false;
+          if (ok && abmelden) { verbindungTrennen(); location.reload(); return; }
           if (ok) { app.overlayOeffnen('standard', {}, { ersetzen: true }); return; }
           o.pin = '';
           o.fehler = 'Falsche PIN. Bitte erneut versuchen.';
@@ -145,8 +149,8 @@ function pinBlatt(app) {
   };
   const ziffer = (zf) => h('button', { type: 'button', class: 'pin-taste', onclick: () => tippen(zf) }, zf);
   return [
-    blattKopf(app, 'Admin-PIN eingeben'),
-    h('p', { class: 'hinweis-text' }, 'Nur für die Grundeinstellung des Tablets.'),
+    blattKopf(app, abmelden ? 'Tablet abmelden' : 'Admin-PIN eingeben'),
+    abmelden ? abmeldenHinweis(app) : h('p', { class: 'hinweis-text' }, 'Nur für die Grundeinstellung des Tablets.'),
     h('div', { class: 'pin-punkte', 'aria-label': o.pin.length + ' von 4 Ziffern' },
       [0, 1, 2, 3].map((i) => h('span', { class: 'pin-punkt' + (i < o.pin.length ? ' voll' : '') }))),
     o.prueft && h('p', { class: 'pin-status' }, 'Wird geprüft …'),
@@ -156,6 +160,17 @@ function pinBlatt(app) {
       h('button', { type: 'button', class: 'pin-taste klein', onclick: () => { o.pin = ''; o.fehler = null; neu(); } }, 'Löschen'),
       ziffer('0'),
       h('button', { type: 'button', class: 'pin-taste klein', onclick: () => { o.pin = o.pin.slice(0, -1); neu(); } }, '⌫')),
+  ];
+}
+
+function abmeldenHinweis(app) {
+  const n = app.warteschlange.anzahl();
+  return [
+    h('p', { class: 'hinweis-text' },
+      'Admin-PIN eingeben, um dieses Tablet von der Google-Tabelle zu trennen. Danach zeigt es nur noch ' +
+      'Beispieldaten, bis es mit dem Einrichtungs-Link neu eingerichtet wird.'),
+    n > 0 && h('div', { class: 'meldung fehler' },
+      '⚠ ' + n + (n === 1 ? ' Änderung ist' : ' Änderungen sind') + ' noch nicht gesendet und ginge' + (n === 1 ? '' : 'n') + ' verloren.'),
   ];
 }
 

@@ -109,6 +109,7 @@ h1, h2, h3, p { margin: 0; }
 .start-laden { text-align: center; padding: 80px 20px; font-size: 20px; color: var(--text-3); }
 .start-laden .dreher { width: 40px; height: 40px; border-width: 4px; color: var(--blau-rahmen); margin: 0 auto 12px; }
 .start-fehler { margin: 40px var(--abstand-rand); }
+.start-fehler .link-einfuegen { text-align: left; margin: 8px 0 20px; }
 
 /* ---------- Kopfleiste ---------- */
 

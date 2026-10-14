@@ -96,6 +96,8 @@ def bearbeiten(a):
             BESTELLUNGEN[b["id"]] = b
             PROTOKOLL.append(("Erstellt", b["id"], tablet))
             return {"ok": True, "bestellung": b, "warnung": "Test: So sähe eine Kalender-Warnung aus."}
+        if aktion == "pin":
+            return {"ok": True, "richtig": a.get("pin") == PIN}
         b = BESTELLUNGEN.get(a.get("id"))
         if not b:
             raise ValueError("Diese Bestellung wurde nicht gefunden.")
@@ -115,8 +117,6 @@ def bearbeiten(a):
             if b["status"] == "storniert":
                 b.update(storniertVon="", storniertAm="")
             b.update(status=a["status"], abgeholtAm=(a.get("zeit") or jetzt()) if a["status"] == "abgeholt" else "")
-        elif aktion == "pin":
-            return {"ok": True, "richtig": a.get("pin") == PIN}
         else:
             return {"ok": False, "fehler": "Unbekannte Aktion"}
         PROTOKOLL.append((aktion, b["id"], tablet))

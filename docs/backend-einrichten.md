@@ -72,6 +72,8 @@ Alles mit **dem Google-Konto** machen, dem die Tabelle und der Kalender „Beste
 | Tablet sperren (verloren/gestohlen) | Blatt „Tablets" → Spalte **Aktiv** auf **Nein**. Wirkt sofort. |
 | Neuen Schlüssel vergeben | In die Zeile des Tablets klicken → **Bestell-App → Neuen Schlüssel für markiertes Tablet**. Danach Tablet mit dem neuen Link (Spalte D) neu einrichten. |
 | Weiteres Tablet | Neue Zeile mit Namen → **Einrichten / prüfen** erzeugt Schlüssel und Link. |
+| Tablet abmelden (zurück zu Beispieldaten) | Auf dem Tablet: Zahnrad → **Tablet abmelden (Admin-PIN)**. Ist das Tablet gesperrt, geht es ohne PIN. |
+| Gesperrtes Gerät / neuer Schlüssel | Neuen Link (Spalte D) öffnen oder in der App ins Feld **Einrichtungs-Link einfügen** kopieren – das Feld erscheint bei gesperrtem Gerät automatisch. |
 | Wann war ein Tablet zuletzt online? | Spalte **Zuletzt gesehen**. |
 | Kalender aus-/einschalten | Blatt „Einstellungen" → Kalender-Spiegelung **Ja/Nein**. |
 | Märkte, Fahrzeuge, Mitarbeiter | Blatt „Konfiguration" wie bisher – die Tablets übernehmen es beim nächsten Aktualisieren. |
