@@ -15,6 +15,11 @@ Alles mit **dem Google-Konto** machen, dem die Tabelle und der Kalender „Beste
 
 1. Tabelle „Fisch-Bestellungen" öffnen → Menü **Erweiterungen → Apps Script**.
    Es öffnet sich ein neuer Tab mit dem Skript-Editor.
+   ⚠ Meldung **„Datei kann derzeit nicht geöffnet werden"**? Das passiert, wenn im Browser mehrere
+   Google-Konten angemeldet sind. Dann: **Inkognito-Fenster** öffnen, nur mit dem Konto anmelden,
+   dem die Tabelle gehört, Tabelle öffnen und noch einmal **Erweiterungen → Apps Script**.
+   (Ein „normal" unter script.google.com angelegtes Projekt lässt sich nicht nachträglich an die
+   Tabelle hängen – das Skript muss über dieses Menü entstehen.)
 2. Oben links auf „Unbenanntes Projekt" klicken → Namen **Bestell-App 2.0** eingeben → Umbenennen.
 3. Links die Datei **Code.gs** anklicken, den gesamten Inhalt löschen und durch diesen Code ersetzen:
    https://raw.githubusercontent.com/Creephunter1303/Seefisch-Feinkost-bestellungen/main/backend/Code.gs
