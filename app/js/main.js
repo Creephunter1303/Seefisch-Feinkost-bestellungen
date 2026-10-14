@@ -7,7 +7,7 @@ import { demoEinstellungen } from './daten/demo.js';
 import { mitZeitlimit, Verbindungsfehler, Zugangsfehler } from './daten/fehler.js';
 import { Warteschlange } from './warteschlange.js';
 import { ansichtGleich, ansichtName } from './logik.js';
-import { toast, vibrieren } from './ui.js';
+import { h, toast, vibrieren } from './ui.js';
 import { scharfInhalt } from './komponenten.js';
 import { listeZeichnen } from './ansichten/liste.js';
 import { formularZeichnen, formularNeuStarten } from './ansichten/formular.js';
@@ -155,14 +155,15 @@ function statusInfo() {
     return { klasse: 'fehler', text: 'Keine Verbindung' + (n ? ' · ' + n + ' wartet' : '') };
   }
   if (n) return { klasse: 'wartet', text: 'Wird gesendet …' };
-  return { klasse: 'ok', text: stand ? 'Aktuell · ' + stand : 'Verbunden' };
+  // Auf dem Handy entfällt „Aktuell ·" (zu schmal) – grüner Punkt + Uhrzeit bleiben.
+  return stand ? { klasse: 'ok', vorsatz: 'Aktuell · ', text: stand } : { klasse: 'ok', text: 'Verbunden' };
 }
 
 app.statusZeichnen = function () {
   const s = statusInfo();
   document.querySelectorAll('.sync').forEach((el) => {
     el.className = 'sync ' + s.klasse;
-    el.textContent = s.text;
+    el.replaceChildren(...(s.vorsatz ? [h('span', { class: 'sync-vorsatz' }, s.vorsatz)] : []), s.text);
   });
 };
 
@@ -226,11 +227,11 @@ app.heuteNeuSetzen = function (tag) {
 };
 
 function tagwechselPruefen() {
-  const h = heuteIso();
-  if (h === zustand.heute) return;
+  const heute = heuteIso();
+  if (heute === zustand.heute) return;
   // Neuer Tag: zurück auf Heute und auf die Standard-Ansicht des Tablets.
-  zustand.heute = h;
-  zustand.tag = h;
+  zustand.heute = heute;
+  zustand.tag = heute;
   zustand.zeitraum = 'tag';
   loeschen('ansicht_temp');
   zustand.ansicht = zustand.standard;
