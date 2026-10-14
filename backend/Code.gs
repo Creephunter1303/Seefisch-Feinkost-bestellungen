@@ -451,6 +451,7 @@ function neuerSchluessel() {
     ui.ButtonSet.YES_NO);
   if (antwort !== ui.Button.YES) return;
   blatt.getRange(zeile, 2).setValue(schluesselErzeugen_());
+  linkFormelSichern_(blatt.getRange(zeile, 4), zeile);
   ui.alert('Erledigt. Den neuen Einrichtungs-Link für „' + name + '" findest du in Spalte D.');
 }
 
@@ -568,9 +569,7 @@ function einrichten() {
     const z = i + 1;
     if (!text_(werte[i][1])) { tablets.getRange(z, 2).setValue(schluesselErzeugen_()); neueSchluessel++; }
     if (!text_(werte[i][2])) tablets.getRange(z, 3).setValue('Ja');
-    if (!tablets.getRange(z, 4).getFormula()) {
-      tablets.getRange(z, 4).setFormula('=IF(OR(B' + z + '="",C' + z + '="Nein",WEBAPP_ADRESSE=""),"",APP_ADRESSE&"#api="&ENCODEURL(WEBAPP_ADRESSE)&"&k="&ENCODEURL(B' + z + '))');
-    }
+    linkFormelSichern_(tablets.getRange(z, 4), z);
   }
   meldungen.push('Tablets: ' + (werte.length - 1) + ' Zeilen, ' + neueSchluessel + ' neue Schlüssel erzeugt.');
 
@@ -603,6 +602,18 @@ function kopfSichern_(blatt, kopf) {
   const bisher = blatt.getRange(1, 1, 1, kopf.length).getValues()[0];
   kopf.forEach((name, i) => { if (!text_(bisher[i])) blatt.getRange(1, i + 1).setValue(name).setFontWeight('bold'); });
   if (blatt.getFrozenRows() < 1) blatt.setFrozenRows(1);
+}
+
+/**
+ * Link-Formel in Spalte D anlegen oder reparieren (fehlt sie oder zeigt sie einen Fehler wie
+ * „#ERROR!"). Je nach Tabellen-Sprache trennt Google mit „," oder „;" – darum beide probieren.
+ */
+function linkFormelSichern_(zelle, z) {
+  if (zelle.getFormula() && !/^#/.test(zelle.getDisplayValue())) return;
+  const formel = '=IF(OR(B' + z + '="",C' + z + '="Nein",WEBAPP_ADRESSE=""),"",APP_ADRESSE&"#api="&ENCODEURL(WEBAPP_ADRESSE)&"&k="&ENCODEURL(B' + z + '))';
+  zelle.setFormula(formel);
+  SpreadsheetApp.flush();
+  if (/^#/.test(zelle.getDisplayValue())) zelle.setFormula(formel.replace(/,/g, ';'));
 }
 
 function benannterBereich_(ss, blatt, name, beschriftung) {
