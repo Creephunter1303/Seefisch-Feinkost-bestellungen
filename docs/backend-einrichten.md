@@ -76,3 +76,7 @@ Alles mit **dem Google-Konto** machen, dem die Tabelle und der Kalender „Beste
 
 Code wie in Schritt 1 ersetzen und speichern → **Bereitstellen → Bereitstellungen verwalten** →
 Stift-Symbol → Version: **Neue Version** → **Bereitstellen**. Die Web-App-Adresse bleibt gleich.
+
+⚠ **Nicht** „Neue Bereitstellung" wählen und die alte archivieren: Das ergibt eine **neue Adresse**,
+und alle Tablets verlieren die Verbindung. Dann neue Adresse ins Blatt „Einstellungen" und jedes
+Gerät noch einmal über seinen Link (Spalte D) einrichten.
