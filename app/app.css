@@ -27,6 +27,7 @@
   --blau-rahmen: #4F79A3;        /* Rahmen offene Bestellung (3 px) */
   --blau-feld: #E3ECF5;          /* Bestellfeld im offenen Zettel */
   --blau-feld-text: #0B2A47;
+  --ware-text: #000000;          /* App-Ergänzung: Bestelltext im offenen Zettel schwarz (Wunsch Max) */
   --blau-aktiv: #DCE7F2;         /* aktiver Tag */
   --blau-aktiv-rand: #5B84AB;
   --blau-auswahl: #D3E2F0;       /* Fahrzeug-Auswahl */
@@ -342,7 +343,7 @@ h1, h2, h3, p { margin: 0; }
 
 /* Offen: weiß, kräftiger blauer Rahmen, Bestellung im blauen Feld */
 .zettel.offen { background: var(--flaeche); border: 3px solid var(--blau-rahmen); box-shadow: 0 6px 16px rgba(11, 61, 102, .12); }
-.zettel.offen .ware { margin: 10px 10px 0; padding: 14px 16px; border-radius: var(--radius-feld); background: var(--blau-feld); color: var(--blau-feld-text); font-size: 30px; line-height: 1.15; }
+.zettel.offen .ware { margin: 10px 10px 0; padding: 14px 16px; border-radius: var(--radius-feld); background: var(--blau-feld); color: var(--ware-text); font-size: 30px; line-height: 1.15; }
 .zettel.offen .kunde { padding: 10px 20px 12px; font-size: 20px; color: var(--text-2); }
 .zettel.offen .fuss { border-top: 2px dashed var(--strich); padding: 10px 14px 12px 20px; display: flex; align-items: center; gap: 12px; }
 .zettel.offen .infos { flex: 1; min-width: 0; font-size: 16px; color: var(--text-3); display: flex; flex-direction: column; gap: 2px; overflow-wrap: anywhere; }
