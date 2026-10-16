@@ -29,10 +29,14 @@ Tablet-App (PWA) für Kundenbestellungen der Verkaufswagen. Löst v3 ab
   `--offline`) nur für Hinweise (fremde Ansicht, offline).
   Farbregel: Dunkelblau gefüllt NUR „Neue Bestellung". Blau = offen / aktive Auswahl,
   Grün = abgeholt (und der Kopf „Bestellung gespeichert"), Rot = storniert und Fehlermeldungen
-  (z. B. „Nicht gespeichert – keine Verbindung"). Feld-Hinweise unter Eingaben: dunkel + ⚠.
+  (z. B. „Nicht gespeichert – keine Verbindung"). Fehlende Pflichtfelder: roter Rahmen
+  (`--rot-punkt`), Hinweis darunter rot + ⚠.
 - Startseite (v3): Sync normal nur grüner Punkt (Tippen = aktualisieren), Text nur bei Problemen
   („Offline · Stand 6:42 · 1 wartet", orange). Tagesleiste „HEUTE · DI" … „WOCHE · KW 42";
   Woche zeigt Sa/So schon die nächste Woche.
+- Waagerecht wischen auf der Startseite: links = nächster Tag mit Markt/Bestellung in der Ansicht,
+  rechts = vorheriger (nicht vor heute); in „Woche" ganze Wochen.
+- Markt ohne Bestellungen: nur der Markt-Kopf, kein graues „Keine Bestellungen"-Feld.
 - Markt-Kopf ohne Zähler; Fahrzeug dezent (`.fz`, Lkw + Name, grau): in „Alle Märkte" immer,
   sonst nur bei fremdem Fahrzeug.
 - Fremde Ansicht (≠ Standard-Ansicht): gelbes Hinweisband im klebenden Kopf (keine temp-leiste mehr),

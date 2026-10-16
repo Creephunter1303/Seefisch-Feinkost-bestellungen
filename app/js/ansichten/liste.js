@@ -15,7 +15,7 @@ import {
 
 export function listeZeichnen(app) {
   const z = app.zustand;
-  return h('div', { class: 'bs bs-liste' },
+  const seite = h('div', { class: 'bs bs-liste' },
     app.istDemo && demoStreifen(),
     h('header', { class: 'kopf' },
       kopfZeile(app),
@@ -25,6 +25,54 @@ export function listeZeichnen(app) {
     h('footer', { class: 'fuss-leiste' },
       h('button', { type: 'button', class: 'primaer', onclick: () => app.neueBestellung() },
         icon('plus', { groesse: 26, strich: 3 }), 'Neue Bestellung')));
+  wischenEinrichten(seite, app);
+  return seite;
+}
+
+// ---------- Wischen: links = nächster Tag (bzw. Woche), rechts = vorheriger ----------
+
+function wischenEinrichten(el, app) {
+  let start = null;
+  el.addEventListener('touchstart', (e) => {
+    start = null;
+    if (e.touches.length !== 1 || app.zustand.sucheOffen || app.zustand.overlay) return;
+    if (e.target.closest('input, textarea')) return;
+    const t = e.touches[0];
+    start = { x: t.clientX, y: t.clientY, zeit: Date.now() };
+  }, { passive: true });
+  el.addEventListener('touchcancel', () => { start = null; }, { passive: true });
+  el.addEventListener('touchend', (e) => {
+    if (!start) return;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - start.x;
+    const dy = t.clientY - start.y;
+    const dauer = Date.now() - start.zeit;
+    start = null;
+    // Nur deutliche, schnelle, waagerechte Bewegungen – Scrollen bleibt unberührt.
+    if (dauer > 700 || Math.abs(dx) < 70 || Math.abs(dx) < 1.5 * Math.abs(dy)) return;
+    tagWischen(app, dx < 0 ? 1 : -1);
+  }, { passive: true });
+}
+
+/** Nächster/vorheriger Tag mit Markt oder Bestellung in der aktuellen Ansicht; in „Woche" die Woche. */
+function tagWischen(app, richtung) {
+  const z = app.zustand;
+  const heute = heuteIso();
+  const max = plusTage(heute, VORLAUF_TAGE);
+  let ziel = null;
+  if (z.zeitraum === 'woche') {
+    const neu = plusTage(wochenstart(z.tag), 7 * richtung);
+    if (neu <= max && neu >= wochenstart(heute)) ziel = neu < heute ? heute : neu;
+  } else {
+    const mitBestellung = new Set(fuerAnsicht(app.bestellungen(), z.konfig, z.ansicht).map((b) => b.datum));
+    for (let t = plusTage(z.tag, richtung); t >= heute && t <= max; t = plusTage(t, richtung)) {
+      if (mitBestellung.has(t) || maerkteAmTag(z.konfig, z.ansicht, t).length) { ziel = t; break; }
+    }
+  }
+  if (!ziel || ziel === z.tag) return;
+  app.tagSetzen(ziel);
+  const inhalt = document.getElementById('listen-inhalt');
+  if (inhalt) inhalt.classList.add(richtung > 0 ? 'von-rechts' : 'von-links');
 }
 
 /** Nur den Listenbereich neu aufbauen (z. B. beim Tippen in der Suche – Tastatur bleibt offen). */
@@ -249,10 +297,9 @@ function marktGruppen(app, amTag, maerkte, { klein = false, einklappen = app.erl
     const vomMarkt = zettelSortieren(amTag.filter((b) => b.markt === name));
     return [
       marktKopf(app, name, { klein }),
-      vomMarkt.length
-        ? raster(app, vomMarkt, einklappen ? vomMarkt[0].datum + '|' + name : null)
-        : h('div', { class: 'leer-zeile' }, 'Keine Bestellungen für diesen Markt.'),
-    ];
+      // Markt ohne Bestellungen: nur der Kopf – darunter steht dann einfach nichts.
+      vomMarkt.length > 0 && raster(app, vomMarkt, einklappen ? vomMarkt[0].datum + '|' + name : null),
+    ].filter(Boolean);
   });
 }
 

@@ -101,6 +101,7 @@ svg { display: block; flex-shrink: 0; }
 h1, h2, h3, p { margin: 0; }
 
 .bs { min-height: 100vh; }
+.bs-liste { touch-action: pan-y; }   /* waagerecht wischen = Tag wechseln */
 
 .demo-streifen {
   background: repeating-linear-gradient(-45deg, #fde68a 0 14px, #fcd34d 14px 28px);
@@ -258,7 +259,7 @@ h1, h2, h3, p { margin: 0; }
 }
 /* Markt-Kopf schlicht (v3): Name + dezentes Fahrzeug, kein Zähler */
 .markt-v3 { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; padding: 2px 2px 0; }
-.raster + .markt-v3, .leer-zeile + .markt-v3 { margin-top: 14px; }
+.raster + .markt-v3, .leer-zeile + .markt-v3, .markt-v3 + .markt-v3 { margin-top: 14px; }
 .markt-name { display: flex; align-items: center; gap: 8px; color: var(--blau); min-width: 0; }
 .markt-name h2 {
   margin: 0;
@@ -560,7 +561,7 @@ h1, h2, h3, p { margin: 0; }
 .feld-hinweis { font-family: var(--schrift); font-size: 16px; font-weight: 500; letter-spacing: 0; text-transform: none; color: var(--text-3); }
 .ok-marke { display: none; color: var(--blau); }
 .feld.ok .ok-marke { display: inline-flex; }
-.feld-fehler { margin-top: 8px; font-size: 17px; font-weight: 600; color: var(--text); }
+.feld-fehler { margin-top: 8px; font-size: 17px; font-weight: 600; color: var(--rot-text); }
 .feld-fehler::before { content: "⚠ "; }
 .feld-fehler:empty { display: none; }
 .feld-leer { padding: 16px; border: 1.5px dashed var(--kopf-linie); border-radius: var(--radius-button); color: var(--text-3); font-size: 17px; }
@@ -583,8 +584,9 @@ h1, h2, h3, p { margin: 0; }
 .eingabe:focus { outline: none; box-shadow: inset 0 0 0 3px var(--blau-aktiv-rand); }
 textarea.eingabe { min-height: 120px; resize: vertical; line-height: 1.3; }
 #feld-bestellung { font-family: var(--schrift-schmal); font-size: 26px; font-weight: 600; line-height: 1.2; min-height: 150px; }
-.feld.fehlerhaft .eingabe { box-shadow: inset 0 0 0 3px var(--text); }
-.feld.fehlerhaft .auswahl-gitter { outline: 3px solid var(--text); outline-offset: 4px; border-radius: var(--radius-button); }
+.feld.fehlerhaft .eingabe { box-shadow: inset 0 0 0 3px var(--rot-punkt); }   /* fehlende Pflichtangabe: rot (Wunsch Max) */
+.feld.fehlerhaft .auswahl-gitter { outline: 3px solid var(--rot-punkt); outline-offset: 4px; border-radius: var(--radius-button); }
+.feld.fehlerhaft .feld-leer { border: 3px solid var(--rot-punkt); }
 
 .auswahl-gitter { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px; }
 .auswahl {
@@ -838,3 +840,9 @@ textarea.eingabe.link-feld { min-height: 96px; font-size: 16px; word-break: brea
   .primaer { height: 64px; font-size: 20px; }
   .toast { width: calc(100% - 2 * var(--abstand-rand)); bottom: calc(96px + env(safe-area-inset-bottom)); font-size: 17px; }
 }
+
+/* Tag per Wischen gewechselt: Inhalt kommt kurz aus der Wischrichtung */
+@keyframes von-rechts { from { transform: translateX(40px); opacity: .3; } to { transform: none; opacity: 1; } }
+@keyframes von-links { from { transform: translateX(-40px); opacity: .3; } to { transform: none; opacity: 1; } }
+.liste.von-rechts { animation: von-rechts .18s ease-out; }
+.liste.von-links { animation: von-links .18s ease-out; }
