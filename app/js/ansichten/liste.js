@@ -492,8 +492,9 @@ function wocheBauen(app, liste) {
     teile.push(h('h2', { class: 'tag-titel' },
       rel && h('span', { class: 'heute-marke' }, rel),
       h('button', { type: 'button', class: 'tag-link', onclick: () => { app.zeitraumSetzen('tag'); app.tagSetzen(t); } }, datumLang(t))));
-    // Tag ohne Bestellungen: nur die Überschrift – darunter folgt gleich der nächste Tag.
-    if (amTag.length) teile.push(...marktGruppen(app, amTag, maerkte, { klein: true }));
+    // Nur Märkte mit Bestellungen (Reihenfolge wie in der Tabelle). Tag ohne Bestellungen:
+    // nur die Überschrift – darunter folgt gleich der nächste Tag.
+    if (amTag.length) teile.push(...marktGruppen(app, amTag, [], { klein: true }));
   }
   if (!gezeigt) {
     teile.push(h('div', { class: 'leer' }, h('div', { class: 'leer-titel' },
