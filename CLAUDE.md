@@ -24,7 +24,7 @@ Tablet-App (PWA) für Kundenbestellungen der Verkaufswagen. Löst v3 ab
 - UI/Doku Deutsch, Begriffe wie am Wagen (Abholung, Kunde, Markt). UX-Regeln „Ein Blick, ein Tipp":
   Tippflächen ≥ 56 px, Kontraste nach UX-Regeln, Status immer Wort + Zeichen + Farbe.
 - Design: **Designvorlage F6 v3 „Schlicht"** (`design-vorlage/`, PNGs + `vorlage.css` inkl. Abschnitte
-  v2 und v3) ist verbindlich; Werte 1:1 in `app/app.css` (`alt-v1/`, `alt-v2/` nur zum Vergleich).
+  v2, v3 und v3.1 „Feste Wochenleiste" mit `design-vorlage/tagesleiste/`) ist verbindlich; Werte 1:1 in `app/app.css` (`alt-v1/`, `alt-v2/` nur zum Vergleich).
   Schriften Barlow / Barlow Condensed (selbst gehostet, `app/schriften/`). Bernstein (`--hinweis-*`,
   `--offline`) nur für Hinweise (fremde Ansicht, offline).
   Farbregel: Dunkelblau gefüllt NUR „Neue Bestellung". Blau = offen / aktive Auswahl,
@@ -32,16 +32,21 @@ Tablet-App (PWA) für Kundenbestellungen der Verkaufswagen. Löst v3 ab
   (z. B. „Nicht gespeichert – keine Verbindung"). Fehlende Pflichtfelder: roter Rahmen
   (`--rot-punkt`), Hinweis darunter rot + ⚠.
 - Startseite (v3): Sync normal nur grüner Punkt (Tippen = aktualisieren), Text nur bei Problemen
-  („Offline · Stand 6:42 · 1 wartet", orange). Tagesleiste „HEUTE · DI" … „WOCHE · KW 42";
-  Woche zeigt Sa/So schon die nächste Woche.
-- Waagerecht wischen auf der Startseite: links = nächster Tag mit Markt/Bestellung in der Ansicht,
-  rechts = vorheriger (nicht vor heute); in „Woche" ganze Wochen.
+  („Offline · Stand 6:42 · 1 wartet", orange).
+- Feste Wochenleiste (v3.1): immer Di Mi Do Fr Sa der angezeigten Woche + Wochen-Kachel (KW dieser
+  Woche, Tippen = ganze Woche). Heute = Fähnchen `.ist-heute`. `.kein-markt` (kein Markt der Ansicht und
+  keine Bestellung an dem Tag) und `.vorbei` (vor heute) sind deaktiviert. Montag: laufende Woche,
+  Sonntag: nächste Woche; gewählt wird heute bzw. der nächste Tag mit Markt (`tagAnpassen`).
+- Wischen NUR auf der Wochenleiste (Liste scrollt ungestört): links = nächste Woche, rechts = vorige;
+  von der aktuellen Woche bis zur Woche, in der `VORLAUF_TAGE` endet; an der Grenze federt sie zurück,
+  Pfeil `.aus`. Danach derselbe Wochentag, sonst der erste mit Markt. Pfeile nur Hinweis (aria-hidden).
 - Markt ohne Bestellungen: nur der Markt-Kopf, kein graues „Keine Bestellungen"-Feld.
 - Markt-Kopf ohne Zähler; Fahrzeug dezent (`.fz`, Lkw + Name, grau): in „Alle Märkte" immer,
   sonst nur bei fremdem Fahrzeug.
-- Fremde Ansicht (≠ Standard-Ansicht): gelbes Hinweisband im klebenden Kopf (keine temp-leiste mehr),
-  „Du siehst gerade … · <Tag>", Knopf „Zurück zu <Standard> · Heute" setzt Ansicht UND Tag zurück.
-  Bloßer Tageswechsel zeigt kein Band.
+- Gelbes Hinweisband im klebenden Kopf bei fremder Ansicht (≠ Standard) und/oder anderer Woche als der
+  aktuellen: „Du siehst gerade <Ansicht> · nächste Woche|KW n · Freitag, 23.10.", Knopf „Zurück zu Heute"
+  bzw. „Zurück zu <Standard> · Heute" setzt Ansicht, Woche und Tag zurück. Tageswechsel innerhalb der
+  aktuellen Woche zeigt kein Band.
 - Offener Zettel auf der Startseite = `zettelSchlicht` (`.zettel-s`): Bestellung, darunter Kunde
   (+ `.kontakt-icon` Hörer bzw. Brief bei „@", wenn Kontakt hinterlegt), Kommentar fett mit Sprechblase,
   „⏳ wird gesendet", rechts `.haken` „Abgeholt?". Kontakt-Text nur in der Detailansicht.

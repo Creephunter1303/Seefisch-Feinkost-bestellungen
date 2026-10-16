@@ -257,3 +257,34 @@ svg { display: block; }
 .kipp.an { background: var(--blau-rahmen); }
 .kipp.an::after { left: 36px; }
 .kipp-wort { font-size: 16px; font-weight: 600; color: var(--text-2); width: 32px; }
+
+/* Kontakt hinterlegt? Kleiner Hörer hinter dem Kundennamen – Nummer selbst nur in der Detailansicht */
+.zettel-s .kunde { display: inline-flex; align-items: center; gap: 10px; }
+.kontakt-icon { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; background: var(--sekundaer); color: var(--text-3); }
+
+/* =========================================================================
+   v3.1 – Feste Wochenleiste Di–Sa (16.10.)
+   Fünf feste Kacheln Di Mi Do Fr Sa, links/rechts kleine Pfeile als Wisch-Hinweis
+   (nicht antippbar), rechts daneben die Wochen-Kachel. Wischen wechselt die Woche.
+   ========================================================================= */
+.wochenleiste { display: flex; align-items: stretch; gap: 6px; padding-bottom: 14px; }
+.wochenleiste .tage-fest { flex: 1; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+.wisch-pfeil { width: 22px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: #9AA5B1; }
+.wisch-pfeil.aus { color: #D3DAE2; }                  /* keine Woche mehr in diese Richtung */
+.wochenleiste .tag.woche-kachel { width: 104px; flex-shrink: 0; }
+.tag.kein-markt { background: transparent; box-shadow: inset 0 0 0 1.5px #DDE3E9; color: #A9B2BC; cursor: default; }
+.tag.kein-markt .wt, .tag.kein-markt .anz { color: #A9B2BC; }
+.tag.kein-markt .nr { color: #B8C0C9; }
+.tag.vorbei { background: transparent; color: #8C96A1; }
+.tag.vorbei .wt, .tag.vorbei .anz { color: #8C96A1; }
+.tag .heute-marke { font-size: 13px; font-weight: 700; letter-spacing: .05em; color: var(--blau); }
+.app.quer .wochenleiste .tag.woche-kachel { width: 150px; }
+/* „Heute“ als kleines Fähnchen auf der Kachel – der Wochentag bleibt in der Kachel stehen */
+.tag { position: relative; }
+.tag.ist-heute::before { content: "HEUTE"; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); padding: 2px 8px; border-radius: 6px; background: var(--blau); color: #fff; font-size: 12px; font-weight: 700; letter-spacing: .06em; line-height: 1.3; }
+.wochenleiste { padding-top: 10px; }
+/* Wochen-Kachel schmaler (v3.1b) */
+.wochenleiste .tag.woche-kachel { width: 82px; }
+.wochenleiste .tag.woche-kachel .nr { font-size: 26px; }
+.wochenleiste .tag.woche-kachel .wt { letter-spacing: .02em; }
+.app.quer .wochenleiste .tag.woche-kachel { width: 118px; gap: 8px; }

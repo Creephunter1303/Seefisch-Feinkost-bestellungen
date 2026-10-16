@@ -1,12 +1,12 @@
-// Startseite: Kopfleiste mit Fahrzeug-Auswahl, Tagesleiste (Heute + nächste Markttage + Woche),
-// ggf. gelbes Hinweisband (fremde Ansicht), darunter die Zettel nach Markt gruppiert.
-// Gestaltung: Designvorlage F6 v3 „Schlicht".
+// Startseite: Kopfleiste mit Fahrzeug-Auswahl, feste Wochenleiste Di–Sa (Wischen = Woche wechseln)
+// + Wochen-Kachel, ggf. gelbes Hinweisband (fremde Ansicht / andere Woche), darunter die Zettel
+// nach Markt gruppiert. Gestaltung: Designvorlage F6 v3 „Schlicht" + v3.1 „Feste Wochenleiste".
 
 import { h } from '../ui.js';
 import { icon } from '../icons.js';
 import { demoStreifen, syncAnzeige, marktKopf, zettel, zettelSchlicht } from '../komponenten.js';
 import {
-  heuteIso, plusTage, datumLang, datumKurz, relativerTag, wochenstart, kalenderwoche, wochenText,
+  heuteIso, plusTage, datumLang, datumKurz, tagMonat, relativerTag, wochenstart, kalenderwoche, wochenText,
   wochentag, ausIso, TAGE_KURZ, TAGE_LANG, VORLAUF_TAGE,
 } from '../datum.js';
 import {
@@ -15,64 +15,17 @@ import {
 
 export function listeZeichnen(app) {
   const z = app.zustand;
-  const seite = h('div', { class: 'bs bs-liste' },
+  tagAnpassen(app);
+  return h('div', { class: 'bs bs-liste' },
     app.istDemo && demoStreifen(),
     h('header', { class: 'kopf' },
       kopfZeile(app),
-      z.sucheOffen ? suchLeiste(app) : tagesleiste(app),
-      app.istVoruebergehend() && hinweisband(app)),
+      z.sucheOffen ? suchLeiste(app) : wochenleiste(app),
+      (app.istVoruebergehend() || andereWoche(app)) && hinweisband(app)),
     h('main', { class: 'liste', id: 'listen-inhalt' }, inhaltBauen(app)),
     h('footer', { class: 'fuss-leiste' },
       h('button', { type: 'button', class: 'primaer', onclick: () => app.neueBestellung() },
         icon('plus', { groesse: 26, strich: 3 }), 'Neue Bestellung')));
-  wischenEinrichten(seite, app);
-  return seite;
-}
-
-// ---------- Wischen: links = nächster Tag (bzw. Woche), rechts = vorheriger ----------
-
-function wischenEinrichten(el, app) {
-  let start = null;
-  el.addEventListener('touchstart', (e) => {
-    start = null;
-    if (e.touches.length !== 1 || app.zustand.sucheOffen || app.zustand.overlay) return;
-    if (e.target.closest('input, textarea')) return;
-    const t = e.touches[0];
-    start = { x: t.clientX, y: t.clientY, zeit: Date.now() };
-  }, { passive: true });
-  el.addEventListener('touchcancel', () => { start = null; }, { passive: true });
-  el.addEventListener('touchend', (e) => {
-    if (!start) return;
-    const t = e.changedTouches[0];
-    const dx = t.clientX - start.x;
-    const dy = t.clientY - start.y;
-    const dauer = Date.now() - start.zeit;
-    start = null;
-    // Nur deutliche, schnelle, waagerechte Bewegungen – Scrollen bleibt unberührt.
-    if (dauer > 700 || Math.abs(dx) < 70 || Math.abs(dx) < 1.5 * Math.abs(dy)) return;
-    tagWischen(app, dx < 0 ? 1 : -1);
-  }, { passive: true });
-}
-
-/** Nächster/vorheriger Tag mit Markt oder Bestellung in der aktuellen Ansicht; in „Woche" die Woche. */
-function tagWischen(app, richtung) {
-  const z = app.zustand;
-  const heute = heuteIso();
-  const max = plusTage(heute, VORLAUF_TAGE);
-  let ziel = null;
-  if (z.zeitraum === 'woche') {
-    const neu = plusTage(wochenstart(z.tag), 7 * richtung);
-    if (neu <= max && neu >= wochenstart(heute)) ziel = neu < heute ? heute : neu;
-  } else {
-    const mitBestellung = new Set(fuerAnsicht(app.bestellungen(), z.konfig, z.ansicht).map((b) => b.datum));
-    for (let t = plusTage(z.tag, richtung); t >= heute && t <= max; t = plusTage(t, richtung)) {
-      if (mitBestellung.has(t) || maerkteAmTag(z.konfig, z.ansicht, t).length) { ziel = t; break; }
-    }
-  }
-  if (!ziel || ziel === z.tag) return;
-  app.tagSetzen(ziel);
-  const inhalt = document.getElementById('listen-inhalt');
-  if (inhalt) inhalt.classList.add(richtung > 0 ? 'von-rechts' : 'von-links');
 }
 
 /** Nur den Listenbereich neu aufbauen (z. B. beim Tippen in der Suche – Tastatur bleibt offen). */
@@ -80,6 +33,68 @@ export function listenInhaltErneuern(app) {
   const ziel = document.getElementById('listen-inhalt');
   if (!ziel) return false;
   ziel.replaceChildren(...inhaltBauen(app));
+  return true;
+}
+
+// ---------- Wochen-Logik ----------
+
+/** Montag der Woche, die die Leiste für diesen Tag zeigt – sonntags schon die nächste Woche. */
+function anzeigeWoche(t) {
+  return wochentag(t) === 0 ? plusTage(t, 1) : wochenstart(t);
+}
+
+/** Die fünf festen Tage Di–Sa einer Woche (Montag übergeben). */
+function festeTage(montag) {
+  return [1, 2, 3, 4, 5].map((i) => plusTage(montag, i));
+}
+
+/** Erste und letzte Woche, durch die man wischen kann (aktuelle Woche … Woche, in der der Vorlauf endet). */
+function wochenGrenzen() {
+  const heute = heuteIso();
+  return { erste: anzeigeWoche(heute), letzte: wochenstart(plusTage(heute, VORLAUF_TAGE)) };
+}
+
+function andereWoche(app) {
+  return anzeigeWoche(app.zustand.tag) !== wochenGrenzen().erste;
+}
+
+function tageMitBestellung(app) {
+  const z = app.zustand;
+  return new Set(fuerAnsicht(app.bestellungen(), z.konfig, z.ansicht).map((b) => b.datum));
+}
+
+/** Antippbar: nicht vorbei und in der Ansicht ein Markt (oder schon Bestellungen) an dem Tag. */
+function waehlbar(app, t, mitBestellung) {
+  return t >= heuteIso() && (mitBestellung.has(t) || maerkteAmTag(app.zustand.konfig, app.zustand.ansicht, t).length > 0);
+}
+
+/**
+ * Gewählter Tag hat in der Ansicht nichts (Montag, Sonntag, Tag ohne Markt, Ansicht gewechselt) →
+ * der erste kommende Tag der angezeigten Woche mit Markt. Hat die Woche keinen: so lassen (Leer-Hinweis).
+ */
+function tagAnpassen(app) {
+  const z = app.zustand;
+  if (!z.konfig || z.zeitraum !== 'tag') return;
+  const mitBestellung = tageMitBestellung(app);
+  if (waehlbar(app, z.tag, mitBestellung)) return;
+  const ziel = festeTage(anzeigeWoche(z.tag)).find((t) => waehlbar(app, t, mitBestellung));
+  if (ziel) z.tag = ziel;
+}
+
+/** Woche wechseln: derselbe Wochentag, wenn dort ein Markt ist, sonst der erste Tag mit Markt. */
+function wocheWechseln(app, richtung) {
+  const z = app.zustand;
+  const g = wochenGrenzen();
+  const neu = plusTage(anzeigeWoche(z.tag), 7 * richtung);
+  if (neu < g.erste || neu > g.letzte) return false;
+  const mitBestellung = tageMitBestellung(app);
+  const tage = festeTage(neu);
+  const gleicherTag = plusTage(neu, (wochentag(z.tag) + 6) % 7);
+  let ziel = waehlbar(app, gleicherTag, mitBestellung) ? gleicherTag : tage.find((t) => waehlbar(app, t, mitBestellung));
+  if (!ziel) ziel = tage.find((t) => t >= heuteIso()) || neu;
+  app.tagSetzen(ziel);
+  const klasse = richtung > 0 ? 'von-rechts' : 'von-links';
+  document.querySelectorAll('.wochenleiste .tage-fest, #listen-inhalt').forEach((el) => el.classList.add(klasse));
   return true;
 }
 
@@ -106,32 +121,41 @@ function kopfZeile(app) {
 }
 
 /**
- * Gelbes Hinweisband im klebenden Kopf – nur wenn die Ansicht von der Standard-Ansicht abweicht.
- * „Zurück zu … · Heute" setzt Ansicht UND Tag zurück.
+ * Gelbes Hinweisband im klebenden Kopf – wenn die Ansicht von der Standard-Ansicht abweicht und/oder
+ * eine andere als die aktuelle Woche angezeigt wird. Der Knopf setzt beides zurück (Ansicht, Woche, Tag).
  */
 function hinweisband(app) {
   const z = app.zustand;
   const heute = heuteIso();
-  const gerade = z.ansicht.typ === 'alle' ? 'alle Fahrzeuge' : z.ansicht.wert;
+  const fremd = app.istVoruebergehend();
+  const woche = anzeigeWoche(z.tag);
+  const erste = wochenGrenzen().erste;
+  const wocheText = woche === erste ? '' : woche === plusTage(erste, 7) ? 'nächste Woche' : 'KW ' + kalenderwoche(woche);
   let wann = '';
-  if (z.zeitraum === 'woche') wann = 'KW ' + kalenderwoche(z.tag);
-  else if (z.tag !== heute) wann = z.tag <= plusTage(heute, 6) ? TAGE_LANG[wochentag(z.tag)] : datumKurz(z.tag);
+  if (z.zeitraum === 'woche') wann = wocheText ? '' : 'KW ' + kalenderwoche(woche);
+  else if (wocheText) wann = TAGE_LANG[wochentag(z.tag)] + ', ' + tagMonat(z.tag);
+  else if (z.tag !== heute) wann = TAGE_LANG[wochentag(z.tag)];
   const standard = z.standard.typ === 'alle' ? 'Alle' : z.standard.wert;
+  const teile = [];
+  if (fremd) teile.push(h('b', null, z.ansicht.typ === 'alle' ? 'alle Fahrzeuge' : z.ansicht.wert));
+  if (wocheText) teile.push(h('b', null, wocheText));
+  if (wann) teile.push(wann);
   return h('div', { class: 'hinweisband' },
-    h('span', { class: 'hinweis-text-band' }, 'Du siehst gerade ', h('b', null, gerade), wann && ' · ' + wann),
+    h('span', { class: 'hinweis-text-band' }, 'Du siehst gerade ', teile.flatMap((t, i) => (i ? [' · ', t] : [t]))),
     h('div', { class: 'platzhalter' }),
     h('button', {
       type: 'button',
       onclick: () => {
-        app.ansichtSetzen(z.standard);
+        if (fremd) app.ansichtSetzen(z.standard);
         z.zeitraum = 'tag';
-        z.tag = heuteIso();
+        z.tag = heuteIso();   // tagAnpassen() nimmt sonst den nächsten Markttag
+        z.nachOben = true;
         app.render();
       },
-    }, 'Zurück zu ' + standard + ' · Heute'));
+    }, fremd ? 'Zurück zu ' + standard + ' · Heute' : 'Zurück zu Heute'));
 }
 
-// ---------- Tagesleiste: Heute + nächste 4 Markttage + ganze Woche ----------
+// ---------- Feste Wochenleiste Di–Sa + Wochen-Kachel ----------
 
 function offenProTag(app) {
   const z = app.zustand;
@@ -142,65 +166,66 @@ function offenProTag(app) {
   return m;
 }
 
-function tagesleiste(app) {
+function wochenleiste(app) {
   const z = app.zustand;
-  const heute = heuteIso();
-  const max = plusTage(heute, VORLAUF_TAGE);
+  const woche = anzeigeWoche(z.tag);
+  const g = wochenGrenzen();
   const offen = offenProTag(app);
-  const tage = [];
-  for (let t = plusTage(heute, 1); t <= max && tage.length < 4; t = plusTage(t, 1)) {
-    if (maerkteAmTag(z.konfig, z.ansicht, t).length) tage.push(t);
-  }
-  // Ein weiter entfernter Tag (aus dem Kalender gewählt) ersetzt die letzte Kachel.
-  if (z.zeitraum === 'tag' && z.tag !== heute && !tage.includes(z.tag)) {
-    if (tage.length === 4) tage.pop();
-    tage.push(z.tag);
-    tage.sort();
-  }
-  return h('nav', { class: 'tage', 'aria-label': 'Tage' },
-    tagKachel(app, heute, true, offen.get(heute) || 0),
-    tage.map((t) => tagKachel(app, t, false, offen.get(t) || 0)),
-    wochenKachel(app));
+  const mitBestellung = tageMitBestellung(app);
+  const zurueck = woche > g.erste;
+  const vor = woche < g.letzte;
+  const pfeil = (name, geht) => h('span', { class: 'wisch-pfeil' + (geht ? '' : ' aus'), 'aria-hidden': 'true' },
+    icon(name, { groesse: 20, strich: 2.6 }));
+  const leiste = h('nav', { class: 'wochenleiste', 'aria-label': 'Woche – zum Wechseln wischen' },
+    pfeil('pfeilLinks', zurueck),
+    h('div', { class: 'tage-fest' },
+      festeTage(woche).map((t) => tagKachel(app, t, offen.get(t) || 0, mitBestellung))),
+    pfeil('pfeilRechts', vor),
+    wochenKachel(app, woche));
+  wischenEinrichten(leiste, app, { zurueck, vor });
+  return leiste;
 }
 
-function tagKachel(app, t, istHeute, anzahl) {
+function tagKachel(app, t, anzahl, mitBestellung) {
   const z = app.zustand;
+  const heute = heuteIso();
+  const wt = TAGE_KURZ[wochentag(t)].toUpperCase();
+  const zustandText = t < heute ? 'vorbei' : !waehlbar(app, t, mitBestellung) ? 'kein Markt' : null;
+  if (zustandText) {
+    return h('button', {
+      type: 'button', class: 'tag ' + (t < heute ? 'vorbei' : 'kein-markt'), disabled: true, 'aria-disabled': 'true',
+      'aria-label': datumLang(t) + ', ' + zustandText,
+    },
+      h('span', { class: 'nr' }, String(ausIso(t).getDate())),
+      h('span', { class: 'text' }, h('span', { class: 'wt' }, wt), h('span', { class: 'anz' }, zustandText)));
+  }
   const aktiv = z.zeitraum === 'tag' && z.tag === t;
+  const istHeute = t === heute;
+  const offenText = aktiv || istHeute;
   return h('button', {
     type: 'button',
-    class: 'tag' + (aktiv ? ' aktiv' : ''),
+    class: 'tag' + (aktiv ? ' aktiv' : '') + (istHeute ? ' ist-heute' : ''),
     'aria-pressed': aktiv ? 'true' : 'false',
     'aria-label': (istHeute ? 'Heute, ' : '') + datumLang(t) + ', ' + anzahl + ' offen',
     onclick: () => { app.zeitraumSetzen('tag'); app.tagSetzen(t); },
   },
     h('span', { class: 'nr' }, String(ausIso(t).getDate())),
     h('span', { class: 'text' },
-      h('span', { class: 'wt' }, istHeute
-        ? [h('b', null, 'HEUTE'), h('span', { class: 'wt-zusatz' }, ' · ' + TAGE_KURZ[wochentag(t)].toUpperCase())]
-        : TAGE_KURZ[wochentag(t)].toUpperCase()),
-      h('span', { class: 'anz nur-hoch' }, istHeute ? anzahl + ' offen' : anzahl ? String(anzahl) : '–'),
-      h('span', { class: 'anz nur-quer' }, istHeute ? anzahl + ' offen' : anzahl ? anzahl + ' Best.' : 'keine')));
+      h('span', { class: 'wt' }, wt),
+      h('span', { class: 'anz nur-hoch' }, offenText ? anzahl + ' offen' : anzahl ? String(anzahl) : '–'),
+      h('span', { class: 'anz nur-quer' }, offenText ? anzahl + ' offen' : anzahl ? anzahl + ' Best.' : 'keine')));
 }
 
-/** Welche Woche „Ganze KW" zeigt: am Samstag/Sonntag ist die laufende Woche praktisch vorbei → nächste Woche. */
-function wocheAb() {
-  const heute = heuteIso();
-  const wt = wochentag(heute);
-  if (wt === 6) return plusTage(heute, 2);
-  if (wt === 0) return plusTage(heute, 1);
-  return heute;
-}
-
-function wochenKachel(app) {
+function wochenKachel(app, woche) {
   const z = app.zustand;
   const aktiv = z.zeitraum === 'woche';
-  const kw = String(kalenderwoche(aktiv ? z.tag : wocheAb()));
+  const kw = String(kalenderwoche(woche));
   return h('button', {
     type: 'button',
-    class: 'tag' + (aktiv ? ' aktiv' : ''),
+    class: 'tag woche-kachel' + (aktiv ? ' aktiv' : ''),
     'aria-pressed': aktiv ? 'true' : 'false',
     'aria-label': 'Ganze Woche anzeigen, KW ' + kw,
-    onclick: () => { if (!aktiv) app.tagSetzen(wocheAb()); app.zeitraumSetzen('woche'); },
+    onclick: () => app.zeitraumSetzen('woche'),
   },
     h('span', { class: 'nr' }, h('span', { class: 'nur-hoch' }, 'KW ' + kw), h('span', { class: 'nur-quer' }, kw)),
     h('span', { class: 'text' },
@@ -209,7 +234,52 @@ function wochenKachel(app) {
       h('span', { class: 'anz nur-quer' }, 'KW · alle')));
 }
 
-// ---------- Suche (ersetzt die Tagesleiste) ----------
+/**
+ * Wischen nur auf der Wochenleiste (die Liste scrollt ungestört): nach links = nächste Woche,
+ * nach rechts = vorige. Die Kacheln folgen dem Finger; an der Grenze federn sie nur zurück.
+ */
+function wischenEinrichten(leiste, app, geht) {
+  let s = null;
+  let gewischt = false;
+  const band = () => leiste.querySelector('.tage-fest');
+  const zurueckfedern = () => {
+    const b = band();
+    b.style.transition = 'transform .2s ease-out';
+    b.style.transform = '';
+  };
+  leiste.addEventListener('touchstart', (e) => {
+    gewischt = false;
+    if (e.touches.length !== 1) { s = null; return; }
+    const t = e.touches[0];
+    s = { x: t.clientX, y: t.clientY, dx: 0, waagerecht: null };
+    band().style.transition = 'none';
+  }, { passive: true });
+  leiste.addEventListener('touchmove', (e) => {
+    if (!s) return;
+    const t = e.touches[0];
+    const dx = t.clientX - s.x;
+    const dy = t.clientY - s.y;
+    if (s.waagerecht === null && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) s.waagerecht = Math.abs(dx) > Math.abs(dy);
+    if (!s.waagerecht) return;
+    gewischt = true;
+    s.dx = (dx < 0 ? geht.vor : geht.zurueck) ? dx : dx * 0.25;
+    band().style.transform = 'translateX(' + s.dx + 'px)';
+  }, { passive: true });
+  leiste.addEventListener('touchend', () => {
+    if (!s) return;
+    const { dx, waagerecht } = s;
+    s = null;
+    if (waagerecht && Math.abs(dx) > 50 && wocheWechseln(app, dx < 0 ? 1 : -1)) return;
+    zurueckfedern();
+  }, { passive: true });
+  leiste.addEventListener('touchcancel', () => { s = null; zurueckfedern(); }, { passive: true });
+  // Nach einer Wischbewegung keinen Tag „antippen".
+  leiste.addEventListener('click', (e) => {
+    if (gewischt) { e.stopPropagation(); e.preventDefault(); gewischt = false; }
+  }, true);
+}
+
+// ---------- Suche (ersetzt die Wochenleiste) ----------
 
 function suchLeiste(app) {
   const z = app.zustand;
@@ -309,17 +379,28 @@ function tagBauen(app, liste) {
   const amTag = liste.filter((b) => b.datum === tag);
   const maerkte = maerkteAmTag(z.konfig, z.ansicht, tag);
   if (!amTag.length) {
-    return [...maerkte.map((m) => marktKopf(app, m.name)), leerTag(app, liste, tag, maerkte)];
+    return [...maerkte.map((m) => marktKopf(app, m.name)), leerTag(app, liste, tag, maerkte, wocheOhneMarkt(app, tag))];
   }
   return marktGruppen(app, amTag, maerkte);
 }
 
-function leerTag(app, liste, tag, maerkte) {
+/** Die angezeigte Woche hat in der Ansicht gar keinen Markttag mehr → Titel für den Leer-Hinweis, sonst null. */
+function wocheOhneMarkt(app, tag) {
+  const mitBestellung = tageMitBestellung(app);
+  const woche = anzeigeWoche(tag);
+  if (festeTage(woche).some((t) => waehlbar(app, t, mitBestellung))) return null;
+  return ansichtName(app.zustand.ansicht) + (woche === wochenGrenzen().erste
+    ? ': diese Woche keine Markttage mehr'
+    : ': in KW ' + kalenderwoche(woche) + ' keine Markttage');
+}
+
+function leerTag(app, liste, tag, maerkte, wochenTitel) {
   const z = app.zustand;
   const rel = relativerTag(tag);
   const wann = rel ? rel.toLowerCase() : 'am ' + datumKurz(tag);
   let titel;
-  if (maerkte.length) titel = (rel || 'Am ' + datumKurz(tag)) + ' keine Bestellungen ' + ansichtFuer(z.ansicht);
+  if (wochenTitel) titel = wochenTitel;
+  else if (maerkte.length) titel = (rel || 'Am ' + datumKurz(tag)) + ' keine Bestellungen ' + ansichtFuer(z.ansicht);
   else if (z.ansicht.typ === 'alle') titel = (rel || 'Am ' + datumKurz(tag)) + ' ist kein Markttag';
   else if (z.ansicht.typ === 'markt') titel = z.ansicht.wert + ' findet ' + wann + ' nicht statt';
   else titel = z.ansicht.wert + ' hat ' + wann + ' keinen Markt';
@@ -344,24 +425,23 @@ function wocheBauen(app, liste) {
   const z = app.zustand;
   const heute = heuteIso();
   const max = plusTage(heute, VORLAUF_TAGE);
-  const start = wochenstart(z.tag);
+  const start = anzeigeWoche(z.tag);
   const tage = [];
   for (let i = 0; i < (mitSonntag(z.konfig) ? 7 : 6); i++) {
     const t = plusTage(start, i);
     if (t >= heute && t <= max) tage.push(t);
   }
-  const vorher = start > wochenstart(heute) ? plusTage(start, -7) : null;
-  const nachher = plusTage(start, 7) <= max ? plusTage(start, 7) : null;
+  const g = wochenGrenzen();
 
   const teile = [h('div', { class: 'wochen-kopf' },
     h('button', {
-      type: 'button', class: 'icon-knopf', 'aria-label': 'Vorherige Woche', disabled: !vorher,
-      onclick: () => vorher && app.tagSetzen(vorher < heute ? heute : vorher),
+      type: 'button', class: 'icon-knopf', 'aria-label': 'Vorherige Woche', disabled: start <= g.erste,
+      onclick: () => wocheWechseln(app, -1),
     }, icon('pfeilLinks', { groesse: 26, strich: 2.5 })),
     h('h2', null, 'KW ' + kalenderwoche(start) + ' · ' + wochenText(start)),
     h('button', {
-      type: 'button', class: 'icon-knopf', 'aria-label': 'Nächste Woche', disabled: !nachher,
-      onclick: () => nachher && app.tagSetzen(nachher),
+      type: 'button', class: 'icon-knopf', 'aria-label': 'Nächste Woche', disabled: start >= g.letzte,
+      onclick: () => wocheWechseln(app, 1),
     }, icon('pfeilRechts', { groesse: 26, strich: 2.5 })),
     h('button', { type: 'button', class: 'knopf', onclick: () => app.overlayOeffnen('tag') },
       icon('kalender', { groesse: 22 }), 'Tag wählen'))];
@@ -381,7 +461,7 @@ function wocheBauen(app, liste) {
   }
   if (!gezeigt) {
     teile.push(h('div', { class: 'leer' }, h('div', { class: 'leer-titel' },
-      ansichtName(z.ansicht) + (start === wochenstart(heute) ? ': diese Woche keine Markttage mehr' : ': in dieser Woche keine Markttage'))));
+      ansichtName(z.ansicht) + (start === g.erste ? ': diese Woche keine Markttage mehr' : ': in dieser Woche keine Markttage'))));
   }
   return teile;
 }

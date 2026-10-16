@@ -101,7 +101,6 @@ svg { display: block; flex-shrink: 0; }
 h1, h2, h3, p { margin: 0; }
 
 .bs { min-height: 100vh; }
-.bs-liste { touch-action: pan-y; }   /* waagerecht wischen = Tag wechseln */
 
 .demo-streifen {
   background: repeating-linear-gradient(-45deg, #fde68a 0 14px, #fcd34d 14px 28px);
@@ -219,7 +218,6 @@ h1, h2, h3, p { margin: 0; }
 
 /* ---------- Tagesleiste ---------- */
 
-.tage { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; padding-bottom: 14px; }
 .tag {
   height: 92px;
   border-radius: var(--radius-button);
@@ -240,8 +238,27 @@ h1, h2, h3, p { margin: 0; }
 .tag .nr { font-family: var(--schrift-schmal); font-size: 30px; font-weight: 700; line-height: 1; }
 .tag.aktiv { background: var(--blau-aktiv); color: var(--blau); box-shadow: inset 0 0 0 2px var(--blau-aktiv-rand); }
 .tag.aktiv .wt, .tag.aktiv .anz { color: var(--blau); font-weight: 600; }
-.tag .wt b { font-weight: 700; }   /* „HEUTE · DI" */
+.tag .wt b { font-weight: 700; }
 .nur-quer { display: none; }
+
+/* v3.1 – Feste Wochenleiste Di–Sa: fünf feste Kacheln, kleine Pfeile als Wisch-Hinweis
+   (nicht antippbar), rechts die Wochen-Kachel. Wischen wechselt die Woche. */
+.wochenleiste { display: flex; align-items: stretch; gap: 6px; padding-top: 10px; padding-bottom: 14px; touch-action: pan-y; }
+.wochenleiste .tage-fest { flex: 1; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+.wisch-pfeil { width: 22px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: #9AA5B1; }
+.wisch-pfeil.aus { color: #D3DAE2; }                  /* keine Woche mehr in diese Richtung */
+.wochenleiste .tag.woche-kachel { width: 82px; flex-shrink: 0; }
+.wochenleiste .tag.woche-kachel .nr { font-size: 26px; }
+.wochenleiste .tag.woche-kachel .wt { letter-spacing: .02em; }
+.tag:disabled { opacity: 1; }
+.tag.kein-markt { background: transparent; box-shadow: inset 0 0 0 1.5px #DDE3E9; color: #A9B2BC; cursor: default; }
+.tag.kein-markt .wt, .tag.kein-markt .anz { color: #A9B2BC; }
+.tag.kein-markt .nr { color: #B8C0C9; }
+.tag.vorbei { background: transparent; color: #8C96A1; }
+.tag.vorbei .wt, .tag.vorbei .anz { color: #8C96A1; }
+/* „Heute" als kleines Fähnchen auf der Kachel – der Wochentag bleibt in der Kachel stehen */
+.tag { position: relative; }
+.tag.ist-heute::before { content: "HEUTE"; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); padding: 2px 8px; border-radius: 6px; background: var(--blau); color: #fff; font-size: 12px; font-weight: 700; letter-spacing: .06em; line-height: 1.3; }
 
 .such-leiste { display: flex; gap: 10px; padding-bottom: 14px; }
 .such-leiste .eingabe { flex: 1; min-height: var(--tipp-min); }
@@ -782,12 +799,13 @@ textarea.eingabe.link-feld { min-height: 96px; font-size: 16px; word-break: brea
 @media (orientation: landscape) and (min-width: 900px) {
   :root { --abstand-rand: 24px; }
   .kopf { padding-top: 10px; gap: 10px; }
-  .tage { padding-bottom: 12px; }
   .tag { height: 60px; flex-direction: row; gap: 10px; }
   .tag .nr { order: 0; }
   .tag .text { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.15; }
   .nur-hoch { display: none; }
   .nur-quer { display: inline; }
+  .wochenleiste { padding-bottom: 12px; }
+  .wochenleiste .tag.woche-kachel { width: 118px; gap: 8px; }
   .such-leiste { padding-bottom: 12px; }
   .liste { padding-top: 14px; padding-bottom: 104px; }   /* Platz, damit der schwebende Button nichts dauerhaft verdeckt */
   .raster { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -817,8 +835,11 @@ textarea.eingabe.link-feld { min-height: 96px; font-size: 16px; word-break: brea
   .kopf.unter { gap: 8px; }
   .kopf-zurueck { height: 50px; padding: 0 12px 0 6px; font-size: 17px; }
   .kopf-titel { font-size: 19px; letter-spacing: .03em; white-space: normal; line-height: 1.05; }
-  .tage { gap: 5px; }
-  .tag .wt-zusatz { display: none; }          /* schmale Kachel: nur „HEUTE" */
+  .wochenleiste { gap: 2px; }
+  .wochenleiste .tage-fest { gap: 5px; }
+  .wisch-pfeil { width: 14px; }
+  .wochenleiste .tag.woche-kachel { width: 60px; }
+  .tag .anz { font-size: 12px; line-height: 1.1; text-align: center; }   /* „kein Markt" bricht um */
   .tag .nr .nur-hoch { display: none; }       /* Woche: nur die Zahl unter „WOCHE" */
   .tag .nr .nur-quer { display: inline; }
   .tag .wt { font-size: 13px; letter-spacing: .02em; }
@@ -841,8 +862,10 @@ textarea.eingabe.link-feld { min-height: 96px; font-size: 16px; word-break: brea
   .toast { width: calc(100% - 2 * var(--abstand-rand)); bottom: calc(96px + env(safe-area-inset-bottom)); font-size: 17px; }
 }
 
-/* Tag per Wischen gewechselt: Inhalt kommt kurz aus der Wischrichtung */
+/* Woche per Wischen gewechselt: Kacheln und Liste kommen kurz aus der Wischrichtung */
 @keyframes von-rechts { from { transform: translateX(40px); opacity: .3; } to { transform: none; opacity: 1; } }
 @keyframes von-links { from { transform: translateX(-40px); opacity: .3; } to { transform: none; opacity: 1; } }
 .liste.von-rechts { animation: von-rechts .18s ease-out; }
 .liste.von-links { animation: von-links .18s ease-out; }
+.tage-fest.von-rechts { animation: von-rechts .2s ease-out; }
+.tage-fest.von-links { animation: von-links .2s ease-out; }
