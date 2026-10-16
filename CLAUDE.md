@@ -40,6 +40,8 @@ Tablet-App (PWA) für Kundenbestellungen der Verkaufswagen. Löst v3 ab
 - Wischen NUR auf der Wochenleiste (Liste scrollt ungestört): links = nächste Woche, rechts = vorige;
   von der aktuellen Woche bis zur Woche, in der `VORLAUF_TAGE` endet; an der Grenze federt sie zurück,
   Pfeil `.aus`. Danach derselbe Wochentag, sonst der erste mit Markt. Pfeile nur Hinweis (aria-hidden).
+- Ansicht „Woche": ohne eigenen Wochenkopf/Kalender („Tag wählen" entfällt – Woche wird oben gewischt).
+  Tage mit Markt als Überschrift; ohne Bestellungen nur die Überschrift, kein graues Feld.
 - Markt ohne Bestellungen: nur der Markt-Kopf, kein graues „Keine Bestellungen"-Feld.
 - Markt-Kopf ohne Zähler; Fahrzeug dezent (`.fz`, Lkw + Name, grau): in „Alle Märkte" immer,
   sonst nur bei fremdem Fahrzeug.

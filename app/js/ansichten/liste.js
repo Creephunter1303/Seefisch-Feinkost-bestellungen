@@ -6,7 +6,7 @@ import { h } from '../ui.js';
 import { icon } from '../icons.js';
 import { demoStreifen, syncAnzeige, marktKopf, zettel, zettelSchlicht } from '../komponenten.js';
 import {
-  heuteIso, plusTage, datumLang, datumKurz, tagMonat, relativerTag, wochenstart, kalenderwoche, wochenText,
+  heuteIso, plusTage, datumLang, datumKurz, tagMonat, relativerTag, wochenstart, kalenderwoche,
   wochentag, ausIso, TAGE_KURZ, TAGE_LANG, VORLAUF_TAGE,
 } from '../datum.js';
 import {
@@ -432,20 +432,7 @@ function wocheBauen(app, liste) {
     if (t >= heute && t <= max) tage.push(t);
   }
   const g = wochenGrenzen();
-
-  const teile = [h('div', { class: 'wochen-kopf' },
-    h('button', {
-      type: 'button', class: 'icon-knopf', 'aria-label': 'Vorherige Woche', disabled: start <= g.erste,
-      onclick: () => wocheWechseln(app, -1),
-    }, icon('pfeilLinks', { groesse: 26, strich: 2.5 })),
-    h('h2', null, 'KW ' + kalenderwoche(start) + ' · ' + wochenText(start)),
-    h('button', {
-      type: 'button', class: 'icon-knopf', 'aria-label': 'Nächste Woche', disabled: start >= g.letzte,
-      onclick: () => wocheWechseln(app, 1),
-    }, icon('pfeilRechts', { groesse: 26, strich: 2.5 })),
-    h('button', { type: 'button', class: 'knopf', onclick: () => app.overlayOeffnen('tag') },
-      icon('kalender', { groesse: 22 }), 'Tag wählen'))];
-
+  const teile = [];
   let gezeigt = 0;
   for (const t of tage) {
     const maerkte = maerkteAmTag(z.konfig, z.ansicht, t);
@@ -456,8 +443,8 @@ function wocheBauen(app, liste) {
     teile.push(h('h2', { class: 'tag-titel' },
       rel && h('span', { class: 'heute-marke' }, rel),
       h('button', { type: 'button', class: 'tag-link', onclick: () => { app.zeitraumSetzen('tag'); app.tagSetzen(t); } }, datumLang(t))));
+    // Tag ohne Bestellungen: nur die Überschrift – darunter folgt gleich der nächste Tag.
     if (amTag.length) teile.push(...marktGruppen(app, amTag, maerkte, { klein: true }));
-    else teile.push(h('div', { class: 'leer-zeile' }, 'Keine Bestellungen · ' + maerkte.map((m) => m.name).join(', ')));
   }
   if (!gezeigt) {
     teile.push(h('div', { class: 'leer' }, h('div', { class: 'leer-titel' },

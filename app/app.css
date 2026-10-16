@@ -276,7 +276,7 @@ h1, h2, h3, p { margin: 0; }
 }
 /* Markt-Kopf schlicht (v3): Name + dezentes Fahrzeug, kein Zähler */
 .markt-v3 { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; padding: 2px 2px 0; }
-.raster + .markt-v3, .leer-zeile + .markt-v3, .markt-v3 + .markt-v3 { margin-top: 14px; }
+.raster + .markt-v3, .markt-v3 + .markt-v3 { margin-top: 14px; }
 .markt-name { display: flex; align-items: center; gap: 8px; color: var(--blau); min-width: 0; }
 .markt-name h2 {
   margin: 0;
@@ -295,16 +295,6 @@ h1, h2, h3, p { margin: 0; }
 
 .raster { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--abstand-zettel); align-items: start; }
 
-.wochen-kopf { display: flex; align-items: center; gap: 6px; }
-.wochen-kopf h2 {
-  flex: 1;
-  text-align: center;
-  font-family: var(--schrift-schmal);
-  font-size: 24px;
-  font-weight: 700;
-  letter-spacing: .04em;
-  text-transform: uppercase;
-}
 .tag-titel {
   display: flex;
   align-items: center;
@@ -342,7 +332,6 @@ h1, h2, h3, p { margin: 0; }
 .leer-titel { font-family: var(--schrift-schmal); font-size: 26px; font-weight: 700; line-height: 1.2; }
 .leer-text { color: var(--text-3); font-size: 18px; margin: 8px 0 16px; }
 /* Leerer Markt (Vorlage v2 „.leer") */
-.leer-zeile { padding: 18px 20px; border-radius: var(--radius-zettel); background: rgba(255, 255, 255, .55); color: var(--text-3); font-size: 18px; box-shadow: inset 0 0 0 1.5px #D3DAE2; }
 .hinweis-text { color: var(--text-3); font-size: 17px; }
 
 /* ---------- Zettel: gemeinsam ---------- */
@@ -762,29 +751,6 @@ textarea.eingabe.link-feld { min-height: 96px; font-size: 16px; word-break: brea
 .blatt-titel.dezent { font-size: 18px; color: var(--text-3); margin-top: 26px; padding-top: 16px; border-top: 2px solid var(--kopf-linie); }
 .blatt-abstand { margin-bottom: 6px; }
 
-.kalender { display: flex; flex-direction: column; gap: 6px; }
-.kalender-zeile { display: grid; grid-template-columns: 52px repeat(var(--spalten), 1fr); gap: 6px; }
-.kalender-kopf span { text-align: center; font-weight: 600; color: var(--text-3); font-size: 15px; letter-spacing: .04em; }
-.kw-knopf { min-height: 64px; border-radius: var(--radius-button); background: var(--sekundaer); color: var(--sekundaer-text); font-family: var(--schrift-schmal); font-size: 18px; font-weight: 700; }
-.tag-zelle {
-  min-height: 64px;
-  border-radius: var(--radius-button);
-  background: var(--tag-normal);
-  color: var(--tag-normal-text);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1px;
-  line-height: 1.1;
-}
-.tag-zelle:disabled { background: transparent; }
-.tag-zelle.heute { box-shadow: inset 0 0 0 1.5px var(--blau-auswahl-rand); }
-.tag-zelle.gewaehlt { background: var(--blau-aktiv); color: var(--blau); box-shadow: inset 0 0 0 2px var(--blau-aktiv-rand); }
-.tag-nr { font-family: var(--schrift-schmal); font-size: 24px; font-weight: 700; }
-.tag-monat { font-size: 13px; font-weight: 600; color: var(--text-3); }
-.tag-anzahl { font-size: 13px; font-weight: 600; color: var(--blau); }
-
 .pin-punkte { display: flex; justify-content: center; gap: 18px; margin: 18px 0; }
 .pin-punkt { width: 22px; height: 22px; border-radius: 50%; box-shadow: inset 0 0 0 2.5px var(--blau-aktiv-rand); }
 .pin-punkt.voll { background: var(--blau); box-shadow: none; }
@@ -843,9 +809,6 @@ textarea.eingabe.link-feld { min-height: 96px; font-size: 16px; word-break: brea
   .tag .nr .nur-hoch { display: none; }       /* Woche: nur die Zahl unter „WOCHE" */
   .tag .nr .nur-quer { display: inline; }
   .tag .wt { font-size: 13px; letter-spacing: .02em; }
-  .wochen-kopf { flex-wrap: wrap; }
-  .wochen-kopf h2 { font-size: 20px; }
-  .wochen-kopf .knopf { order: 1; flex-basis: 100%; justify-content: center; }
   .zettel.offen .ware { font-size: 26px; padding: 12px 14px; }
   .zettel-s .ware { font-size: 26px; padding: 12px 14px; }
   .zettel-s .unten { padding: 8px 8px 8px 14px; }
