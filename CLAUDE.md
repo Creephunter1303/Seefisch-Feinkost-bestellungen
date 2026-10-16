@@ -31,7 +31,7 @@ Tablet-App (PWA) für Kundenbestellungen der Verkaufswagen. Löst v3 ab
   Grün = abgeholt (und der Kopf „Bestellung gespeichert"), Rot = storniert und Fehlermeldungen
   (z. B. „Nicht gespeichert – keine Verbindung"). Fehlende Pflichtfelder: roter Rahmen
   (`--rot-punkt`), Hinweis darunter rot + ⚠.
-- Startseite (v3): Sync normal nur grüner Punkt (Tippen = aktualisieren), Text nur bei Problemen
+- Startseite (v3): Sync normal grüner Punkt + „Aktuell" (Handy: nur Punkt; Tippen = aktualisieren), sonst Text
   („Offline · Stand 6:42 · 1 wartet", orange).
 - Feste Wochenleiste (v3.1): immer Di Mi Do Fr Sa der angezeigten Woche + Wochen-Kachel (KW dieser
   Woche, Tippen = ganze Woche). Heute = Fähnchen `.ist-heute`. `.kein-markt` (kein Markt der Ansicht und

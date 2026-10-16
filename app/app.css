@@ -124,10 +124,10 @@ h1, h2, h3, p { margin: 0; }
   z-index: 20;
   background: var(--flaeche);
   box-shadow: 0 1px 0 var(--kopf-linie);
-  padding: 14px var(--abstand-rand) 0;
+  padding: 10px var(--abstand-rand) 0;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 4px;
 }
 .kopf-zeile { display: flex; align-items: center; gap: 12px; }
 .fahrzeug {
@@ -163,9 +163,10 @@ h1, h2, h3, p { margin: 0; }
 .sync.offline { color: #8A4B05; font-weight: 600; }
 .sync.offline::before { background: var(--offline); }
 /* v3: im Normalzustand nur ein Punkt; Tippen = aktualisieren */
-.sync-punkt { width: var(--tipp-min); height: var(--tipp-min); display: flex; align-items: center; justify-content: center; background: transparent; flex-shrink: 0; }
+.sync-punkt { min-width: var(--tipp-min); height: var(--tipp-min); padding: 0 6px; display: flex; align-items: center; justify-content: center; gap: 8px; background: transparent; flex-shrink: 0; font-size: 16px; color: var(--text-3); white-space: nowrap; }
 .sync-punkt::before { content: ""; width: 12px; height: 12px; border-radius: 50%; background: var(--online); }
 .sync-punkt.laedt::before { background: var(--text-3); }
+/* Tablet: „Aktuell" neben dem Punkt – auf dem Handy nur der Punkt */
 
 .icon-knopf {
   width: var(--tipp-min);
@@ -209,17 +210,17 @@ h1, h2, h3, p { margin: 0; }
 }
 
 /* Hinweisband: fremde Ansicht – Teil des klebenden Kopfs (v2 + v3), Bernstein nur für Hinweise */
-.hinweisband { display: flex; align-items: center; gap: 12px; padding: 0 12px 0 var(--abstand-rand); min-height: 60px; background: var(--hinweis-flaeche); border-bottom: 2px solid var(--hinweis-rand); color: var(--hinweis-text); font-size: 18px; }
+.hinweisband { display: flex; align-items: center; gap: 12px; padding: 4px 10px 4px var(--abstand-rand); min-height: 50px; background: var(--hinweis-flaeche); border-bottom: 2px solid var(--hinweis-rand); color: var(--hinweis-text); font-size: 16px; }
 .hinweisband b { font-weight: 600; }
 .hinweisband .platzhalter { flex: 1; }
-.hinweisband button { height: 48px; padding: 0 16px; border-radius: var(--radius-button); background: #fff; color: var(--hinweis-text); font-size: 17px; font-weight: 600; box-shadow: inset 0 0 0 1.5px var(--hinweis-rand); white-space: nowrap; }
+.hinweisband button { height: 42px; padding: 0 14px; border-radius: var(--radius-button); background: #fff; color: var(--hinweis-text); font-size: 15px; font-weight: 600; box-shadow: inset 0 0 0 1.5px var(--hinweis-rand); white-space: nowrap; }
 .hinweisband button:active { box-shadow: inset 0 0 0 3px var(--hinweis-rand); }
 .kopf .hinweisband { margin: 0 calc(-1 * var(--abstand-rand)); border-top: 1px solid var(--hinweis-rand); }
 
 /* ---------- Tagesleiste ---------- */
 
 .tag {
-  height: 92px;
+  height: 84px;
   border-radius: var(--radius-button);
   background: var(--tag-normal);
   color: var(--tag-normal-text);
@@ -244,7 +245,7 @@ h1, h2, h3, p { margin: 0; }
 /* v3.1 – Feste Wochenleiste Di–Sa: fünf feste Kacheln, kleine Pfeile als Wisch-Hinweis
    (nicht antippbar), rechts die Wochen-Kachel. Wischen wechselt die Woche. */
 .bs-liste { touch-action: pan-y; }   /* waagerecht über die Liste wischen = Tag wechseln */
-.wochenleiste { display: flex; align-items: stretch; gap: 6px; padding-top: 10px; padding-bottom: 14px; touch-action: pan-y; }
+.wochenleiste { display: flex; align-items: stretch; gap: 6px; padding-top: 10px; padding-bottom: 10px; touch-action: pan-y; }   /* oben: Platz fürs HEUTE-Fähnchen */
 .wochenleiste .tage-fest { flex: 1; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
 .wisch-pfeil { width: 22px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: #9AA5B1; }
 .wisch-pfeil.aus { color: #D3DAE2; }                  /* keine Woche mehr in diese Richtung */
@@ -765,13 +766,13 @@ textarea.eingabe.link-feld { min-height: 96px; font-size: 16px; word-break: brea
 
 @media (orientation: landscape) and (min-width: 900px) {
   :root { --abstand-rand: 24px; }
-  .kopf { padding-top: 10px; gap: 10px; }
+  .kopf { padding-top: 8px; gap: 2px; }
   .tag { height: 60px; flex-direction: row; gap: 10px; }
   .tag .nr { order: 0; }
   .tag .text { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.15; }
   .nur-hoch { display: none; }
   .nur-quer { display: inline; }
-  .wochenleiste { padding-bottom: 12px; }
+  .wochenleiste { padding-bottom: 10px; }
   .wochenleiste .tag.woche-kachel { width: 118px; gap: 8px; }
   .such-leiste { padding-bottom: 12px; }
   .liste { padding-top: 14px; padding-bottom: 104px; }   /* Platz, damit der schwebende Button nichts dauerhaft verdeckt */
@@ -792,12 +793,13 @@ textarea.eingabe.link-feld { min-height: 96px; font-size: 16px; word-break: brea
 
 @media (max-width: 520px) {
   :root { --abstand-rand: 14px; }
-  .kopf { padding-top: 10px; gap: 10px; }
+  .kopf { padding-top: 8px; gap: 2px; }
   .kopf-zeile { gap: 4px; }
   .fahrzeug { max-width: none; min-width: 0; flex-shrink: 1; height: 52px; padding: 0 12px; gap: 6px; font-size: 18px; }
   .sync { min-width: 0; flex-shrink: 1; overflow: hidden; font-size: 14px; gap: 6px; padding-left: 4px; }
   .sync-stand { display: none; }
-  .sync-punkt { width: 44px; }
+  .sync-punkt { min-width: 44px; padding: 0; }
+  .sync-wort { display: none; }
   .icon-knopf { width: 46px; }
   .kopf.unter { gap: 8px; }
   .kopf-zurueck { height: 50px; padding: 0 12px 0 6px; font-size: 17px; }
@@ -815,7 +817,7 @@ textarea.eingabe.link-feld { min-height: 96px; font-size: 16px; word-break: brea
   .zettel-s .unten { padding: 8px 8px 8px 14px; }
   .zettel-s .kunde { font-size: 18px; }
   .haken { width: 84px; }
-  .hinweisband { flex-wrap: wrap; gap: 6px 12px; padding: 8px 12px 8px var(--abstand-rand); font-size: 16px; }
+  .hinweisband { flex-wrap: wrap; gap: 4px 12px; padding: 6px 10px 6px var(--abstand-rand); font-size: 15px; }
   .hinweisband button { margin-left: auto; }
   .eingeklappt { gap: 10px; padding: 0 14px; font-size: 17px; }
   .zettel.offen .kunde { padding: 8px 16px 10px; font-size: 18px; }

@@ -9,7 +9,7 @@ export function demoStreifen() {
   return h('div', { class: 'demo-streifen' }, 'PROTOTYP · Beispieldaten, nur auf diesem Tablet');
 }
 
-/** Sync-Status: normal nur ein Punkt, Text nur bei Problemen; Tippen aktualisiert. Inhalt setzt app.statusZeichnen(). */
+/** Sync-Status: normal Punkt + „Aktuell" (Handy: nur Punkt), sonst Text; Tippen aktualisiert. Inhalt setzt app.statusZeichnen(). */
 export function syncAnzeige(app) {
   return h('button', { type: 'button', class: 'sync-punkt', 'data-sync': '', onclick: () => app.aktualisieren() });
 }

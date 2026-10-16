@@ -155,7 +155,7 @@ function statusInfo() {
   const n = app.warteschlange.anzahl();
   const stand = zustand.stand ? uhrzeit(zustand.stand) : '';
   const wartet = n ? ' · ' + n + ' wartet' : '';
-  if (zustand.laedt) return { punkt: true, klasse: 'laedt', label: 'Aktualisiere …' };
+  if (zustand.laedt) return { punkt: true, klasse: 'laedt', label: 'Aktualisiere …', wort: 'Aktualisiere …' };
   if (zustand.gesperrt) return { klasse: 'offline', text: ['Tablet gesperrt'] };
   if (zustand.fehler || app.warteschlange.hatFehler()) {
     // Warteschlange wiederholt nur nach Verbindungsfehlern → ohne eigenen Ladefehler: offline.
@@ -163,7 +163,7 @@ function statusInfo() {
     return { klasse: 'offline', text: [offline ? 'Offline' : 'Fehler', stand && h('span', { class: 'sync-stand' }, ' · Stand ' + stand), wartet] };
   }
   if (n) return { klasse: 'wartet', text: ['Wird gesendet' + wartet] };
-  return { punkt: true, klasse: 'ok', label: stand ? 'Aktuell · ' + stand : 'Verbunden' };
+  return { punkt: true, klasse: 'ok', label: stand ? 'Aktuell · ' + stand : 'Verbunden', wort: 'Aktuell' };
 }
 
 app.statusZeichnen = function () {
@@ -171,7 +171,7 @@ app.statusZeichnen = function () {
   document.querySelectorAll('[data-sync]').forEach((el) => {
     el.className = s.punkt ? 'sync-punkt ' + s.klasse : 'sync ' + s.klasse;
     el.setAttribute('aria-label', (s.label || s.text.filter((t) => typeof t === 'string').join('')) + ' – tippen zum Aktualisieren');
-    el.replaceChildren(...(s.punkt ? [] : [h('span', null, s.text.filter(Boolean))]));
+    el.replaceChildren(s.punkt ? h('span', { class: 'sync-wort' }, s.wort) : h('span', null, s.text.filter(Boolean)));
   });
 };
 
