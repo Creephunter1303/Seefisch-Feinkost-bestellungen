@@ -1,4 +1,4 @@
-/* Seefisch Bestellungen – Gestaltung nach Designvorlage F6 (design-vorlage/vorlage.css).
+/* Seefisch Bestellungen – Gestaltung nach Designvorlage F6 v3 „Schlicht" (design-vorlage/vorlage.css).
    Variablen und Komponentenwerte 1:1 aus der Vorlage übernommen.
    Farbregel: Dunkelblau gefüllt NUR „Neue Bestellung". Blau = offen / aktive Auswahl,
    Grün = abgeholt, Rot = storniert – nie für etwas anderes. Fehler: dunkel + ⚠. */
@@ -19,15 +19,14 @@
   /* Text */
   --text: #111827;
   --text-2: #1F2937;             /* Kundenname */
-  --text-3: #4A5361;             /* Telefon, Kommentar, Zähler, Status-Text */
+  --text-3: #3F4856;             /* Telefon, Zähler, Status-Text (v2: dunkler, ≥ 7:1 auch auf Grau) */
   --icon: #3D4652;
 
   /* Hauptfarbe Blau – NUR für Primäraktion, aktive Auswahl, offene Bestellung */
   --blau: #0B3D66;               /* Primärbutton „Neue Bestellung", Marktname */
   --blau-rahmen: #4F79A3;        /* Rahmen offene Bestellung (3 px) */
   --blau-feld: #E3ECF5;          /* Bestellfeld im offenen Zettel */
-  --blau-feld-text: #0B2A47;
-  --ware-text: #000000;          /* App-Ergänzung: Bestelltext im offenen Zettel schwarz (Wunsch Max) */
+  --blau-feld-text: #111111;     /* Bestelltext schwarz */
   --blau-aktiv: #DCE7F2;         /* aktiver Tag */
   --blau-aktiv-rand: #5B84AB;
   --blau-auswahl: #D3E2F0;       /* Fahrzeug-Auswahl */
@@ -60,6 +59,12 @@
 
   /* Online-Punkt */
   --online: #1E7A3C;
+
+  /* v2: Bernstein – nur für Hinweise (fremde Ansicht, offline) */
+  --hinweis-flaeche: #FFF1CC;
+  --hinweis-rand: #E8C46A;
+  --hinweis-text: #4D3800;
+  --offline: #D97706;
 
   /* Schrift */
   --schrift: "Barlow", system-ui, sans-serif;
@@ -153,9 +158,14 @@ h1, h2, h3, p { margin: 0; }
   white-space: nowrap;
 }
 .sync::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--online); flex-shrink: 0; }
-.sync.laedt::before, .sync.wartet::before { background: var(--text-3); }
-.sync.fehler { color: var(--text); font-weight: 600; }
-.sync.fehler::before { background: transparent; box-shadow: inset 0 0 0 2px var(--text); }
+.sync.wartet::before { background: var(--text-3); }
+/* Sync-Status offline / Fehler / gesperrt (v2) */
+.sync.offline { color: #8A4B05; font-weight: 600; }
+.sync.offline::before { background: var(--offline); }
+/* v3: im Normalzustand nur ein Punkt; Tippen = aktualisieren */
+.sync-punkt { width: var(--tipp-min); height: var(--tipp-min); display: flex; align-items: center; justify-content: center; background: transparent; flex-shrink: 0; }
+.sync-punkt::before { content: ""; width: 12px; height: 12px; border-radius: 50%; background: var(--online); }
+.sync-punkt.laedt::before { background: var(--text-3); }
 
 .icon-knopf {
   width: var(--tipp-min);
@@ -198,18 +208,13 @@ h1, h2, h3, p { margin: 0; }
   text-overflow: ellipsis;
 }
 
-.temp-leiste {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 8px 16px;
-  padding: 8px var(--abstand-rand);
-  background: var(--blau-aktiv);
-  box-shadow: inset 0 -2px 0 var(--blau-aktiv-rand);
-  color: var(--blau);
-  font-size: 18px;
-}
-.temp-leiste .knopf { margin-left: auto; background: var(--flaeche); color: var(--blau); }
+/* Hinweisband: fremde Ansicht – Teil des klebenden Kopfs (v2 + v3), Bernstein nur für Hinweise */
+.hinweisband { display: flex; align-items: center; gap: 12px; padding: 0 12px 0 var(--abstand-rand); min-height: 60px; background: var(--hinweis-flaeche); border-bottom: 2px solid var(--hinweis-rand); color: var(--hinweis-text); font-size: 18px; }
+.hinweisband b { font-weight: 600; }
+.hinweisband .platzhalter { flex: 1; }
+.hinweisband button { height: 48px; padding: 0 16px; border-radius: var(--radius-button); background: #fff; color: var(--hinweis-text); font-size: 17px; font-weight: 600; box-shadow: inset 0 0 0 1.5px var(--hinweis-rand); white-space: nowrap; }
+.hinweisband button:active { box-shadow: inset 0 0 0 3px var(--hinweis-rand); }
+.kopf .hinweisband { margin: 0 calc(-1 * var(--abstand-rand)); border-top: 1px solid var(--hinweis-rand); }
 
 /* ---------- Tagesleiste ---------- */
 
@@ -234,6 +239,7 @@ h1, h2, h3, p { margin: 0; }
 .tag .nr { font-family: var(--schrift-schmal); font-size: 30px; font-weight: 700; line-height: 1; }
 .tag.aktiv { background: var(--blau-aktiv); color: var(--blau); box-shadow: inset 0 0 0 2px var(--blau-aktiv-rand); }
 .tag.aktiv .wt, .tag.aktiv .anz { color: var(--blau); font-weight: 600; }
+.tag .wt b { font-weight: 700; }   /* „HEUTE · DI" */
 .nur-quer { display: none; }
 
 .such-leiste { display: flex; gap: 10px; padding-bottom: 14px; }
@@ -250,8 +256,9 @@ h1, h2, h3, p { margin: 0; }
   flex-direction: column;
   gap: var(--abstand-zettel);
 }
-.markt { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 4px 12px; }
-.raster + .markt, .leer-zeile + .markt { margin-top: 14px; }
+/* Markt-Kopf schlicht (v3): Name + dezentes Fahrzeug, kein Zähler */
+.markt-v3 { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; padding: 2px 2px 0; }
+.raster + .markt-v3, .leer-zeile + .markt-v3 { margin-top: 14px; }
 .markt-name { display: flex; align-items: center; gap: 8px; color: var(--blau); min-width: 0; }
 .markt-name h2 {
   margin: 0;
@@ -263,20 +270,10 @@ h1, h2, h3, p { margin: 0; }
   color: var(--text);
   overflow-wrap: anywhere;
 }
-.markt.klein .markt-name h2 { font-size: 21px; }
-.markt.klein .zaehler { font-size: 16px; }
-.markt-fz {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--text-3);
-  background: var(--flaeche);
-  box-shadow: inset 0 0 0 1px var(--kopf-linie);
-  border-radius: var(--radius-feld);
-  padding: 1px 8px;
-  white-space: nowrap;
-}
-.zaehler { font-size: 17px; color: var(--text-3); }
-.zaehler b { color: var(--text); font-weight: 600; }
+.markt-v3 .markt-name h2 { font-size: 24px; }
+.markt-v3.klein .markt-name h2 { font-size: 21px; }
+.markt-v3 .fz { display: inline-flex; align-items: center; gap: 5px; font-size: 16px; font-weight: 500; color: var(--text-3); white-space: nowrap; }
+.markt-v3 .fz svg { opacity: .8; }
 
 .raster { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--abstand-zettel); align-items: start; }
 
@@ -326,13 +323,8 @@ h1, h2, h3, p { margin: 0; }
 }
 .leer-titel { font-family: var(--schrift-schmal); font-size: 26px; font-weight: 700; line-height: 1.2; }
 .leer-text { color: var(--text-3); font-size: 18px; margin: 8px 0 16px; }
-.leer-zeile {
-  padding: 14px 18px;
-  border: 1.5px dashed var(--kopf-linie);
-  border-radius: var(--radius-zettel);
-  color: var(--text-3);
-  font-size: 17px;
-}
+/* Leerer Markt (Vorlage v2 „.leer") */
+.leer-zeile { padding: 18px 20px; border-radius: var(--radius-zettel); background: rgba(255, 255, 255, .55); color: var(--text-3); font-size: 18px; box-shadow: inset 0 0 0 1.5px #D3DAE2; }
 .hinweis-text { color: var(--text-3); font-size: 17px; }
 
 /* ---------- Zettel: gemeinsam ---------- */
@@ -344,7 +336,7 @@ h1, h2, h3, p { margin: 0; }
 
 /* Offen: weiß, kräftiger blauer Rahmen, Bestellung im blauen Feld */
 .zettel.offen { background: var(--flaeche); border: 3px solid var(--blau-rahmen); box-shadow: 0 6px 16px rgba(11, 61, 102, .12); }
-.zettel.offen .ware { margin: 10px 10px 0; padding: 14px 16px; border-radius: var(--radius-feld); background: var(--blau-feld); color: var(--ware-text); font-size: 30px; line-height: 1.15; }
+.zettel.offen .ware { margin: 10px 10px 0; padding: 14px 16px; border-radius: var(--radius-feld); background: var(--blau-feld); color: var(--blau-feld-text); font-size: 30px; line-height: 1.15; }
 .zettel.offen .kunde { padding: 10px 20px 12px; font-size: 20px; color: var(--text-2); }
 .zettel.offen .fuss { border-top: 2px dashed var(--strich); padding: 10px 14px 12px 20px; display: flex; align-items: center; gap: 12px; }
 .zettel.offen .infos { flex: 1; min-width: 0; font-size: 16px; color: var(--text-3); display: flex; flex-direction: column; gap: 2px; overflow-wrap: anywhere; }
@@ -385,6 +377,36 @@ h1, h2, h3, p { margin: 0; }
   animation: ablauf 4s linear forwards;
 }
 @keyframes ablauf { from { width: 100%; } to { width: 0; } }
+
+/* ---------- Zettel schlicht (v3, Startseite): Bestellfeld + eine Zeile ---------- */
+
+.zettel-s { background: var(--flaeche); border: 3px solid var(--blau-rahmen); border-radius: var(--radius-zettel); box-shadow: 0 6px 16px rgba(11, 61, 102, .12); min-width: 0; cursor: pointer; }
+.zettel-s .ware { display: block; width: calc(100% - 20px); text-align: left; margin: 10px 10px 0; padding: 14px 16px; border-radius: var(--radius-feld); background: var(--blau-feld); color: var(--blau-feld-text); font-family: var(--schrift-schmal); font-weight: 600; font-size: 30px; line-height: 1.15; white-space: pre-line; overflow-wrap: anywhere; }
+.zettel-s:active .ware { filter: brightness(.97); }
+.zettel-s .unten { display: flex; align-items: center; gap: 12px; padding: 8px 10px 10px 20px; }
+.zettel-s .wer { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; overflow-wrap: anywhere; }
+.zettel-s .kunde { font-size: 20px; color: var(--text-2); }
+.zettel-s .hinweis { display: flex; align-items: center; gap: 6px; font-size: 17px; font-weight: 600; color: var(--text); }
+.zettel-s .hinweis svg { color: #B45309; flex-shrink: 0; }
+.zettel-s .wartet { font-size: 16px; color: var(--text-3); }
+/* Kontakt hinterlegt: kleiner grauer Kreis mit Hörer bzw. Briefumschlag. Nicht in vorlage.css –
+   Maße nach F6-hochformat.png (Kreis 30 px, Symbol 18 px, 10 px Abstand zum Namen). */
+.kontakt-icon { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; margin-left: 10px; border-radius: 50%; background: var(--sekundaer); color: var(--sekundaer-text); vertical-align: middle; }
+
+/* Abhaken: Kreis-Haken mit Wort darunter; 1. Tipp → „Nochmal tippen" (gedämpftes Grün), 2. Tipp bestätigt */
+.haken { width: 92px; height: 72px; border-radius: 14px; background: var(--sekundaer); color: var(--sekundaer-text); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 14px; font-weight: 600; flex-shrink: 0; line-height: 1.15; text-align: center; }
+.haken:active { box-shadow: inset 0 0 0 2px var(--sekundaer-text); }
+.haken.scharf { background: var(--gruen-flaeche); color: var(--gruen-text); box-shadow: inset 0 0 0 2px var(--gruen-rand); }
+
+/* Erledigtes eingeklappt (Einstellung „einklappen", v2) */
+.eingeklappt { min-height: 60px; border-radius: var(--radius-zettel); background: rgba(255, 255, 255, .55); box-shadow: inset 0 0 0 1.5px #C5CED8; display: flex; align-items: center; gap: 14px; padding: 0 18px; font-size: 18px; color: var(--text-2); width: 100%; text-align: left; }
+.eingeklappt .punkt { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+.eingeklappt .gruen { background: var(--gruen-punkt); }
+.eingeklappt .rot { background: var(--rot-punkt); }
+.eingeklappt .platzhalter { flex: 1; }
+.eingeklappt .mehr { font-weight: 600; color: var(--blau); }
+.eingeklappt svg { color: var(--blau); }
+.eingeklappt:active { box-shadow: inset 0 0 0 2.5px #C5CED8; }
 
 /* Erledigt: kompakter, farbig hinterlegt */
 .zettel.abgeholt, .zettel.storniert { border-width: 2px; border-style: solid; }
@@ -504,10 +526,10 @@ h1, h2, h3, p { margin: 0; }
 .inhalt.schmal { max-width: 780px; }
 .karte {
   background: var(--flaeche);
-  border-radius: var(--radius-zettel);
+  border-radius: 12px;
   box-shadow: inset 0 0 0 1px var(--kopf-linie);
-  padding: 16px 18px;
-  margin-bottom: 16px;
+  padding: 18px 20px;
+  margin-bottom: 14px;
 }
 .karte h2 {
   font-family: var(--schrift-schmal);
@@ -515,7 +537,7 @@ h1, h2, h3, p { margin: 0; }
   font-weight: 700;
   letter-spacing: .05em;
   text-transform: uppercase;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 .karte p { margin: 6px 0; }
 
@@ -651,11 +673,19 @@ textarea.eingabe { min-height: 120px; resize: vertical; line-height: 1.3; }
 
 /* ---------- Einstellungen, Einrichtung ---------- */
 
-.schalter-zeile { display: flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--kopf-linie); }
-.schalter-text { flex: 1; display: flex; flex-direction: column; gap: 2px; }
-.schalter-text span { color: var(--text-3); font-size: 16px; }
-.knopf.schalter { min-width: 110px; }
-.knopf.schalter.an { background: var(--blau-aktiv); color: var(--blau); box-shadow: inset 0 0 0 2px var(--blau-aktiv-rand); }
+/* Schalter-Zeile mit Kippschalter (Vorlage v3) */
+.schalter-zeile { display: flex; align-items: center; gap: 16px; padding: 10px 0; }
+.schalter-zeile + .schalter-zeile { border-top: 1px solid var(--kopf-linie); }
+.schalter-text { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.schalter-text strong { font-size: 19px; font-weight: 600; }
+.schalter-text span { font-size: 16px; color: var(--text-3); }
+/* Tippfläche ≥ 56 px: Wort und Schalter sind ein Knopf */
+.kipp-knopf { display: flex; align-items: center; gap: 16px; min-height: var(--tipp-min); flex-shrink: 0; }
+.kipp { width: 76px; height: 44px; border-radius: 22px; background: #C7CFD8; position: relative; flex-shrink: 0; transition: background .15s; }
+.kipp::after { content: ""; position: absolute; top: 4px; left: 4px; width: 36px; height: 36px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, .25); transition: left .15s; }
+.kipp.an { background: var(--blau-rahmen); }
+.kipp.an::after { left: 36px; }
+.kipp-wort { font-size: 16px; font-weight: 600; color: var(--text-2); width: 32px; }
 
 .einrichtung { padding-top: 40px; }
 .einrichtung h1 { font-family: var(--schrift-schmal); font-size: 36px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; margin-bottom: 8px; }
@@ -760,6 +790,7 @@ textarea.eingabe.link-feld { min-height: 96px; font-size: 16px; word-break: brea
   .liste { padding-top: 14px; padding-bottom: 104px; }   /* Platz, damit der schwebende Button nichts dauerhaft verdeckt */
   .raster { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .zettel.offen .ware { font-size: 27px; line-height: 1.12; padding: 12px 14px; }
+  .zettel-s .ware { font-size: 27px; padding: 12px 14px; }
   .zettel.offen .kunde { padding: 8px 18px 10px; font-size: 19px; }
   .zettel.offen .fuss { padding: 8px 12px 10px 18px; }
   .knopf-abgeholt { height: 56px; font-size: 17px; padding: 0 14px; }
@@ -777,17 +808,29 @@ textarea.eingabe.link-feld { min-height: 96px; font-size: 16px; word-break: brea
   .kopf { padding-top: 10px; gap: 10px; }
   .kopf-zeile { gap: 4px; }
   .fahrzeug { max-width: none; min-width: 0; flex-shrink: 1; height: 52px; padding: 0 12px; gap: 6px; font-size: 18px; }
-  .sync { min-width: 0; flex-shrink: 1; overflow: hidden; text-overflow: ellipsis; font-size: 14px; gap: 6px; padding-left: 4px; }
-  .sync-vorsatz { display: none; }
+  .sync { min-width: 0; flex-shrink: 1; overflow: hidden; font-size: 14px; gap: 6px; padding-left: 4px; }
+  .sync-stand { display: none; }
+  .sync-punkt { width: 44px; }
   .icon-knopf { width: 46px; }
   .kopf.unter { gap: 8px; }
   .kopf-zurueck { height: 50px; padding: 0 12px 0 6px; font-size: 17px; }
   .kopf-titel { font-size: 19px; letter-spacing: .03em; white-space: normal; line-height: 1.05; }
   .tage { gap: 5px; }
+  .tag .wt-zusatz { display: none; }          /* schmale Kachel: nur „HEUTE" */
+  .tag .nr .nur-hoch { display: none; }       /* Woche: nur die Zahl unter „WOCHE" */
+  .tag .nr .nur-quer { display: inline; }
+  .tag .wt { font-size: 13px; letter-spacing: .02em; }
   .wochen-kopf { flex-wrap: wrap; }
   .wochen-kopf h2 { font-size: 20px; }
   .wochen-kopf .knopf { order: 1; flex-basis: 100%; justify-content: center; }
   .zettel.offen .ware { font-size: 26px; padding: 12px 14px; }
+  .zettel-s .ware { font-size: 26px; padding: 12px 14px; }
+  .zettel-s .unten { padding: 8px 8px 8px 14px; }
+  .zettel-s .kunde { font-size: 18px; }
+  .haken { width: 84px; }
+  .hinweisband { flex-wrap: wrap; gap: 6px 12px; padding: 8px 12px 8px var(--abstand-rand); font-size: 16px; }
+  .hinweisband button { margin-left: auto; }
+  .eingeklappt { gap: 10px; padding: 0 14px; font-size: 17px; }
   .zettel.offen .kunde { padding: 8px 16px 10px; font-size: 18px; }
   .zettel.offen .fuss { flex-wrap: wrap; padding: 10px 12px 12px 16px; }
   .zettel.offen .infos { flex-basis: 100%; }

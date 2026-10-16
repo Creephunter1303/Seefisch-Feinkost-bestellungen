@@ -4,7 +4,7 @@
 // Bei jeder Änderung an der App VERSION erhöhen (und APP_VERSION in js/version.js),
 // sonst bekommen die Tablets die neue Version nicht.
 
-const VERSION = '0.3.4';
+const VERSION = '0.4.0';
 const CACHE = 'seefisch-app-' + VERSION;
 
 const DATEIEN = [

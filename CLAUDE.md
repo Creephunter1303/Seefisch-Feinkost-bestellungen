@@ -23,17 +23,33 @@ Tablet-App (PWA) für Kundenbestellungen der Verkaufswagen. Löst v3 ab
 ## Feste Entscheidungen
 - UI/Doku Deutsch, Begriffe wie am Wagen (Abholung, Kunde, Markt). UX-Regeln „Ein Blick, ein Tipp":
   Tippflächen ≥ 56 px, Kontraste nach UX-Regeln, Status immer Wort + Zeichen + Farbe.
-- Design: **Designvorlage F6** (`design-vorlage/`) ist verbindlich; Variablen aus `vorlage.css` 1:1 in
-  `app/app.css`, Schriften Barlow / Barlow Condensed (selbst gehostet, `app/schriften/`).
+- Design: **Designvorlage F6 v3 „Schlicht"** (`design-vorlage/`, PNGs + `vorlage.css` inkl. Abschnitte
+  v2 und v3) ist verbindlich; Werte 1:1 in `app/app.css` (`alt-v1/`, `alt-v2/` nur zum Vergleich).
+  Schriften Barlow / Barlow Condensed (selbst gehostet, `app/schriften/`). Bernstein (`--hinweis-*`,
+  `--offline`) nur für Hinweise (fremde Ansicht, offline).
   Farbregel: Dunkelblau gefüllt NUR „Neue Bestellung". Blau = offen / aktive Auswahl,
   Grün = abgeholt (und der Kopf „Bestellung gespeichert"), Rot = storniert und Fehlermeldungen
   (z. B. „Nicht gespeichert – keine Verbindung"). Feld-Hinweise unter Eingaben: dunkel + ⚠.
-- Fahrzeug am Markt-Kopf: in „Alle Märkte" immer, sonst nur bei fremdem Fahrzeug.
-  „Ganze KW" zeigt Sa/So schon die nächste Woche.
+- Startseite (v3): Sync normal nur grüner Punkt (Tippen = aktualisieren), Text nur bei Problemen
+  („Offline · Stand 6:42 · 1 wartet", orange). Tagesleiste „HEUTE · DI" … „WOCHE · KW 42";
+  Woche zeigt Sa/So schon die nächste Woche.
+- Markt-Kopf ohne Zähler; Fahrzeug dezent (`.fz`, Lkw + Name, grau): in „Alle Märkte" immer,
+  sonst nur bei fremdem Fahrzeug.
+- Fremde Ansicht (≠ Standard-Ansicht): gelbes Hinweisband im klebenden Kopf (keine temp-leiste mehr),
+  „Du siehst gerade … · <Tag>", Knopf „Zurück zu <Standard> · Heute" setzt Ansicht UND Tag zurück.
+  Bloßer Tageswechsel zeigt kein Band.
+- Offener Zettel auf der Startseite = `zettelSchlicht` (`.zettel-s`): Bestellung, darunter Kunde
+  (+ `.kontakt-icon` Hörer bzw. Brief bei „@", wenn Kontakt hinterlegt), Kommentar fett mit Sprechblase,
+  „⏳ wird gesendet", rechts `.haken` „Abgeholt?". Kontakt-Text nur in der Detailansicht.
+  `.kontakt-icon` fehlt in vorlage.css → Maße aus F6-hochformat.png (Kreis 30 px).
+- Erledigtes pro Markt: Einstellung „Erledigte Bestellungen einklappen" (Einstellungen → Anzeige,
+  `sf_erledigte_einklappen`, Standard AN, pro Tablet, ohne PIN). AN → eine Zeile `.eingeklappt`
+  „● 1 abgeholt ● 1 storniert anzeigen", Aufklappen pro Markt+Tag bis Neuladen/Tageswechsel.
+  In der Suche immer ausgeklappt. Unterseiten (Formular, Detail, Bestätigung) noch im alten Zettel-Stil.
 - Zettel-Typen: offen (weiß, blauer Rahmen), abgeholt (grün), storniert (rot, durchgestrichen,
   bleibt sichtbar). Reihenfolge: offen, abgeholt, storniert. Bestellung ist Freitext (Zeilenumbrüche bleiben).
 - Status: offen → abgeholt, dazu storniert. „Abgeholt" = **zwei Tipps** (1. Tipp: Knopf 4 s „Nochmal tippen",
-  gedämpftes Grün, gleiche Größe; 2. Tipp bestätigt), danach „Rückgängig" auf dem Zettel – ebenfalls
+  gedämpftes Grün, gleiche Größe – Startseite `.haken.scharf`; 2. Tipp bestätigt), danach „Rückgängig" auf dem Zettel – ebenfalls
   zwei Tipps – plus 6 s Einblendung (wegwischbar, Rückgängig dort mit einem Tipp), ohne Mitarbeiter (Protokoll: Tablet). „Rückgängig" auf einem
   stornierten Zettel hebt das Storno auf. Neu/Bearbeiten/Stornieren: Mitarbeiter-Auswahl Pflicht.
 - Tablet zeigt nur heute + Zukunft (62 Tage). Nicht Abgeholtes bleibt „offen" in der Tabelle.

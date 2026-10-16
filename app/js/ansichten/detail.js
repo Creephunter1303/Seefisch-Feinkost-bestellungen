@@ -30,7 +30,7 @@ export function detailZeichnen(app) {
     app.istDemo && demoStreifen(),
     unterKopf(app, 'Bestellung'),
     h('div', { class: 'inhalt schmal' },
-      h('div', { class: 'detail-markt' }, marktKopf(app, b.markt, [], { zaehler: false })),
+      h('div', { class: 'detail-markt' }, marktKopf(app, b.markt)),
       zettelDetail(app, b),
       h('div', { class: 'karte detail-info' },
         zeile('Abholung', datumVoll(b.datum) + (rel ? ' · ' + rel : '')),

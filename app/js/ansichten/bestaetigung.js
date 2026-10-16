@@ -18,7 +18,7 @@ export function bestaetigungZeichnen(app) {
       h('div', { class: 'erfolg-kopf', role: 'status' },
         h('span', { class: 'erfolg-punkt' }, icon('haken', { groesse: 24, strich: 3.2 })),
         'Bestellung gespeichert'),
-      h('div', { class: 'detail-markt' }, marktKopf(app, b.markt, [], { zaehler: false })),
+      h('div', { class: 'detail-markt' }, marktKopf(app, b.markt)),
       z,
       h('div', { class: 'karte detail-info' },
         zeile('Abholung', datumVoll(b.datum)),

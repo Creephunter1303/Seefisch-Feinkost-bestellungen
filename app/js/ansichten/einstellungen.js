@@ -1,4 +1,4 @@
-// Einstellungen: Verbindung, Standard-Ansicht des Tablets (Admin-PIN), Prototyp-Schalter.
+// Einstellungen: Anzeige (pro Tablet), Verbindung, Standard-Ansicht des Tablets (Admin-PIN), Prototyp-Schalter.
 
 import { h, toast } from '../ui.js';
 import { icon } from '../icons.js';
@@ -15,13 +15,15 @@ function abschnitt(titel, ...inhalt) {
   return h('section', { class: 'karte' }, h('h2', null, titel), inhalt);
 }
 
+/** Schalter-Zeile mit Kippschalter (Vorlage F6 v3); Wort „An"/„Aus" und Schalter sind ein Knopf (≥ 56 px). */
 function schalter(titel, erklaerung, an, beiWechsel) {
+  const texte = Array.isArray(erklaerung) ? erklaerung : [erklaerung];
   return h('div', { class: 'schalter-zeile' },
-    h('div', { class: 'schalter-text' }, h('strong', null, titel), erklaerung && h('span', null, erklaerung)),
+    h('div', { class: 'schalter-text' }, h('strong', null, titel), texte.filter(Boolean).map((t) => h('span', null, t))),
     h('button', {
-      type: 'button', class: 'knopf schalter' + (an ? ' an' : ''), 'aria-pressed': an ? 'true' : 'false',
+      type: 'button', class: 'kipp-knopf', 'aria-pressed': an ? 'true' : 'false', 'aria-label': titel,
       onclick: beiWechsel,
-    }, an ? '✓ An' : 'Aus'));
+    }, h('span', { class: 'kipp-wort' }, an ? 'An' : 'Aus'), h('span', { class: 'kipp' + (an ? ' an' : '') })));
 }
 
 /**
@@ -64,6 +66,12 @@ export function einstellungenZeichnen(app) {
     app.istDemo && demoStreifen(),
     unterKopf(app, 'Einstellungen'),
     h('div', { class: 'inhalt schmal' },
+      abschnitt('Anzeige',
+        schalter('Erledigte Bestellungen einklappen', [
+          'An: Abgeholte und stornierte Zettel stehen als eine Zeile „… anzeigen“ unter dem Markt. Aus: Sie bleiben als grüne und rote Zettel sichtbar.',
+          'Gilt nur für dieses Tablet und bleibt gespeichert.',
+        ], app.erledigteEinklappen(), () => { app.erledigteEinklappenSetzen(!app.erledigteEinklappen()); app.render(); })),
+
       abschnitt('Verbindung',
         h('p', null, z.fehler ? '⚠ Letzte Aktualisierung fehlgeschlagen: ' + z.fehler : 'Verbindung in Ordnung.'),
         z.stand && h('p', null, 'Stand der Daten: ' + zeitpunktText(z.stand)),

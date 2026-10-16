@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Designvorlage F6 v2 – Sonderzustände</title>
+<link rel="stylesheet" href="vorlage-v2.css">
+</head>
+<body>
+<!-- Sonderzustände im Hochformat: offline, fremde Ansicht („Alle“) mit Hinweisband, mehrere Märkte,
+     Erledigtes eingeklappt (ab 3 erledigten), leerer Markt. -->
+<div class="app" style="width: 640px; height: 1072px">
+
+  <header class="kopf">
+    <div class="kopf-zeile">
+      <button class="fahrzeug">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1" y="4" width="14" height="12" rx="1"/><path d="M15 8h4l3 3v5h-7z"/><circle cx="5.5" cy="18.5" r="2"/><circle cx="18.5" cy="18.5" r="2"/></svg>
+        Alle
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <div class="platzhalter"></div>
+      <span class="sync offline">Offline · Stand 6:42 · 1 wartet</span>
+      <button class="icon-knopf" aria-label="Suchen"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></button>
+    </div>
+    <nav class="tage" aria-label="Tage">
+      <button class="tag"><span class="wt">MI</span><span class="nr">14</span><span class="anz">2</span></button>
+      <button class="tag"><span class="wt">DO</span><span class="nr">15</span><span class="anz">1</span></button>
+      <button class="tag aktiv"><span class="wt">FR</span><span class="nr">16</span><span class="anz">4 offen</span></button>
+      <button class="tag"><span class="wt">SA</span><span class="nr">17</span><span class="anz">–</span></button>
+      <button class="tag"><span class="wt">MO</span><span class="nr">19</span><span class="anz">–</span></button>
+      <button class="tag"><span class="wt">WOCHE</span><span class="nr">KW 42</span><span class="anz">alle</span></button>
+    </nav>
+  </header>
+
+  <div class="hinweisband">
+    <span>Du siehst gerade <b>alle Fahrzeuge</b> · Freitag</span>
+    <div class="platzhalter"></div>
+    <button>Zurück zu Seico · Heute</button>
+  </div>
+
+  <main class="liste">
+    <div class="markt">
+      <div class="markt-name">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <h2>Vorsfelde Wolfsburg</h2>
+      </div>
+      <span class="zaehler"><b>2 zurücklegen</b> · 3 abgeholt · 1 storniert</span>
+    </div>
+
+    <article class="zettel offen">
+      <div class="ware">Fischplatte für 6 Personen</div>
+      <div class="kunde">Restaurant Seeblick</div>
+      <div class="fuss">
+        <div class="infos">
+          <span class="zeile hinweis"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>kommt gegen 11 Uhr</span>
+          <span class="zeile"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>0171 2345678</span>
+        </div>
+        <button class="knopf-abgeholt"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M8 12.5l2.7 2.7L16.5 9.5"/></svg>Abgeholt?</button>
+      </div>
+    </article>
+
+    <article class="zettel offen">
+      <div class="ware">4 Forellen, geräuchert</div>
+      <div class="kunde-zeile"><div class="kunde">Herr Koch</div><button class="knopf-abgeholt"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M8 12.5l2.7 2.7L16.5 9.5"/></svg>Abgeholt?</button></div>
+    </article>
+
+    <button class="eingeklappt">
+      <span class="punkt gruen"></span>3 abgeholt
+      <span class="punkt rot"></span>1 storniert
+      <span class="platzhalter"></span>
+      <span class="mehr">anzeigen</span>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+
+    <div class="markt weiterer">
+      <div class="markt-name">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <h2>Celle Weststadt</h2>
+      </div>
+      <span class="zaehler">keine Bestellungen</span>
+    </div>
+    <div class="leer">Für diesen Markt liegt nichts zum Zurücklegen vor.</div>
+  </main>
+
+  <footer class="fuss-leiste">
+    <button class="primaer"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Neue Bestellung</button>
+  </footer>
+</div>
+</body>
+</html>

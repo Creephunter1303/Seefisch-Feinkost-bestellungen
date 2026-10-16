@@ -1,12 +1,13 @@
 // Startseite: Kopfleiste mit Fahrzeug-Auswahl, Tagesleiste (Heute + nächste Markttage + Woche),
-// darunter die Zettel nach Markt gruppiert. Gestaltung: Designvorlage F6.
+// ggf. gelbes Hinweisband (fremde Ansicht), darunter die Zettel nach Markt gruppiert.
+// Gestaltung: Designvorlage F6 v3 „Schlicht".
 
 import { h } from '../ui.js';
 import { icon } from '../icons.js';
-import { demoStreifen, syncAnzeige, marktKopf, zettel } from '../komponenten.js';
+import { demoStreifen, syncAnzeige, marktKopf, zettel, zettelSchlicht } from '../komponenten.js';
 import {
   heuteIso, plusTage, datumLang, datumKurz, relativerTag, wochenstart, kalenderwoche, wochenText,
-  wochentag, ausIso, TAGE_KURZ, VORLAUF_TAGE,
+  wochentag, ausIso, TAGE_KURZ, TAGE_LANG, VORLAUF_TAGE,
 } from '../datum.js';
 import {
   ansichtName, ansichtFuer, fuerAnsicht, sortieren, istErledigt, suchen, maerkteAmTag, mitSonntag,
@@ -18,8 +19,8 @@ export function listeZeichnen(app) {
     app.istDemo && demoStreifen(),
     h('header', { class: 'kopf' },
       kopfZeile(app),
-      z.sucheOffen ? suchLeiste(app) : tagesleiste(app)),
-    app.istVoruebergehend() && tempLeiste(app),
+      z.sucheOffen ? suchLeiste(app) : tagesleiste(app),
+      app.istVoruebergehend() && hinweisband(app)),
     h('main', { class: 'liste', id: 'listen-inhalt' }, inhaltBauen(app)),
     h('footer', { class: 'fuss-leiste' },
       h('button', { type: 'button', class: 'primaer', onclick: () => app.neueBestellung() },
@@ -56,14 +57,30 @@ function kopfZeile(app) {
       icon('zahnrad', { groesse: 26 })));
 }
 
-function tempLeiste(app) {
+/**
+ * Gelbes Hinweisband im klebenden Kopf – nur wenn die Ansicht von der Standard-Ansicht abweicht.
+ * „Zurück zu … · Heute" setzt Ansicht UND Tag zurück.
+ */
+function hinweisband(app) {
   const z = app.zustand;
-  return h('div', { class: 'temp-leiste' },
-    h('span', { class: 'temp-text' }, 'Vorübergehend: ', h('strong', null, ansichtName(z.ansicht))),
+  const heute = heuteIso();
+  const gerade = z.ansicht.typ === 'alle' ? 'alle Fahrzeuge' : z.ansicht.wert;
+  let wann = '';
+  if (z.zeitraum === 'woche') wann = 'KW ' + kalenderwoche(z.tag);
+  else if (z.tag !== heute) wann = z.tag <= plusTage(heute, 6) ? TAGE_LANG[wochentag(z.tag)] : datumKurz(z.tag);
+  const standard = z.standard.typ === 'alle' ? 'Alle' : z.standard.wert;
+  return h('div', { class: 'hinweisband' },
+    h('span', { class: 'hinweis-text-band' }, 'Du siehst gerade ', h('b', null, gerade), wann && ' · ' + wann),
+    h('div', { class: 'platzhalter' }),
     h('button', {
-      type: 'button', class: 'knopf',
-      onclick: () => { app.ansichtSetzen(z.standard); app.render(); },
-    }, icon('pfeilLinks', { groesse: 20, strich: 2.5 }), 'Zurück zu ' + ansichtName(z.standard)));
+      type: 'button',
+      onclick: () => {
+        app.ansichtSetzen(z.standard);
+        z.zeitraum = 'tag';
+        z.tag = heuteIso();
+        app.render();
+      },
+    }, 'Zurück zu ' + standard + ' · Heute'));
 }
 
 // ---------- Tagesleiste: Heute + nächste 4 Markttage + ganze Woche ----------
@@ -110,7 +127,9 @@ function tagKachel(app, t, istHeute, anzahl) {
   },
     h('span', { class: 'nr' }, String(ausIso(t).getDate())),
     h('span', { class: 'text' },
-      h('span', { class: 'wt' }, istHeute ? 'HEUTE' : TAGE_KURZ[wochentag(t)].toUpperCase()),
+      h('span', { class: 'wt' }, istHeute
+        ? [h('b', null, 'HEUTE'), h('span', { class: 'wt-zusatz' }, ' · ' + TAGE_KURZ[wochentag(t)].toUpperCase())]
+        : TAGE_KURZ[wochentag(t)].toUpperCase()),
       h('span', { class: 'anz nur-hoch' }, istHeute ? anzahl + ' offen' : anzahl ? String(anzahl) : '–'),
       h('span', { class: 'anz nur-quer' }, istHeute ? anzahl + ' offen' : anzahl ? anzahl + ' Best.' : 'keine')));
 }
@@ -127,19 +146,19 @@ function wocheAb() {
 function wochenKachel(app) {
   const z = app.zustand;
   const aktiv = z.zeitraum === 'woche';
+  const kw = String(kalenderwoche(aktiv ? z.tag : wocheAb()));
   return h('button', {
     type: 'button',
     class: 'tag' + (aktiv ? ' aktiv' : ''),
     'aria-pressed': aktiv ? 'true' : 'false',
-    'aria-label': 'Ganze Kalenderwoche anzeigen',
+    'aria-label': 'Ganze Woche anzeigen, KW ' + kw,
     onclick: () => { if (!aktiv) app.tagSetzen(wocheAb()); app.zeitraumSetzen('woche'); },
   },
-    h('span', { class: 'nr' }, 'KW'),
+    h('span', { class: 'nr' }, h('span', { class: 'nur-hoch' }, 'KW ' + kw), h('span', { class: 'nur-quer' }, kw)),
     h('span', { class: 'text' },
-      h('span', { class: 'wt nur-hoch' }, 'GANZE'),
-      h('span', { class: 'wt nur-quer' }, 'WOCHE'),
-      h('span', { class: 'anz nur-hoch' }, 'Woche'),
-      h('span', { class: 'anz nur-quer' }, 'alle')));
+      h('span', { class: 'wt' }, 'WOCHE'),
+      h('span', { class: 'anz nur-hoch' }, 'alle'),
+      h('span', { class: 'anz nur-quer' }, 'KW · alle')));
 }
 
 // ---------- Suche (ersetzt die Tagesleiste) ----------
@@ -177,19 +196,62 @@ function zettelSortieren(liste) {
   return [...liste].sort((a, b) => (rang[a.status] - rang[b.status]) || a.kunde.localeCompare(b.kunde, 'de'));
 }
 
-function raster(app, liste) {
-  return h('div', { class: 'raster' }, liste.map((b) => zettel(app, b)));
+// ---------- Erledigtes einklappen (Einstellung, pro Tablet) ----------
+
+// Aufgeklappte Märkte (Tag|Markt) – gelten bis zum Neuladen oder Tageswechsel.
+const aufgeklappt = { heute: '', schluessel: new Set() };
+
+function istAufgeklappt(k) {
+  if (aufgeklappt.heute !== heuteIso()) {
+    aufgeklappt.heute = heuteIso();
+    aufgeklappt.schluessel.clear();
+  }
+  return aufgeklappt.schluessel.has(k);
+}
+
+function erledigtZeile(app, erledigt, auf, k) {
+  const abgeholt = erledigt.filter((b) => b.status === 'abgeholt').length;
+  const storniert = erledigt.length - abgeholt;
+  return h('button', {
+    type: 'button', class: 'eingeklappt', 'aria-expanded': auf ? 'true' : 'false',
+    onclick: () => {
+      if (auf) aufgeklappt.schluessel.delete(k); else aufgeklappt.schluessel.add(k);
+      listenInhaltErneuern(app);
+    },
+  },
+    abgeholt > 0 && [h('span', { class: 'punkt gruen' }), abgeholt + ' abgeholt'],
+    storniert > 0 && [h('span', { class: 'punkt rot' }), storniert + ' storniert'],
+    h('span', { class: 'platzhalter' }),
+    h('span', { class: 'mehr' }, auf ? 'ausblenden' : 'anzeigen'),
+    icon(auf ? 'pfeilHoch' : 'pfeilRunter', { groesse: 20, strich: 2.5 }));
+}
+
+/** Zettel eines Markts: offene (schlicht), dann Erledigtes – eingeklappt als eine Zeile oder als Zettel. */
+function raster(app, liste, klappSchluessel) {
+  const offen = liste.filter((b) => b.status === 'offen');
+  const erledigt = liste.filter((b) => b.status !== 'offen');
+  const teile = offen.map((b) => zettelSchlicht(app, b));
+  if (erledigt.length && klappSchluessel) {
+    const auf = istAufgeklappt(klappSchluessel);
+    teile.push(erledigtZeile(app, erledigt, auf, klappSchluessel));
+    if (auf) teile.push(...erledigt.map((b) => zettel(app, b)));
+  } else {
+    teile.push(...erledigt.map((b) => zettel(app, b)));
+  }
+  return h('div', { class: 'raster' }, teile);
 }
 
 /** Bestellungen eines Tages, nach Markt gruppiert (Reihenfolge wie in der Tabelle). */
-function marktGruppen(app, amTag, maerkte, { klein = false } = {}) {
+function marktGruppen(app, amTag, maerkte, { klein = false, einklappen = app.erledigteEinklappen() } = {}) {
   const namen = maerkte.map((m) => m.name);
   for (const b of sortieren(amTag, app.zustand.konfig)) if (!namen.includes(b.markt)) namen.push(b.markt);
   return namen.flatMap((name) => {
     const vomMarkt = zettelSortieren(amTag.filter((b) => b.markt === name));
     return [
-      marktKopf(app, name, vomMarkt, { klein }),
-      vomMarkt.length ? raster(app, vomMarkt) : h('div', { class: 'leer-zeile' }, 'Keine Bestellungen für diesen Markt'),
+      marktKopf(app, name, { klein }),
+      vomMarkt.length
+        ? raster(app, vomMarkt, einklappen ? vomMarkt[0].datum + '|' + name : null)
+        : h('div', { class: 'leer-zeile' }, 'Keine Bestellungen für diesen Markt.'),
     ];
   });
 }
@@ -200,7 +262,7 @@ function tagBauen(app, liste) {
   const amTag = liste.filter((b) => b.datum === tag);
   const maerkte = maerkteAmTag(z.konfig, z.ansicht, tag);
   if (!amTag.length) {
-    return [...maerkte.map((m) => marktKopf(app, m.name, [], { zaehler: false })), leerTag(app, liste, tag, maerkte)];
+    return [...maerkte.map((m) => marktKopf(app, m.name)), leerTag(app, liste, tag, maerkte)];
   }
   return marktGruppen(app, amTag, maerkte);
 }
@@ -297,7 +359,7 @@ function sucheBauen(app, alle, inAnsicht) {
   for (const t of [...new Set(sortieren(treffer, z.konfig).map((b) => b.datum))]) {
     const rel = relativerTag(t);
     teile.push(h('h2', { class: 'tag-titel' }, rel && h('span', { class: 'heute-marke' }, rel), h('span', null, datumLang(t))));
-    teile.push(...marktGruppen(app, treffer.filter((b) => b.datum === t), [], { klein: true }));
+    teile.push(...marktGruppen(app, treffer.filter((b) => b.datum === t), [], { klein: true, einklappen: false }));
   }
   return teile;
 }

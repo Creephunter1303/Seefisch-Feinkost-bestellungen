@@ -9,9 +9,9 @@ export function demoStreifen() {
   return h('div', { class: 'demo-streifen' }, 'PROTOTYP · Beispieldaten, nur auf diesem Tablet');
 }
 
-/** Sync-Status als reiner Text; Tippen aktualisiert. Inhalt setzt app.statusZeichnen(). */
+/** Sync-Status: normal nur ein Punkt, Text nur bei Problemen; Tippen aktualisiert. Inhalt setzt app.statusZeichnen(). */
 export function syncAnzeige(app) {
-  return h('button', { type: 'button', class: 'sync', title: 'Tippen zum Aktualisieren', onclick: () => app.aktualisieren() });
+  return h('button', { type: 'button', class: 'sync-punkt', 'data-sync': '', onclick: () => app.aktualisieren() });
 }
 
 /** Kopfleiste der Unterseiten: Zurück links, Titel, Sync-Status rechts. */
@@ -36,21 +36,14 @@ export function fremdesFahrzeug(app, marktName) {
   return m.fahrzeug !== eigenes ? m.fahrzeug : null;
 }
 
-/** Markt-Überschrift: Ort-Symbol, Name in Großbuchstaben, rechts der Zähler. */
-export function marktKopf(app, name, liste, { klein = false, zaehler = true } = {}) {
-  const offen = liste.filter((b) => b.status === 'offen').length;
-  const abgeholt = liste.filter((b) => b.status === 'abgeholt').length;
-  const storniert = liste.filter((b) => b.status === 'storniert').length;
+/** Markt-Überschrift (F6 v3): Ort-Symbol, Name in Großbuchstaben, ggf. dezent das Fahrzeug. Kein Zähler. */
+export function marktKopf(app, name, { klein = false } = {}) {
   const fz = fremdesFahrzeug(app, name);
-  return h('div', { class: 'markt' + (klein ? ' klein' : '') },
+  return h('div', { class: 'markt-v3' + (klein ? ' klein' : '') },
     h('div', { class: 'markt-name' },
-      icon('ort', { groesse: klein ? 20 : 22, strich: 2.2 }),
-      h('h2', null, name),
-      fz && h('span', { class: 'markt-fz' }, fz)),
-    zaehler && h('span', { class: 'zaehler' },
-      h('b', null, offen ? offen + ' zurücklegen' : 'nichts zurückzulegen'),
-      abgeholt ? ' · ' + abgeholt + ' abgeholt' : '',
-      storniert ? ' · ' + storniert + ' storniert' : ''));
+      icon('ort', { groesse: 20, strich: 2.2 }),
+      h('h2', null, name)),
+    fz && h('span', { class: 'fz' }, icon('lkw', { groesse: 18 }), fz));
 }
 
 function zeitKurz(isoZeit) {
@@ -109,6 +102,13 @@ function zweiTippKnopf(app, schluessel, klasse, ausloesen) {
 /** Beschriftung je Zustand; die Breite bleibt beim Scharfschalten gleich. */
 export function scharfInhalt(k, scharf) {
   k.classList.toggle('scharf', scharf);
+  if (k.classList.contains('haken')) {
+    // Startseite (F6 v3): Kreis-Haken + „Abgeholt?" → Haken + „Nochmal tippen"; Größe fest in der CSS.
+    k.replaceChildren(
+      icon(scharf ? 'haken' : 'kreisHaken', { groesse: 30, strich: scharf ? 3 : 2 }),
+      scharf ? 'Nochmal tippen' : 'Abgeholt?');
+    return;
+  }
   if (k.classList.contains('rueckgaengig')) {
     // Feste Mindestbreite in der CSS – passt für beide Texte.
     k.replaceChildren(scharf ? 'Nochmal tippen' : 'Rückgängig');
@@ -150,6 +150,33 @@ export function zettel(app, b, { mitAktion = true, antippbar = true } = {}) {
   return h('article', { class: 'zettel ' + b.status },
     oben('kopfteil', h('span', { class: 'ware' }, b.bestellung), h('span', { class: 'kunde' }, b.kunde)),
     statusZeile(app, b));
+}
+
+/**
+ * Offener Zettel auf der Startseite (F6 v3 „Schlicht"): Bestellung im blauen Feld, darunter eine Zeile
+ * mit Kunde (+ Symbol, falls Kontakt hinterlegt), Kommentar und rechts „Abgeholt?" (zwei Tipps).
+ * Kontakt selbst steht nur in der Detailansicht – Zettel antippen.
+ */
+export function zettelSchlicht(app, b) {
+  const oeffnen = () => app.navigieren('detail', { detailId: b.id, detailStorno: null });
+  const kontakt = b.kontakt && b.kontakt.trim();
+  return h('article', { class: 'zettel-s', onclick: oeffnen },
+    h('button', { type: 'button', class: 'ware', 'aria-label': 'Bestellung von ' + b.kunde + ' öffnen: ' + b.bestellung }, b.bestellung),
+    h('div', { class: 'unten' },
+      h('div', { class: 'wer' },
+        h('span', { class: 'kunde' }, b.kunde,
+          kontakt && h('span', { class: 'kontakt-icon', title: 'Kontakt hinterlegt', 'aria-label': 'Kontakt hinterlegt', role: 'img' },
+            icon(kontakt.includes('@') ? 'brief' : 'telefon', { groesse: 18 }))),
+        b.kommentar && h('span', { class: 'hinweis' }, icon('sprechblase', { groesse: 18, strich: 2.2 }), b.kommentar),
+        b.wartet && h('span', { class: 'wartet' }, '⏳ wird gesendet')),
+      hakenKnopf(app, b)));
+}
+
+/** „Abgeholt?" auf dem schlichten Zettel – zwei Tipps wie „Als abgeholt markieren". */
+function hakenKnopf(app, b) {
+  const k = zweiTippKnopf(app, 'abholen:' + b.id, 'haken', () => app.abholen(b.id));
+  k.setAttribute('aria-label', 'Als abgeholt markieren');
+  return k;
 }
 
 /** Große Namens-Knöpfe für die Mitarbeiter-Auswahl. */

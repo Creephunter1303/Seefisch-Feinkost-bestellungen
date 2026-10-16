@@ -131,6 +131,7 @@ app.aktualisieren = async function () {
   } catch (e) {
     zustand.fehler = e.message || 'Unbekannter Fehler';
     zustand.gesperrt = e instanceof Zugangsfehler;
+    zustand.offline = e instanceof Verbindungsfehler && !zustand.gesperrt;
   } finally {
     zustand.laedt = false;
   }
@@ -148,24 +149,29 @@ function anzeigeAktualisieren() {
 
 // ---------- Verbindungsstatus oben rechts ----------
 
+// Normal nur ein grüner Punkt (Tippen = aktualisieren). Text nur bei Problemen (Vorlage F6 v3):
+// „Offline · Stand 6:42 · 1 wartet" mit orangem Punkt. „Stand …" entfällt auf dem Handy.
 function statusInfo() {
   const n = app.warteschlange.anzahl();
   const stand = zustand.stand ? uhrzeit(zustand.stand) : '';
-  if (zustand.laedt) return { klasse: 'laedt', text: 'Aktualisiere …' };
-  if (zustand.gesperrt) return { klasse: 'fehler', text: 'Tablet gesperrt' };
+  const wartet = n ? ' · ' + n + ' wartet' : '';
+  if (zustand.laedt) return { punkt: true, klasse: 'laedt', label: 'Aktualisiere …' };
+  if (zustand.gesperrt) return { klasse: 'offline', text: ['Tablet gesperrt'] };
   if (zustand.fehler || app.warteschlange.hatFehler()) {
-    return { klasse: 'fehler', text: 'Keine Verbindung' + (n ? ' · ' + n + ' wartet' : '') };
+    // Warteschlange wiederholt nur nach Verbindungsfehlern → ohne eigenen Ladefehler: offline.
+    const offline = !zustand.fehler || zustand.offline;
+    return { klasse: 'offline', text: [offline ? 'Offline' : 'Fehler', stand && h('span', { class: 'sync-stand' }, ' · Stand ' + stand), wartet] };
   }
-  if (n) return { klasse: 'wartet', text: 'Wird gesendet …' };
-  // Auf dem Handy entfällt „Aktuell ·" (zu schmal) – grüner Punkt + Uhrzeit bleiben.
-  return stand ? { klasse: 'ok', vorsatz: 'Aktuell · ', text: stand } : { klasse: 'ok', text: 'Verbunden' };
+  if (n) return { klasse: 'wartet', text: ['Wird gesendet' + wartet] };
+  return { punkt: true, klasse: 'ok', label: stand ? 'Aktuell · ' + stand : 'Verbunden' };
 }
 
 app.statusZeichnen = function () {
   const s = statusInfo();
-  document.querySelectorAll('.sync').forEach((el) => {
-    el.className = 'sync ' + s.klasse;
-    el.replaceChildren(...(s.vorsatz ? [h('span', { class: 'sync-vorsatz' }, s.vorsatz)] : []), s.text);
+  document.querySelectorAll('[data-sync]').forEach((el) => {
+    el.className = s.punkt ? 'sync-punkt ' + s.klasse : 'sync ' + s.klasse;
+    el.setAttribute('aria-label', (s.label || s.text.filter((t) => typeof t === 'string').join('')) + ' – tippen zum Aktualisieren');
+    el.replaceChildren(...(s.punkt ? [] : [h('span', null, s.text.filter(Boolean))]));
   });
 };
 
@@ -178,6 +184,10 @@ function ansichtLaden() {
   loeschen('ansicht_temp');
   return zustand.standard;
 }
+
+// Erledigte Bestellungen pro Markt einklappen (Einstellung pro Tablet, Standard: an).
+app.erledigteEinklappen = () => lesen('erledigte_einklappen', true) !== false;
+app.erledigteEinklappenSetzen = (an) => schreiben('erledigte_einklappen', !!an);
 
 app.istVoruebergehend = () => !!zustand.standard && !!zustand.ansicht && !ansichtGleich(zustand.standard, zustand.ansicht);
 

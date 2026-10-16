@@ -207,3 +207,53 @@ svg { display: block; }
 .zettel.offen .kunde-zeile .kunde { flex: 1; padding: 0 0 0 20px; }
 .app.quer .zettel.offen .kunde-zeile { padding: 4px 12px 10px 0; }
 .app.quer .zettel.offen .kunde-zeile .kunde { padding-left: 18px; }
+
+/* =========================================================================
+   v3 – „Schlicht“ (16.10.): Tagesleiste bleibt, Rest aus der Minimal-Variante.
+   Ersetzt auf der Startseite: Zähler, Telefon auf dem Zettel, gestrichelte Fußzeile,
+   „Keine weiteren Angaben“, Sync-Text im Normalzustand, blaue Vorübergehend-Leiste.
+   ========================================================================= */
+
+/* Sync: im Normalzustand nur ein Punkt; Text nur bei Problemen (offline / wartet / Fehler) */
+.sync-punkt { width: var(--tipp-min); height: var(--tipp-min); display: flex; align-items: center; justify-content: center; background: transparent; }
+.sync-punkt::before { content: ""; width: 12px; height: 12px; border-radius: 50%; background: var(--online); }
+
+/* Hinweisband fest an der Kopfleiste (Teil des klebenden Kopfs, scrollt nicht weg) */
+.kopf .hinweisband { margin: 0 calc(-1 * var(--abstand-rand)); border-top: 1px solid var(--hinweis-rand); }
+
+/* Markt-Kopf schlicht: Name + dezentes Fahrzeug, kein Zähler */
+.markt-v3 { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; padding: 2px 2px 0; }
+.markt-v3 .markt-name h2 { font-size: 24px; }
+.markt-v3 .fz { display: inline-flex; align-items: center; gap: 5px; font-size: 16px; font-weight: 500; color: var(--text-3); }
+.markt-v3 .fz svg { opacity: .8; }
+
+/* Zettel schlicht: Bestellfeld + eine Zeile (Kunde, wichtiger Kommentar, Abhaken) */
+.zettel-s { background: var(--flaeche); border: 3px solid var(--blau-rahmen); border-radius: var(--radius-zettel); box-shadow: 0 6px 16px rgba(11,61,102,.12); }
+.zettel-s .ware { margin: 10px 10px 0; padding: 14px 16px; border-radius: var(--radius-feld); background: var(--blau-feld); color: var(--blau-feld-text); font-family: var(--schrift-schmal); font-weight: 600; font-size: 30px; line-height: 1.15; white-space: pre-line; }
+.zettel-s .unten { display: flex; align-items: center; gap: 12px; padding: 8px 10px 10px 20px; }
+.zettel-s .wer { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.zettel-s .kunde { font-size: 20px; color: var(--text-2); }
+.zettel-s .hinweis { display: flex; align-items: center; gap: 6px; font-size: 17px; font-weight: 600; color: var(--text); }
+.zettel-s .hinweis svg { color: #B45309; flex-shrink: 0; }
+.zettel-s .wartet { font-size: 16px; color: var(--text-3); }
+
+/* Abhaken: Kreis-Haken mit Wort darunter; 1. Tipp → „Nochmal tippen“ (gedämpftes Grün), 2. Tipp bestätigt */
+.haken { width: 92px; height: 72px; border-radius: 14px; background: var(--sekundaer); color: var(--sekundaer-text); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 14px; font-weight: 600; flex-shrink: 0; }
+.haken.scharf { background: var(--gruen-flaeche); color: var(--gruen-text); box-shadow: inset 0 0 0 2px var(--gruen-rand); }
+
+.app.quer .zettel-s .ware { font-size: 27px; padding: 12px 14px; }
+
+/* Einstellungen: Schalter-Zeile */
+.einst { padding: 20px var(--abstand-rand); display: flex; flex-direction: column; gap: 14px; }
+.karte { background: var(--flaeche); border-radius: 12px; padding: 18px 20px; box-shadow: inset 0 0 0 1px var(--kopf-linie); }
+.karte h2 { margin: 0 0 12px; font-family: var(--schrift-schmal); font-size: 22px; letter-spacing: .05em; text-transform: uppercase; }
+.schalter-zeile { display: flex; align-items: center; gap: 16px; padding: 10px 0; }
+.schalter-zeile + .schalter-zeile { border-top: 1px solid var(--kopf-linie); }
+.schalter-text { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.schalter-text strong { font-size: 19px; font-weight: 600; }
+.schalter-text span { font-size: 16px; color: var(--text-3); }
+.kipp { width: 76px; height: 44px; border-radius: 22px; background: #C7CFD8; position: relative; flex-shrink: 0; }
+.kipp::after { content: ""; position: absolute; top: 4px; left: 4px; width: 36px; height: 36px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.25); }
+.kipp.an { background: var(--blau-rahmen); }
+.kipp.an::after { left: 36px; }
+.kipp-wort { font-size: 16px; font-weight: 600; color: var(--text-2); width: 32px; }
