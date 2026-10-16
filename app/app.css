@@ -243,6 +243,7 @@ h1, h2, h3, p { margin: 0; }
 
 /* v3.1 – Feste Wochenleiste Di–Sa: fünf feste Kacheln, kleine Pfeile als Wisch-Hinweis
    (nicht antippbar), rechts die Wochen-Kachel. Wischen wechselt die Woche. */
+.bs-liste { touch-action: pan-y; }   /* waagerecht über die Liste wischen = Tag wechseln */
 .wochenleiste { display: flex; align-items: stretch; gap: 6px; padding-top: 10px; padding-bottom: 14px; touch-action: pan-y; }
 .wochenleiste .tage-fest { flex: 1; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
 .wisch-pfeil { width: 22px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: #9AA5B1; }

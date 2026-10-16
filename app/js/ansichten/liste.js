@@ -16,7 +16,7 @@ import {
 export function listeZeichnen(app) {
   const z = app.zustand;
   tagAnpassen(app);
-  return h('div', { class: 'bs bs-liste' },
+  const seite = h('div', { class: 'bs bs-liste' },
     app.istDemo && demoStreifen(),
     h('header', { class: 'kopf' },
       kopfZeile(app),
@@ -26,6 +26,8 @@ export function listeZeichnen(app) {
     h('footer', { class: 'fuss-leiste' },
       h('button', { type: 'button', class: 'primaer', onclick: () => app.neueBestellung() },
         icon('plus', { groesse: 26, strich: 3 }), 'Neue Bestellung')));
+  tagWischenEinrichten(seite, app);
+  return seite;
 }
 
 /** Nur den Listenbereich neu aufbauen (z. B. beim Tippen in der Suche – Tastatur bleibt offen). */
@@ -96,6 +98,51 @@ function wocheWechseln(app, richtung) {
   const klasse = richtung > 0 ? 'von-rechts' : 'von-links';
   document.querySelectorAll('.wochenleiste .tage-fest, #listen-inhalt').forEach((el) => el.classList.add(klasse));
   return true;
+}
+
+/**
+ * Tagesansicht: waagerecht über die Liste wischen = nächster (links) bzw. vorheriger (rechts) Tag mit
+ * Markt oder Bestellung – über Wochengrenzen hinweg, die Leiste oben wandert mit. Nicht vor heute.
+ * Die Wochenleiste hat ihr eigenes Wischen (Woche); nur deutliche, schnelle Bewegungen zählen.
+ */
+function tagWischenEinrichten(el, app) {
+  let start = null;
+  el.addEventListener('touchstart', (e) => {
+    start = null;
+    const z = app.zustand;
+    if (e.touches.length !== 1 || z.zeitraum !== 'tag' || z.sucheOffen || z.overlay) return;
+    if (e.target.closest('.kopf, input, textarea')) return;
+    const t = e.touches[0];
+    start = { x: t.clientX, y: t.clientY, zeit: Date.now() };
+  }, { passive: true });
+  el.addEventListener('touchcancel', () => { start = null; }, { passive: true });
+  el.addEventListener('touchend', (e) => {
+    if (!start) return;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - start.x;
+    const dy = t.clientY - start.y;
+    const dauer = Date.now() - start.zeit;
+    start = null;
+    if (dauer > 700 || Math.abs(dx) < 70 || Math.abs(dx) < 1.5 * Math.abs(dy)) return;
+    tagWechseln(app, dx < 0 ? 1 : -1);
+  }, { passive: true });
+}
+
+function tagWechseln(app, richtung) {
+  const z = app.zustand;
+  const heute = heuteIso();
+  const max = plusTage(heute, VORLAUF_TAGE);
+  const mitBestellung = tageMitBestellung(app);
+  let ziel = null;
+  for (let t = plusTage(z.tag, richtung); t >= heute && t <= max; t = plusTage(t, richtung)) {
+    if (waehlbar(app, t, mitBestellung)) { ziel = t; break; }
+  }
+  if (!ziel) return;
+  const neueWoche = anzeigeWoche(ziel) !== anzeigeWoche(z.tag);
+  app.tagSetzen(ziel);
+  const klasse = richtung > 0 ? 'von-rechts' : 'von-links';
+  document.querySelectorAll(neueWoche ? '.wochenleiste .tage-fest, #listen-inhalt' : '#listen-inhalt')
+    .forEach((x) => x.classList.add(klasse));
 }
 
 // ---------- Kopfleiste ----------
@@ -192,12 +239,13 @@ function tagKachel(app, t, anzahl, mitBestellung) {
   const wt = TAGE_KURZ[wochentag(t)].toUpperCase();
   const zustandText = t < heute ? 'vorbei' : !waehlbar(app, t, mitBestellung) ? 'kein Markt' : null;
   if (zustandText) {
+    // „vorbei" steht nicht auf der Kachel – blass + Strich reicht.
     return h('button', {
       type: 'button', class: 'tag ' + (t < heute ? 'vorbei' : 'kein-markt'), disabled: true, 'aria-disabled': 'true',
       'aria-label': datumLang(t) + ', ' + zustandText,
     },
       h('span', { class: 'nr' }, String(ausIso(t).getDate())),
-      h('span', { class: 'text' }, h('span', { class: 'wt' }, wt), h('span', { class: 'anz' }, zustandText)));
+      h('span', { class: 'text' }, h('span', { class: 'wt' }, wt), h('span', { class: 'anz' }, t < heute ? '–' : zustandText)));
   }
   const aktiv = z.zeitraum === 'tag' && z.tag === t;
   const istHeute = t === heute;
@@ -212,8 +260,9 @@ function tagKachel(app, t, anzahl, mitBestellung) {
     h('span', { class: 'nr' }, String(ausIso(t).getDate())),
     h('span', { class: 'text' },
       h('span', { class: 'wt' }, wt),
-      h('span', { class: 'anz nur-hoch' }, offenText ? anzahl + ' offen' : anzahl ? String(anzahl) : '–'),
-      h('span', { class: 'anz nur-quer' }, offenText ? anzahl + ' offen' : anzahl ? anzahl + ' Best.' : 'keine')));
+      // Keine offene Bestellung: nur ein Strich (auch heute / gewählt – nicht „0 offen").
+      h('span', { class: 'anz nur-hoch' }, !anzahl ? '–' : offenText ? anzahl + ' offen' : String(anzahl)),
+      h('span', { class: 'anz nur-quer' }, !anzahl ? '–' : offenText ? anzahl + ' offen' : anzahl + ' Best.')));
 }
 
 function wochenKachel(app, woche) {

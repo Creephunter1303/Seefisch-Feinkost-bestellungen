@@ -35,9 +35,12 @@ Tablet-App (PWA) für Kundenbestellungen der Verkaufswagen. Löst v3 ab
   („Offline · Stand 6:42 · 1 wartet", orange).
 - Feste Wochenleiste (v3.1): immer Di Mi Do Fr Sa der angezeigten Woche + Wochen-Kachel (KW dieser
   Woche, Tippen = ganze Woche). Heute = Fähnchen `.ist-heute`. `.kein-markt` (kein Markt der Ansicht und
-  keine Bestellung an dem Tag) und `.vorbei` (vor heute) sind deaktiviert. Montag: laufende Woche,
+  keine Bestellung an dem Tag) und `.vorbei` (vor heute, unten nur „–") sind deaktiviert. Keine offene
+  Bestellung → „–" statt „0 offen". Montag: laufende Woche,
   Sonntag: nächste Woche; gewählt wird heute bzw. der nächste Tag mit Markt (`tagAnpassen`).
-- Wischen NUR auf der Wochenleiste (Liste scrollt ungestört): links = nächste Woche, rechts = vorige;
+- Tagesansicht: waagerecht über die Liste wischen = nächster/vorheriger Tag mit Markt oder Bestellung
+  (nicht vor heute, über Wochengrenzen; nur deutliche, schnelle Bewegungen).
+- Wischen auf der Wochenleiste: links = nächste Woche, rechts = vorige;
   von der aktuellen Woche bis zur Woche, in der `VORLAUF_TAGE` endet; an der Grenze federt sie zurück,
   Pfeil `.aus`. Danach derselbe Wochentag, sonst der erste mit Markt. Pfeile nur Hinweis (aria-hidden).
 - Ansicht „Woche": ohne eigenen Wochenkopf/Kalender („Tag wählen" entfällt – Woche wird oben gewischt).
