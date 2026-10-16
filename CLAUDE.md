@@ -60,6 +60,8 @@ Tablet-App (PWA) für Kundenbestellungen der Verkaufswagen. Löst v3 ab
   `sf_erledigte_einklappen`, Standard AN, pro Tablet, ohne PIN). AN → eine Zeile `.eingeklappt`
   „● 1 abgeholt ● 1 storniert anzeigen", Aufklappen pro Markt+Tag bis Neuladen/Tageswechsel.
   In der Suche immer ausgeklappt. Unterseiten (Formular, Detail, Bestätigung) noch im alten Zettel-Stil.
+- Formular, Abholtag: immer Wochentag (nicht „Morgen"), Fähnchen „DIESE WOCHE" (blau) bzw.
+  „NÄCHSTE WOCHE" (hellblau) – nur diese beiden; Woche = Kalenderwoche Mo–So.
 - Zettel-Typen: offen (weiß, blauer Rahmen), abgeholt (grün), storniert (rot, durchgestrichen,
   bleibt sichtbar). Reihenfolge: offen, abgeholt, storniert. Bestellung ist Freitext (Zeilenumbrüche bleiben).
 - Status: offen → abgeholt, dazu storniert. „Abgeholt" = **zwei Tipps** (1. Tipp: Knopf 4 s „Nochmal tippen",

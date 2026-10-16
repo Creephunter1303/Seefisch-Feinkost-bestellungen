@@ -626,6 +626,11 @@ textarea.eingabe { min-height: 120px; resize: vertical; line-height: 1.3; }
 .auswahl-gitter.dezent { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
 .auswahl-gitter.dezent .auswahl { min-height: var(--tipp-min); font-size: 16px; font-weight: 500; background: var(--tag-normal); box-shadow: none; color: var(--text-3); }
 .auswahl-gitter.dezent .auswahl small { font-size: 14px; }
+/* Abholtag: Fähnchen „diese Woche" / „nächste Woche" oben auf der Kachel (wie HEUTE in der Wochenleiste) */
+.auswahl-gitter.termine { row-gap: 18px; padding-top: 10px; }
+.auswahl.termin { position: relative; }
+.termin-marke { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); padding: 2px 8px; border-radius: 6px; background: var(--blau); color: #fff; font-size: 12px; font-weight: 700; letter-spacing: .06em; line-height: 1.3; text-transform: uppercase; white-space: nowrap; }
+.termin-marke.naechste { background: var(--blau-auswahl); color: var(--blau); box-shadow: inset 0 0 0 1.5px var(--blau-auswahl-rand); }
 .auswahl-gitter.dezent .auswahl.gewaehlt { background: var(--blau-aktiv); color: var(--blau); box-shadow: inset 0 0 0 2px var(--blau-aktiv-rand); }
 
 .speichern-knopf { min-height: 72px; font-size: 22px; margin-top: 8px; }

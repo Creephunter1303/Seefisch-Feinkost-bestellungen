@@ -3,7 +3,7 @@
 
 import { h, toast, vibrieren } from '../ui.js';
 import { lesen, schreiben, loeschen, geraeteId } from '../speicher.js';
-import { heuteIso, plusTage, VORLAUF_TAGE, relativerTag, TAGE_LANG, wochentag, tagMonat, datumKurz, uhrzeit } from '../datum.js';
+import { heuteIso, plusTage, VORLAUF_TAGE, TAGE_LANG, wochentag, wochenstart, tagMonat, datumKurz, uhrzeit } from '../datum.js';
 import { vorbelegterMarkt, marktnamenDerAnsicht, marktFinden, termine, tageText, maerkteNachFahrzeug } from '../logik.js';
 import { bestellungPruefen, MAX_LAENGE } from '../pruefung.js';
 import { Verbindungsfehler } from '../daten/fehler.js';
@@ -192,7 +192,10 @@ function abschnittDatum(app) {
 function terminKnopf(app, t) {
   const fo = app.zustand.formular;
   const gewaehlt = fo.felder.datum === t;
-  const rel = relativerTag(t);
+  // Kunden sagen „diese Woche Samstag" / „nächste Woche Samstag" – darum immer der Wochentag
+  // (nicht „Morgen") und ein Fähnchen für diese bzw. nächste Woche.
+  const woche = wochenstart(heuteIso());
+  const marke = wochenstart(t) === woche ? 'diese Woche' : wochenstart(t) === plusTage(woche, 7) ? 'nächste Woche' : null;
   return h('button', {
     type: 'button',
     class: 'auswahl termin' + (gewaehlt ? ' gewaehlt' : ''),
@@ -203,7 +206,10 @@ function terminKnopf(app, t) {
       entwurfSichern(fo);
       abschnittNeu(app, 'datum');
     },
-  }, h('span', { class: 'auswahl-titel' }, (gewaehlt ? '✓ ' : '') + (rel || TAGE_LANG[wochentag(t)])), h('small', null, tagMonat(t)));
+  },
+    marke && h('span', { class: 'termin-marke' + (marke === 'diese Woche' ? '' : ' naechste') }, marke),
+    h('span', { class: 'auswahl-titel' }, (gewaehlt ? '✓ ' : '') + TAGE_LANG[wochentag(t)]),
+    h('small', null, tagMonat(t)));
 }
 
 function textFeld(app, name, titel, { pflicht = false, mehrzeilig = false, hinweis = null, platzhalter = '', gross = 'sentences' }) {
