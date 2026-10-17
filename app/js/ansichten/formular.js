@@ -124,7 +124,9 @@ function abschnittMarkt(app) {
   const eigeneNamen = z.ansicht.typ === 'alle' ? [] : marktnamenDerAnsicht(k, z.ansicht);
   const eigene = k.maerkte.filter((m) => eigeneNamen.includes(m.name));
   const rest = k.maerkte.filter((m) => !eigeneNamen.includes(m.name));
-  const zeigeRest = !eigene.length || fo.weitereMaerkte || rest.some((m) => m.name === fo.felder.markt);
+  const zeigeRest = !eigene.length || fo.weitereMaerkte;
+  // Eingeklappt, aber ein anderer Markt ist gewählt (z. B. beim Bearbeiten): den trotzdem zeigen.
+  const sichtbarRest = zeigeRest ? rest : rest.filter((m) => m.name === fo.felder.markt);
 
   const knopf = (m) => h('button', {
     type: 'button',
@@ -134,7 +136,7 @@ function abschnittMarkt(app) {
   }, h('span', { class: 'auswahl-titel' }, (fo.felder.markt === m.name ? '✓ ' : '') + m.name), h('small', null, tageText(m)));
 
   // Weitere Märkte nach Fahrzeug gruppiert, damit man nicht 13 Knöpfe absuchen muss.
-  const gruppen = !zeigeRest ? [] : maerkteNachFahrzeug(k, rest).flatMap(([fahrzeug, maerkte]) => [
+  const gruppen = maerkteNachFahrzeug(k, sichtbarRest).flatMap(([fahrzeug, maerkte]) => [
     h('div', { class: 'gruppe-titel' }, fahrzeug),
     h('div', { class: 'auswahl-gitter' }, maerkte.map(knopf)),
   ]);
@@ -143,9 +145,11 @@ function abschnittMarkt(app) {
     feldTitel('Markt', { pflicht: true }),
     eigene.length > 0 && h('div', { class: 'gruppe-titel' }, z.ansicht.typ === 'markt' ? 'Markt der aktuellen Ansicht' : 'Märkte von ' + z.ansicht.wert),
     eigene.length > 0 && h('div', { class: 'auswahl-gitter' }, eigene.map(knopf)),
-    zeigeRest ? gruppen
-      : h('button', { type: 'button', class: 'mehr-knopf', onclick: () => { fo.weitereMaerkte = true; abschnittNeu(app, 'markt'); } },
-        '▾ Andere Märkte anzeigen (' + rest.length + ')'),
+    gruppen,
+    eigene.length > 0 && (zeigeRest || rest.length > sichtbarRest.length) && h('button', {
+      type: 'button', class: 'mehr-knopf',
+      onclick: () => { fo.weitereMaerkte = !fo.weitereMaerkte; abschnittNeu(app, 'markt'); if (!fo.weitereMaerkte) abschnittZeigen('markt'); },
+    }, zeigeRest ? '▴ Weniger Märkte anzeigen' : '▾ Andere Märkte anzeigen (' + (rest.length - sichtbarRest.length) + ')'),
     h('div', { class: 'feld-fehler', id: 'fehler-markt' }));
 }
 
@@ -160,6 +164,14 @@ function marktWaehlen(app, name) {
   entwurfSichern(fo);
   abschnittNeu(app, 'markt');
   abschnittNeu(app, 'datum');
+}
+
+/** Nach dem Einklappen nicht irgendwo weiter unten im Formular stehen bleiben. */
+function abschnittZeigen(name) {
+  const el = document.getElementById('abschnitt-' + name);
+  const kopf = document.querySelector('.kopf');
+  const oben = el ? el.getBoundingClientRect().top - (kopf ? kopf.offsetHeight : 0) - 8 : 0;
+  if (oben < 0) window.scrollBy(0, oben);
 }
 
 function abschnittDatum(app) {
@@ -184,13 +196,7 @@ function abschnittDatum(app) {
         onclick: () => {
           fo.weitereTermine = !fo.weitereTermine;
           abschnittNeu(app, 'datum');
-          // Nach dem Einklappen nicht irgendwo weiter unten im Formular stehen bleiben.
-          if (!fo.weitereTermine) {
-            const el = document.getElementById('abschnitt-datum');
-            const kopf = document.querySelector('.kopf');
-            const oben = el ? el.getBoundingClientRect().top - (kopf ? kopf.offsetHeight : 0) - 8 : 0;
-            if (oben < 0) window.scrollBy(0, oben);
-          }
+          if (!fo.weitereTermine) abschnittZeigen('datum');
         },
       }, fo.weitereTermine ? '▴ Weniger Termine anzeigen'
         : '▾ Weitere Termine anzeigen (bis ' + datumKurz(alle[alle.length - 1]) + ')'),

@@ -37,9 +37,11 @@ function ansichtBlatt(app) {
 
   return [
     blattKopf(app, 'Welche Bestellungen anzeigen?'),
-    app.istVoruebergehend() && h('button', {
-      type: 'button', class: 'knopf hinweis breit blatt-abstand', onclick: () => waehlen(z.standard),
-    }, 'Zurück zur Standard-Ansicht: ' + ansichtName(z.standard)),
+    // Gelb wie das Hinweisband auf der Startseite, mit kleinem weißen Knopf.
+    app.istVoruebergehend() && h('div', { class: 'hinweisband blatt-hinweis' },
+      h('span', { class: 'hinweis-text-band' }, 'Du siehst gerade ', h('b', null, ansichtName(z.ansicht))),
+      h('div', { class: 'platzhalter' }),
+      h('button', { type: 'button', onclick: () => waehlen(z.standard) }, 'Zurück zu ' + ansichtName(z.standard))),
     h('h3', { class: 'blatt-titel' }, 'Fahrzeug'),
     h('div', { class: 'auswahl-gitter gross' },
       k.fahrzeuge.map((f) => {
