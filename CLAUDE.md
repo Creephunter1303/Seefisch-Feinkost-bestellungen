@@ -67,6 +67,8 @@ Tablet-App (PWA) für Kundenbestellungen der Verkaufswagen. Löst v3 ab
   „NÄCHSTE WOCHE" (hellblau) – nur diese beiden; Woche = Kalenderwoche Mo–So.
   „Weitere Termine anzeigen" / „Andere Märkte anzeigen" lassen sich wieder einklappen („Weniger …");
   eingeklappt bleibt ein schon gewählter Termin/Markt sichtbar.
+  Diese „mehr/weniger"-Knöpfe (`.mehr-knopf`) dezent (heller gestrichelt, grauer Text).
+  Pflichtfelder ohne Sternchen; freiwillige Felder tragen „optional" im Hinweis.
   Markt gewechselt und Termin passt nicht mehr → Termin leer, aber erst beim Speichern rot.
 - Zettel-Typen: offen (weiß, blauer Rahmen), abgeholt (grün), storniert (rot, durchgestrichen,
   bleibt sichtbar). Reihenfolge: offen, abgeholt, storniert. Bestellung ist Freitext (Zeilenumbrüche bleiben).

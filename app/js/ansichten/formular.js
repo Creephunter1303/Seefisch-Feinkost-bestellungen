@@ -95,8 +95,8 @@ export function formularZeichnen(app) {
         h('span', null, 'Du bearbeitest die Bestellung von ', h('strong', null, fo.original.kunde), '.')),
       abschnittMarkt(app),
       abschnittDatum(app),
-      textFeld(app, 'kunde', 'Kunde', { pflicht: true, platzhalter: 'Name des Kunden', gross: 'words' }),
-      textFeld(app, 'bestellung', 'Bestellung', { pflicht: true, mehrzeilig: true, hinweis: 'eine Zeile pro Artikel', platzhalter: 'z. B.\n1 Räucheraal, ca. 500 g\n2 Makrelen geräuchert' }),
+      textFeld(app, 'kunde', 'Kunde', { platzhalter: 'Name des Kunden', gross: 'words' }),
+      textFeld(app, 'bestellung', 'Bestellung', { mehrzeilig: true, hinweis: 'eine Zeile pro Artikel', platzhalter: 'z. B.\n1 Räucheraal, ca. 500 g\n2 Makrelen geräuchert' }),
       textFeld(app, 'kontakt', 'Kontakt', { hinweis: 'optional · ab 50 € empfohlen', platzhalter: 'Telefon oder E-Mail' }),
       textFeld(app, 'kommentar', 'Kommentar', { hinweis: 'optional', mehrzeilig: true, platzhalter: 'Besonderheiten, Abholzeit …' }),
       abschnittMitarbeiter(app),
@@ -109,10 +109,10 @@ export function formularZeichnen(app) {
   return wurzel;
 }
 
-function feldTitel(text, { pflicht = false, hinweis = null, fuer = null } = {}) {
+// Kein Sternchen für Pflichtfelder: freiwillige Felder tragen „optional“ im Hinweis.
+function feldTitel(text, { hinweis = null, fuer = null } = {}) {
   return h(fuer ? 'label' : 'div', { class: 'feld-titel', for: fuer },
     h('span', null, text),
-    pflicht && h('span', { class: 'pflicht', 'aria-label': 'Pflichtfeld' }, '*'),
     hinweis && h('span', { class: 'feld-hinweis' }, hinweis),
     h('span', { class: 'ok-marke', 'aria-hidden': 'true' }, '✓'));
 }
@@ -142,7 +142,7 @@ function abschnittMarkt(app) {
   ]);
 
   return h('div', { class: 'feld', id: 'abschnitt-markt' },
-    feldTitel('Markt', { pflicht: true }),
+    feldTitel('Markt'),
     eigene.length > 0 && h('div', { class: 'gruppe-titel' }, z.ansicht.typ === 'markt' ? 'Markt der aktuellen Ansicht' : 'Märkte von ' + z.ansicht.wert),
     eigene.length > 0 && h('div', { class: 'auswahl-gitter' }, eigene.map(knopf)),
     gruppen,
@@ -203,7 +203,7 @@ function abschnittDatum(app) {
     ];
   }
   return h('div', { class: 'feld', id: 'abschnitt-datum' },
-    feldTitel('Abholtag', { pflicht: true, hinweis: m ? 'nur Markttage von ' + m.name : null }),
+    feldTitel('Abholtag', { hinweis: m ? 'nur Markttage von ' + m.name : null }),
     inhalt,
     h('div', { class: 'feld-fehler', id: 'fehler-datum' }));
 }
@@ -231,7 +231,7 @@ function terminKnopf(app, t) {
     h('small', null, tagMonat(t)));
 }
 
-function textFeld(app, name, titel, { pflicht = false, mehrzeilig = false, hinweis = null, platzhalter = '', gross = 'sentences' }) {
+function textFeld(app, name, titel, { mehrzeilig = false, hinweis = null, platzhalter = '', gross = 'sentences' }) {
   const fo = app.zustand.formular;
   const attrs = {
     id: 'feld-' + name, class: 'eingabe', name, placeholder: platzhalter, maxlength: MAX_LAENGE[name],
@@ -258,7 +258,7 @@ function textFeld(app, name, titel, { pflicht = false, mehrzeilig = false, hinwe
     });
   }
   return h('div', { class: 'feld', id: 'abschnitt-' + name },
-    feldTitel(titel, { pflicht, hinweis, fuer: 'feld-' + name }),
+    feldTitel(titel, { hinweis, fuer: 'feld-' + name }),
     eingabe,
     h('div', { class: 'feld-fehler', id: 'fehler-' + name }));
 }
@@ -267,7 +267,7 @@ function abschnittMitarbeiter(app) {
   const z = app.zustand;
   const fo = z.formular;
   return h('div', { class: 'feld', id: 'abschnitt-mitarbeiter' },
-    feldTitel(fo.modus === 'neu' ? 'Wer nimmt die Bestellung auf?' : 'Wer ändert die Bestellung?', { pflicht: true }),
+    feldTitel(fo.modus === 'neu' ? 'Wer nimmt die Bestellung auf?' : 'Wer ändert die Bestellung?'),
     namensGitter(z.konfig.mitarbeiter, fo.felder.mitarbeiter, (n) => {
       fo.felder.mitarbeiter = n;
       fo.beruehrt.mitarbeiter = true;

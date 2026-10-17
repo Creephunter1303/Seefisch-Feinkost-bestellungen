@@ -521,11 +521,11 @@ h1, h2, h3, p { margin: 0; }
   width: 100%;
   min-height: var(--tipp-min);
   margin-top: 10px;
-  border: 1.5px dashed var(--text-3);
+  border: 1.5px dashed #A7B1BC;      /* dezent: weniger Kontrast als die Auswahl-Kacheln */
   border-radius: var(--radius-button);
-  font-size: 17px;
-  font-weight: 600;
-  color: var(--sekundaer-text);
+  font-size: 16px;
+  font-weight: 500;
+  color: #56616E;                    /* ≥ 4,5:1 auf dem grauen Hintergrund */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -568,7 +568,6 @@ h1, h2, h3, p { margin: 0; }
   letter-spacing: .05em;
   text-transform: uppercase;
 }
-.pflicht { color: var(--text-3); }
 .feld-hinweis { font-family: var(--schrift); font-size: 16px; font-weight: 500; letter-spacing: 0; text-transform: none; color: var(--text-3); }
 .ok-marke { display: none; color: var(--blau); }
 .feld.ok .ok-marke { display: inline-flex; }
