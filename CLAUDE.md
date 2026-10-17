@@ -52,7 +52,8 @@ Tablet-App (PWA) für Kundenbestellungen der Verkaufswagen. Löst v3 ab
 - Gelbes Hinweisband im klebenden Kopf bei fremder Ansicht (≠ Standard) und/oder anderer Woche als der
   aktuellen: „Du siehst gerade <Ansicht> · nächste Woche|KW n · Freitag, 23.10.", Knopf „Zurück zu Heute"
   bzw. „Zurück zu <Standard> · Heute" setzt Ansicht, Woche und Tag zurück. Tageswechsel innerhalb der
-  aktuellen Woche zeigt kein Band.
+  aktuellen Woche zeigt kein Band. Handy: Knopf bleibt rechts in derselben Zeile (Schrift 14 px).
+  In der Wagenauswahl ist „Zurück zur Standard-Ansicht" ebenfalls gelb (`.knopf.hinweis`, ohne Symbol).
 - Offener Zettel auf der Startseite = `zettelSchlicht` (`.zettel-s`): Bestellung, darunter Kunde
   (+ `.kontakt-icon` Hörer bzw. Brief bei „@", wenn Kontakt hinterlegt), Kommentar fett mit Sprechblase,
   „⏳ wird gesendet", rechts `.haken` „Abgeholt?". Kontakt-Text nur in der Detailansicht.
@@ -63,6 +64,8 @@ Tablet-App (PWA) für Kundenbestellungen der Verkaufswagen. Löst v3 ab
   In der Suche immer ausgeklappt. Unterseiten (Formular, Detail, Bestätigung) noch im alten Zettel-Stil.
 - Formular, Abholtag: immer Wochentag (nicht „Morgen"), Fähnchen „DIESE WOCHE" (blau) bzw.
   „NÄCHSTE WOCHE" (hellblau) – nur diese beiden; Woche = Kalenderwoche Mo–So.
+  „Weitere Termine anzeigen" lässt sich wieder einklappen („Weniger Termine anzeigen").
+  Markt gewechselt und Termin passt nicht mehr → Termin leer, aber erst beim Speichern rot.
 - Zettel-Typen: offen (weiß, blauer Rahmen), abgeholt (grün), storniert (rot, durchgestrichen,
   bleibt sichtbar). Reihenfolge: offen, abgeholt, storniert. Bestellung ist Freitext (Zeilenumbrüche bleiben).
 - Status: offen → abgeholt, dazu storniert. „Abgeholt" = **zwei Tipps** (1. Tipp: Knopf 4 s „Nochmal tippen",

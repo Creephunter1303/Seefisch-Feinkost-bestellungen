@@ -38,8 +38,8 @@ function ansichtBlatt(app) {
   return [
     blattKopf(app, 'Welche Bestellungen anzeigen?'),
     app.istVoruebergehend() && h('button', {
-      type: 'button', class: 'knopf betont breit blatt-abstand', onclick: () => waehlen(z.standard),
-    }, '↩ Zurück zur Standard-Ansicht: ' + ansichtName(z.standard)),
+      type: 'button', class: 'knopf hinweis breit blatt-abstand', onclick: () => waehlen(z.standard),
+    }, 'Zurück zur Standard-Ansicht: ' + ansichtName(z.standard)),
     h('h3', { class: 'blatt-titel' }, 'Fahrzeug'),
     h('div', { class: 'auswahl-gitter gross' },
       k.fahrzeuge.map((f) => {

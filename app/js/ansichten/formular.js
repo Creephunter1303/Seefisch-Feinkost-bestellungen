@@ -154,7 +154,8 @@ function marktWaehlen(app, name) {
   const m = marktFinden(app.zustand.konfig, name);
   fo.felder.markt = name;
   fo.beruehrt.markt = true;
-  if (fo.felder.datum && m && !m.tage.includes(wochentag(fo.felder.datum))) fo.felder.datum = '';
+  // Termin passt nicht zum neuen Markt → leeren, aber nicht rot markieren: rot erst beim Speichern.
+  if (fo.felder.datum && m && !m.tage.includes(wochentag(fo.felder.datum))) { fo.felder.datum = ''; fo.beruehrt.datum = false; }
   fo.weitereTermine = false;
   entwurfSichern(fo);
   abschnittNeu(app, 'markt');
@@ -173,14 +174,26 @@ function abschnittDatum(app) {
     // Beim Bearbeiten: bisherigen Termin anbieten, auch wenn er außerhalb des Zeitfensters liegt.
     if (fo.felder.datum && !alle.includes(fo.felder.datum)) alle.unshift(fo.felder.datum);
     const index = alle.indexOf(fo.felder.datum);
-    const zeigeAlle = fo.weitereTermine || index >= TERMINE_ANFANGS;
-    const sichtbar = zeigeAlle ? alle : alle.slice(0, TERMINE_ANFANGS);
+    // Eingeklappt: die ersten Termine, dazu ein schon gewählter späterer Termin.
+    const sichtbar = fo.weitereTermine ? alle
+      : alle.slice(0, TERMINE_ANFANGS).concat(index >= TERMINE_ANFANGS ? [alle[index]] : []);
     inhalt = [
       h('div', { class: 'auswahl-gitter termine' }, sichtbar.map((t) => terminKnopf(app, t))),
-      alle.length > sichtbar.length && h('button', {
+      alle.length > TERMINE_ANFANGS && h('button', {
         type: 'button', class: 'mehr-knopf',
-        onclick: () => { fo.weitereTermine = true; abschnittNeu(app, 'datum'); },
-      }, '▾ Weitere Termine anzeigen (bis ' + datumKurz(alle[alle.length - 1]) + ')'),
+        onclick: () => {
+          fo.weitereTermine = !fo.weitereTermine;
+          abschnittNeu(app, 'datum');
+          // Nach dem Einklappen nicht irgendwo weiter unten im Formular stehen bleiben.
+          if (!fo.weitereTermine) {
+            const el = document.getElementById('abschnitt-datum');
+            const kopf = document.querySelector('.kopf');
+            const oben = el ? el.getBoundingClientRect().top - (kopf ? kopf.offsetHeight : 0) - 8 : 0;
+            if (oben < 0) window.scrollBy(0, oben);
+          }
+        },
+      }, fo.weitereTermine ? '▴ Weniger Termine anzeigen'
+        : '▾ Weitere Termine anzeigen (bis ' + datumKurz(alle[alle.length - 1]) + ')'),
     ];
   }
   return h('div', { class: 'feld', id: 'abschnitt-datum' },
